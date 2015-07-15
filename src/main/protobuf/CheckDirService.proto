@@ -1,0 +1,17 @@
+option java_package = "org.apache.spark.sql.hbase";
+option java_outer_classname = "CheckDirProtos";
+option java_generic_services = true;
+option java_generate_equals_and_hash = true;
+option optimize_for = SPEED;
+
+message CheckRequest {
+}
+
+message CheckResponse {
+    required bool accessible = 1;
+}
+
+service CheckDirService {
+    rpc getCheckResult(CheckRequest)
+        returns (CheckResponse);
+}
