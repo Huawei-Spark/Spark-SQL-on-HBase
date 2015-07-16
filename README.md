@@ -49,7 +49,7 @@ The easiest way to start using Spark HBase is through the Scala shell:
 
 First, add the spark-hbase jar to the SPARK_CLASSPATH in the $SPARK_HOME/conf directory, as follows:
 
-SPARK_CLASSPATH=$SPARK_CLASSPATH:/spark-hbase-root-dir/target/spark-hbase_2.10-1.4.0-SNAPSHOT.jar
+SPARK_CLASSPATH=$SPARK_CLASSPATH:/spark-hbase-root-dir/target/spark-sql-on-hbase-1.0.0.jar
    
 
 Then go to the spark-hbase installation directory and issue

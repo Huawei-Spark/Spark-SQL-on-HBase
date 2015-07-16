@@ -26,9 +26,9 @@
     <artifactId>apache</artifactId>
     <version>14</version>
   </parent>
-  <groupId>org.apache.spark</groupId>
-  <artifactId>spark-hbase_2.10</artifactId>
-  <version>1.4.0-SNAPSHOT</version>
+  <groupId>Huawei-Spark</groupId>
+  <artifactId>spark-sql-on-hbase</artifactId>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
   <name>Spark Project HBase</name>
   <url>http://spark.apache.org/</url>
