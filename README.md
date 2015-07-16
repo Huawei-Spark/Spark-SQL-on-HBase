@@ -4,7 +4,7 @@ Apache HBase is a distributed Key-Value store of data on HDFS. It is modeled aft
 
 Although HBase is a very useful big data store, its access mechanism is very primitive and only through client-side APIs, Map/Reduce interfaces and interactive shells. SQL accesses to HBase data are available through Map/Reduce or interfaces mechanisms such as Apache Hive and Impala, or some “native” SQL technologies like Apache Phoenix. While the former is usually cheaper to implement and use, their latencies and efficiencies often cannot compare favorably with the latter and are often suitable only for offline analysis. The latter category, in contrast, often performs better and qualifies more as online engines; they are often on top of purpose-built execution engines.
 
-Currently Spark supports queries against HBase data through HBase’s Map/Reduce interface (i.e., TableInputFormat). SparkSQL supports use of Hive data, which theoretically should be able to support HBase data access, out-of-box, through HBase’s Map/Reduce interface and therefore falls into the first category of the “SQL on HBase” technologies.
+Currently Spark supports queries against HBase data through HBase’s Map/Reduce interface (i.e., TableInputFormat). Spark SQL supports use of Hive data, which theoretically should be able to support HBase data access, out-of-box, through HBase’s Map/Reduce interface and therefore falls into the first category of the “SQL on HBase” technologies.
 
 We believe, as a unified big data processing engine, Spark is in good position to provide better HBase support.
 
@@ -19,7 +19,7 @@ Spark HBase is built using [Apache Maven](http://maven.apache.org/).
 
 I. Clone and build Spark-Huawei/hbase (new standalone spark-hbase project)
 
-    $ git clone https://github.com/Huawei-Spark/SparkSQL-on-HBase spark-hbase
+    $ git clone https://github.com/Huawei-Spark/Spark-SQL-on-HBase spark-hbase
 ```
 II. Go to the root of the source tree
 ```
