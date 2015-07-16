@@ -1,4 +1,4 @@
-# Spark HBase
+# Spark SQL on HBase
 
 Apache HBase is a distributed Key-Value store of data on HDFS. It is modeled after Google’s Big Table, and provides APIs to query the data. The data is organized, partitioned and distributed by its “row keys”. Per partition, the data is further physically partitioned by “column families” that specify collections of “columns” of data. The data model is for wide and sparse tables where columns are dynamic and may well be sparse.
 
@@ -10,7 +10,11 @@ We believe, as a unified big data processing engine, Spark is in good position t
 
 ## Online Documentation
 
-Online documentation can be found on [Spark JIRA page](https://issues.apache.org/jira/browse/SPARK-3880).
+Online documentation https://github.com/Huawei-Spark/Spark-SQL-on-HBase/blob/master/doc/SparkSQLOnHBase_v2.2.docx
+
+## Requirements
+
+This version of 0.1.0 requires Spark 1.4.0.
 
 ## Building Spark HBase
 
