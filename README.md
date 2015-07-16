@@ -17,7 +17,7 @@ Online documentation can be found on [Spark JIRA page](https://issues.apache.org
 Spark HBase is built using [Apache Maven](http://maven.apache.org/).
 
 
-I. Clone and build Spark-Huawei/hbase (new standalone spark-hbase project)
+I. Clone and build Huawei-Spark/Spark-SQL-on-HBase
 
     $ git clone https://github.com/Huawei-Spark/Spark-SQL-on-HBase spark-hbase
 ```
