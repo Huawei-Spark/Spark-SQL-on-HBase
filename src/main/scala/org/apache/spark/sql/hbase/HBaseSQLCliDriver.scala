@@ -127,9 +127,9 @@ object HBaseSQLCliDriver extends Logging {
       case _ =>
         logInfo(s"Processing $input")
         val start = System.currentTimeMillis()
-        val res = hbaseCtx.sql(input).collect()
+        val df = hbaseCtx.sql(input)
         val end = System.currentTimeMillis()
-        res.foreach(println)
+        df.show(Integer.MAX_VALUE)
         val timeTaken: Double = (end - start) / 1000.0
         println(s"Time taken: $timeTaken seconds")
     }
