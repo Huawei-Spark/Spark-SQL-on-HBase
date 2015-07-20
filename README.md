@@ -22,19 +22,19 @@ Spark HBase is built using [Apache Maven](http://maven.apache.org/).
 
 
 I. Clone and build Huawei-Spark/Spark-SQL-on-HBase
-```
+
     $ git clone https://github.com/Huawei-Spark/Spark-SQL-on-HBase spark-hbase
 ```
 II. Go to the root of the source tree
-```
+
     $ cd spark-hbase
 ```
 III. Build without testing
-```
+
     $ mvn -Phbase,hadoop-2.4 -Dhadoop.version=2.4.0 -DskipTests clean package install
 ```
 IV. Build and run test suites against a HBase minicluster, from Maven.
-```
+
     $ mvn clean install
 ```
 
