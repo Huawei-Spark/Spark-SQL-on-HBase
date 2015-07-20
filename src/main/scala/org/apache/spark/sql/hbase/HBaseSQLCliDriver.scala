@@ -110,7 +110,7 @@ object HBaseSQLCliDriver extends Logging {
     val input = line.trim.substring(0, line.length - 1)
 
     try {
-      process(input)
+      process(input.trim())
     } catch {
       case e: Exception =>
         e.printStackTrace()
@@ -129,7 +129,9 @@ object HBaseSQLCliDriver extends Logging {
         val start = System.currentTimeMillis()
         val df = hbaseCtx.sql(input)
         val end = System.currentTimeMillis()
-        df.show(Integer.MAX_VALUE)
+        val str = df.showString(Integer.MAX_VALUE)
+        println("OK")
+        if (!str.equals("++\n||\n++\n++\n")) println(str)
         val timeTaken: Double = (end - start) / 1000.0
         println(s"Time taken: $timeTaken seconds")
     }
