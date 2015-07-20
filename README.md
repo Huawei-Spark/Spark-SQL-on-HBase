@@ -20,19 +20,21 @@ This version of 1.0.0 requires Spark 1.4.0.
 
 Spark HBase is built using [Apache Maven](http://maven.apache.org/).
 
-
 I. Clone and build Huawei-Spark/Spark-SQL-on-HBase
-
+```
     $ git clone https://github.com/Huawei-Spark/Spark-SQL-on-HBase spark-hbase
 ```
+
 II. Go to the root of the source tree
 ```
     $ cd spark-hbase
 ```
+
 III. Build without testing
 ```
     $ mvn -Phbase,hadoop-2.4 -Dhadoop.version=2.4.0 -DskipTests clean package install
 ```
+
 IV. Build and run test suites against a HBase minicluster, from Maven.
 ```
     $ mvn clean install
@@ -41,21 +43,20 @@ IV. Build and run test suites against a HBase minicluster, from Maven.
 ## Interactive Scala Shell
 
 The easiest way to start using Spark HBase is through the Scala shell:
-
+```
     ./bin/hbase-sql
-
+```
 
 ## Python Shell
 
 First, add the spark-hbase jar to the SPARK_CLASSPATH in the $SPARK_HOME/conf directory, as follows:
-
+```
 SPARK_CLASSPATH=$SPARK_CLASSPATH:/spark-hbase-root-dir/target/spark-sql-on-hbase-1.0.0.jar
-   
-
+```
 Then go to the spark-hbase installation directory and issue
-
+```
    ./bin/pyspark-hbase
-
+```
 A successfull message is as follows:
 
    You are using Spark SQL on HBase!!!
@@ -72,13 +73,13 @@ Note that the shell commands are not included in the Zip file of the Spark relea
 Testing first requires [building Spark HBase](#building-spark). Once Spark HBase is built ...
 
 Run all test suites from Maven:
-
+```
     mvn -Phbase,hadoop-2.4 test
-
+```
 Run a single test suite from Maven, for example:
-
+```
     mvn -Phbase,hadoop-2.4 test -DwildcardSuites=org.apache.spark.sql.hbase.BasicQueriesSuite
-
+```
 ## IDE Setup
 
 We use IntelliJ IDEA for Spark HBase development. You can get the community edition for free and install the JetBrains Scala plugin from Preferences > Plugins.
