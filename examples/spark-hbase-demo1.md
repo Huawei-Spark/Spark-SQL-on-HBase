@@ -1,7 +1,8 @@
-## create spark sql table to non-exist hbase (support multiple columns mapping to hbase rowkey)
+## Create and query SparkSQL table map to HBase (support multiple columns mapping to hbase rowkey)
 (1)TableName :
   spark :  spark_teacher_3key
   hbase :  hbase_ teacher_3key
+  
 (2)Fields :
   [grade,int]
   [class,int]
@@ -12,12 +13,17 @@
   keyCols : grade,class,subject
 
 (3)Create table:
-   CREATE TABLE teacher1k(grade int, class int, subject string, teacher_name string, teacher_age int, PRIMARY KEY (grade, class, subject)) MAPPED BY (hbase1k, COLS=[teacher_name=teacher.name, teacher_age=teacher.age]);
+```
+CREATE TABLE teacher1k(grade int, class int, subject string, teacher_name string, teacher_age int, PRIMARY KEY (grade, class, subject)) MAPPED BY (hbase1k, COLS=[teacher_name=teacher.name, teacher_age=teacher.age]);
+```
 
 (4)Load data :
-   LOAD DATA INPATH './examples/teacher1k.csv' INTO TABLE teacher1k FIELDS TERMINATED BY "," ;
+```
+LOAD DATA INPATH './examples/teacher1k.csv' INTO TABLE teacher1k FIELDS TERMINATED BY "," ;
+```
 
 (5) Query :
+```
     // test where
     (1) select teacher_name,teacher_age from teacher1k where teacher_age > 25;
 
@@ -32,3 +38,4 @@
 
     //test join
     (5) select t1.teacher_name, t2.subject, t1.teacher_age from (select teacher_name, teacher_age from teacher1k where teacher_age >=26 ) t1 join  (select teacher_name, subject from teacher1k where teacher_name like 'teacher_2_3%')t2 on t1.teacher_name=t2.teacher_name
+```
