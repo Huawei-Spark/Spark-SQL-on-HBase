@@ -128,8 +128,8 @@ object HBaseSQLCliDriver extends Logging {
         logInfo(s"Processing $input")
         val start = System.currentTimeMillis()
         val df = hbaseCtx.sql(input)
-        val end = System.currentTimeMillis()
         val str = df.showString(Integer.MAX_VALUE)
+        val end = System.currentTimeMillis()
         println("OK")
         if (!str.equals("++\n||\n++\n++\n")) println(str)
         val timeTaken: Double = (end - start) / 1000.0
