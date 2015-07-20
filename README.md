@@ -22,29 +22,29 @@ Spark HBase is built using [Apache Maven](http://maven.apache.org/).
 
 I. Clone and build Huawei-Spark/Spark-SQL-on-HBase
 ```
-    $ git clone https://github.com/Huawei-Spark/Spark-SQL-on-HBase spark-hbase
+$ git clone https://github.com/Huawei-Spark/Spark-SQL-on-HBase spark-hbase
 ```
 
 II. Go to the root of the source tree
 ```
-    $ cd spark-hbase
+$ cd spark-hbase
 ```
 
 III. Build without testing
 ```
-    $ mvn -Phbase,hadoop-2.4 -Dhadoop.version=2.4.0 -DskipTests clean package install
+$ mvn -Phbase,hadoop-2.4 -Dhadoop.version=2.4.0 -DskipTests clean package install
 ```
 
 IV. Build and run test suites against a HBase minicluster, from Maven.
 ```
-    $ mvn clean install
+$ mvn clean install
 ```
 
 ## Interactive Scala Shell
 
 The easiest way to start using Spark HBase is through the Scala shell:
 ```
-    ./bin/hbase-sql
+./bin/hbase-sql
 ```
 
 ## Python Shell
@@ -55,7 +55,7 @@ SPARK_CLASSPATH=$SPARK_CLASSPATH:/spark-hbase-root-dir/target/spark-sql-on-hbase
 ```
 Then go to the spark-hbase installation directory and issue
 ```
-   ./bin/pyspark-hbase
+./bin/pyspark-hbase
 ```
 A successfull message is as follows:
 
@@ -63,8 +63,9 @@ A successfull message is as follows:
    HBaseSQLContext available as hsqlContext.
 
 To run a python script, the PYTHONPATH environment should be set to the "python" directory of the Spark-HBase installation. For example,
-
-    export PYTHONPATH=/root-of-Spark-HBase/python
+```
+export PYTHONPATH=/root-of-Spark-HBase/python
+```
 
 Note that the shell commands are not included in the Zip file of the Spark release. They are for developers' use only for this version of 1.0.0. Instead, users can use "$SPARK_HOME/bin/spark-shell --packages Huawei-Spark/Spark-SQL-on-HBase:1.0.0" for SQL shell or "$SPARK_HOME/bin/pyspark --packages Huawei-Spark/Spark-SQL-on-HBase:1.0.0" for Pythin shell.
 
@@ -74,11 +75,11 @@ Testing first requires [building Spark HBase](#building-spark). Once Spark HBase
 
 Run all test suites from Maven:
 ```
-    mvn -Phbase,hadoop-2.4 test
+mvn -Phbase,hadoop-2.4 test
 ```
 Run a single test suite from Maven, for example:
 ```
-    mvn -Phbase,hadoop-2.4 test -DwildcardSuites=org.apache.spark.sql.hbase.BasicQueriesSuite
+mvn -Phbase,hadoop-2.4 test -DwildcardSuites=org.apache.spark.sql.hbase.BasicQueriesSuite
 ```
 ## IDE Setup
 
@@ -94,7 +95,7 @@ To import the current Spark HBase project for IntelliJ:
 6. When you run the scala test, sometimes you will get out of memory exception. You can increase your VM memory usage by the following setting, for example:
 
 ```
-    -XX:MaxPermSize=512m -Xmx3072m
+-XX:MaxPermSize=512m -Xmx3072m
 ```
 
 You can also make those setting to be the default by setting to the "Defaults -> ScalaTest".
