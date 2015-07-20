@@ -1,7 +1,7 @@
 ## Create and query SparkSQL table map to HBase (support multiple columns mapping to hbase rowkey)
 (1)TableName :
-  spark :  spark_teacher_3key
-  hbase :  hbase_ teacher_3key
+  spark :  teacher1k
+  hbase :  hbase1k
   
 (2)Fields :
   [grade,int]
@@ -12,12 +12,12 @@
 
   keyCols : grade,class,subject
 
-(3)Create table:
+(3) Create table:
 ```
 CREATE TABLE teacher1k(grade int, class int, subject string, teacher_name string, teacher_age int, PRIMARY KEY (grade, class, subject)) MAPPED BY (hbase1k, COLS=[teacher_name=teacher.name, teacher_age=teacher.age]);
 ```
 
-(4)Load data :
+(4) Load data :
 ```
 LOAD DATA INPATH './examples/teacher1k.csv' INTO TABLE teacher1k FIELDS TERMINATED BY "," ;
 ```
