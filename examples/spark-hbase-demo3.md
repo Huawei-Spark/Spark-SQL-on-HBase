@@ -1,4 +1,4 @@
-## Similar to demo 1, but with larger sample file
+## Example 3: Similar to example 1, but with larger sample file
 In this example, we create a new SparkSQL table and map it to a new HBase table with multiple column in rowkey.
 
 (2) Create table in SparkSQL and in HBase 
@@ -8,7 +8,7 @@ CREATE TABLE sales1m(id STRING, product STRING, region STRING, sales INTEGER, qu
 CREATE TABLE sales1m_onekey(id STRING, product STRING, region STRING, sales INTEGER, quantity INTEGER, PRIMARY KEY (id)) MAPPED BY (hbase_sales1m_onekey, COLS=[product=f.product, region=f.region, sales=f.sales, quantity=f.quantity]);
 ```
 
-(4) Load data :
+(2) Load data :
 ```
 LOAD DATA INPATH './examples/sales1m.csv' INTO TABLE sales1m FIELDS TERMINATED BY "," ;
 LOAD DATA INPATH './examples/sales1m.csv' INTO TABLE sales1m_onekey FIELDS TERMINATED BY "," ;

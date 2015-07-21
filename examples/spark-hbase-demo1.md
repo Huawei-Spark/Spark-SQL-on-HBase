@@ -1,4 +1,4 @@
-## Create and query SparkSQL table map to HBase table (multiple columns map to hbase table rowkey)
+## Example 1: Create and query SparkSQL table map to a new HBase table (multiple columns map to hbase table rowkey)
 In this example, we create a new SparkSQL table and map it to a new HBase table with multiple column in rowkey.
 
 Steps:
