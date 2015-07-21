@@ -33,7 +33,7 @@ $ cd spark-hbase
 III. Build the project
 Build without testing
 ```
-$ mvn -Phbase,hadoop-2.4 -Dhadoop.version=2.4.0 -DskipTests clean package install
+$ mvn -DskipTests clean install 
 ```
 Or, build with testing. It will run test suites against a HBase minicluster.
 ```
