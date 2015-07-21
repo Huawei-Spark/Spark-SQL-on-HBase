@@ -5,21 +5,21 @@ Steps:
 (1) Create table and populate data in HBase shell
 ```
 $HBase_Home/bin/hbase shell
-create 'hbase1k', 'f'
-for i in '1'..'1000' do for j in '1'..'2' do put 'hbase10k', "row#{i}", "f:c#{j}", "#{i}#{j}" end end
+create 'hbase_numbers', 'f'
+for i in '1'..'100' do for j in '1'..'2' do put 'hbase_numbers', "row#{i}", "f:c#{j}", "#{i}#{j}" end end
 ```   
 
 (2) Map hbase table with sparksql table in hbase-sql shell
 ```
 $SPARK_HBASE_Home/bin/hbase-sql
-CREATE TABLE spark1k(rowkey STRING, a STRING, b STRING, PRIMARY KEY (rowkey)) MAPPED BY (hbase1k, COLS=[a=f.c1, b=f.c2]);
+CREATE TABLE numbers(rowkey STRING, a STRING, b STRING, PRIMARY KEY (rowkey)) MAPPED BY (hbase_numbers, COLS=[a=f.c1, b=f.c2]);
 ```
 
 (3) Query:
 ```
    // test count *
-   (1) select count(*) from spark1k
+   (1) select count(*) from numbers
 
    // test group by
-   (2) select a, b from spark1k where b > "980"
+   (2) select a, b from numbers where b > "980"
 ```
