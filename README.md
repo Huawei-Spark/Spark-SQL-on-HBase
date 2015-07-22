@@ -71,7 +71,7 @@ Note that the shell commands are not included in the Zip file of the Spark relea
 
 ## Running Tests
 
-Testing first requires [building Spark HBase](#building-spark). Once Spark HBase is built ...
+Testing first requires [building Spark HBase](#building-spark-hbase). Once Spark HBase is built ...
 
 Run all test suites from Maven:
 ```
