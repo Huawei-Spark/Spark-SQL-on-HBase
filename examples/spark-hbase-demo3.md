@@ -1,4 +1,4 @@
-## Example 3: Similar to example 1, but with larger sample file
+## Example 3: Similar to example 2, but with larger sample file
 In this example, we create a new SparkSQL table and map it to a new HBase table with multiple column in rowkey.
 
 (2) Create table in SparkSQL and in HBase 

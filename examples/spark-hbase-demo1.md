@@ -1,4 +1,4 @@
-## Example 2: Create and query SparkSQL table map to existing Hbase table
+## Example 1: Create and query SparkSQL table map to existing Hbase table
 In this example, we create SparkSQL table and map it to a existing HBase table. (a single column map to hbase rowkey)
 
 Steps:
