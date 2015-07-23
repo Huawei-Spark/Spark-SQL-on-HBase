@@ -11,14 +11,21 @@ CREATE TABLE teacher(grade int, class int, subject string, teacher_name string, 
 
 This command will create following tables:
 Tables :
+
   spark :  teacher
+  
   hbase :  hbase_teacher
   
 Fields :
+
   [grade,int]
+  
   [class,int]
+  
   [subject,string]
+  
   [teacher_name,string]
+  
   [teacher_age,int]
 
   key columns : grade,class,subject
