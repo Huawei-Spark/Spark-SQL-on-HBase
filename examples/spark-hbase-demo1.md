@@ -2,6 +2,7 @@
 In this example, we create a new SparkSQL table and map it to a new HBase table with multiple column in rowkey.
 
 Steps:
+
 (1) Create table in hbase-sql shell:
 ```
 $SPARK_HBASE_Home/bin/hbase-sql
