@@ -2,6 +2,7 @@
 In this example, we create SparkSQL table and map it to a existing HBase table. (a single column map to hbase rowkey)
 
 Steps:
+
 (1) Create table and populate data in HBase shell
 ```
 $HBase_Home/bin/hbase shell
