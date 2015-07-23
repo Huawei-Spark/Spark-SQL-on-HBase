@@ -17,15 +17,10 @@ Tables :
   hbase :  hbase_teacher
   
 Fields :
-
   [grade,int]
-  
   [class,int]
-  
   [subject,string]
-  
   [teacher_name,string]
-  
   [teacher_age,int]
 
   key columns : grade,class,subject
