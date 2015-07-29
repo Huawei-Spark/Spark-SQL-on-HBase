@@ -27,7 +27,7 @@ import org.apache.spark.{Logging, SparkConf, SparkContext}
  *
  */
 object HBaseSQLCliDriver extends Logging {
-  private val prompt = "spark-hbaseql"
+  private val prompt = "astro"
   private val continuedPrompt = "".padTo(prompt.length, ' ')
   private val conf = new SparkConf()
   private val sc = new SparkContext(conf)
@@ -107,7 +107,7 @@ object HBaseSQLCliDriver extends Logging {
     // TODO: handle multiple command separated by ;
 
     // Since we are using SqlParser and it does not handle ';', just work around to omit the ';'
-    val input = line.trim.substring(0, line.length - 1)
+    val input = line.substring(0, line.length - 1)
 
     try {
       process(input.trim())

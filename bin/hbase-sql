@@ -32,8 +32,8 @@ echo "\$SPARK_HOME is not set"
 fi
 
 export FWDIR=$SPARK_HOME
-export SPARKHBASE_SOURCE="$(cd "`dirname "$0"`"/..; pwd)"
-export JAR="$SPARKHBASE_SOURCE/target/spark-sql-on-hbase-1.0.0.jar"
+export ASTRO_SOURCE="$(cd "`dirname "$0"`"/..; pwd)"
+export JAR="$ASTRO_SOURCE/target/spark-sql-on-hbase-1.0.0.jar"
 
 function usage {
   if [ -n "$1" ]; then
