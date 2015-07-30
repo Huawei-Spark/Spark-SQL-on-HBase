@@ -1,7 +1,7 @@
 ## Example 3: Similar to example 2, but with larger sample file
 In this example, we create a new SparkSQL table and map it to a new HBase table with multiple column in rowkey.
 
-(2) Create table in SparkSQL and in HBase 
+(1) Create table in SparkSQL and in HBase 
 ```
 $SPARK_HBASE_HOME/bin/hbase-sql
 CREATE TABLE sales1m(id STRING, product STRING, region STRING, sales INTEGER, quantity INTEGER, PRIMARY KEY (id, product, region)) MAPPED BY (hbase_sales1m, COLS=[sales=f.sales, quantity=f.quantity]);
