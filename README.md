@@ -40,6 +40,22 @@ Or, build with testing. It will run test suites against a HBase minicluster.
 $ mvn clean install
 ```
 
+## Activate Coprocessor and Custom Filter in HBase
+
+First, add the path of spark-hbase jar to the hbase-env.sh in $HBASE_HOME/conf directory, as follows:
+```
+HBASE_CLASSPATH=$SPARK_CLASSPATH:/spark-hbase-root-dir/target/spark-sql-on-hbase-1.0.0.jar
+```
+Then, register the coprocessor service 'CheckDirEndPoint' to hbase-site.xml in the same directory, as follows:
+```
+<property>
+    <name>hbase.coprocessor.region.classes</name>
+    <value>org.apache.spark.sql.hbase.CheckDirEndPointImpl</value>
+</property>
+```
+(Warning: Don't register another coprocessor service 'SparkSqlRegionObserver' here !)
+
+
 ## Interactive Scala Shell
 
 The easiest way to start using Spark HBase is through the Scala shell:
