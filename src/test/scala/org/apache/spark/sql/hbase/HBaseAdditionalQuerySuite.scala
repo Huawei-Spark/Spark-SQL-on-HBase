@@ -182,6 +182,13 @@ class HBaseAdditionalQuerySuite extends TestBase {
     teachers.orderBy(Column("grade").asc, Column("class").asc).show(3)
   }
 
+  test("UDF Test") {
+    def myFilter(date: String) = date contains "_1_2"
+    TestHbase.udf.register("myFilter", myFilter _)
+    val result = TestHbase.sql("Select * from spark_teacher_3key WHERE myFilter(teacher_name)")
+    result.foreach(println)
+  }
+
   test("group test for presplit table with coprocessor but without codegen") {
     aggregationTest()
   }
