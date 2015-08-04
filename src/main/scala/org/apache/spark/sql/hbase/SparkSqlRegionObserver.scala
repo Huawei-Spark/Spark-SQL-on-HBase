@@ -47,14 +47,10 @@ class HBaseCoprocessorSQLReaderRDD(var relation: HBaseRelation,
   private def createIterator(context: TaskContext): Iterator[Row] = {
     val otherFilter: (Row) => Boolean = {
       if (otherFilters.isDefined) {
-        if (relation.deploySuccessfully.isDefined && relation.deploySuccessfully.get) {
-          null
+        if (codegenEnabled) {
+          GeneratePredicate.generate(otherFilters.get, finalOutput)
         } else {
-          if (codegenEnabled) {
-            GeneratePredicate.generate(otherFilters.get, finalOutput)
-          } else {
-            InterpretedPredicate.create(otherFilters.get, finalOutput)
-          }
+          InterpretedPredicate.create(otherFilters.get, finalOutput)
         }
       } else null
     }

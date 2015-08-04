@@ -179,14 +179,22 @@ class HBaseAdditionalQuerySuite extends TestBase {
 
   test("DataFrame Test") {
     val teachers: DataFrame = TestHbase.sql("Select * from spark_teacher_3key")
-    teachers.orderBy(Column("grade").asc, Column("class").asc).show(3)
+    val result = teachers.orderBy(Column("grade").asc, Column("class").asc)
+      .select("teacher_name").limit(3).collect()
+    result.foreach(println)
+    val exparr = Array(Array("teacher_1_1_1"), Array("teacher_1_2_1"), Array("teacher_1_3_1"))
+    val res = {
+      for (rx <- exparr.indices)
+      yield compareWithTol(result(rx).toSeq, exparr(rx), s"Row$rx failed")
+    }.foldLeft(true) { case (res1, newres) => res1 && newres}
+    assert(res, "One or more rows did not match expected")
   }
 
   test("UDF Test") {
-    def myFilter(date: String) = date contains "_1_2"
+    def myFilter(s: String) = s contains "_1_2"
     TestHbase.udf.register("myFilter", myFilter _)
-    val result = TestHbase.sql("Select * from spark_teacher_3key WHERE myFilter(teacher_name)")
-    result.foreach(println)
+    val result = TestHbase.sql("Select count(*) from spark_teacher_3key WHERE myFilter(teacher_name)")
+    result.foreach(r => require(r.getLong(0) == 3L))
   }
 
   test("group test for presplit table with coprocessor but without codegen") {

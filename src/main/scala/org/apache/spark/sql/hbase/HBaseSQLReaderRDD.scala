@@ -221,14 +221,21 @@ class HBaseSQLReaderRDD(val relation: HBaseRelation,
         s
     }
 
+    if (!useCustomFilter) {
+      def addOtherFilter(rdd: RDD[Row]): Unit = rdd match {
+        case hcsRDD: HBaseCoprocessorSQLReaderRDD => hcsRDD.otherFilters = otherFilters
+        case _ => if (rdd.dependencies.nonEmpty) addOtherFilter(rdd.firstParent[Row])
+      }
+      addOtherFilter(newSubplanRDD)
+    }
+
     val outputDataType: Seq[DataType] = subplan.get.output.map(attr => attr.dataType)
     val taskContextPara: (Int, Int, Long, Int) = TaskContext.get() match {
       case t: TaskContextImpl => (t.stageId, t.partitionId, t.taskAttemptId, t.attemptNumber)
       case _ => (0, 0, 0L, 0)
     }
 
-    scan.setAttribute(CoprocessorConstants.COINDEX,
-      Bytes.toBytes(partitionIndex))
+    scan.setAttribute(CoprocessorConstants.COINDEX, Bytes.toBytes(partitionIndex))
     scan.setAttribute(CoprocessorConstants.COTYPE, HBaseSerializer.serialize(outputDataType))
     scan.setAttribute(CoprocessorConstants.COKEY, HBaseSerializer.serialize(newSubplanRDD))
     scan.setAttribute(CoprocessorConstants.COTASK, HBaseSerializer.serialize(taskContextPara))

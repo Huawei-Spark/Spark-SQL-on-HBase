@@ -166,7 +166,7 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
    * @param node the node to reset children on
    * @return
    */
-  def resetNode(node: Node) = {
+  private def resetNode(node: Node) = {
     if (node != null && node.cpr != null) {
       node.currentValue = node.cpr.start.orNull
       if (node.currentValue != null && !node.cpr.startInclusive) {
@@ -401,7 +401,7 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
    * @param node the node to start with
    * @return (return code, the row key after successful increment)
    */
-  def increment(node: Node): (ReturnCode, HBaseRawType) = {
+  private def increment(node: Node): (ReturnCode, HBaseRawType) = {
     var currentNode: Node = node
     while (currentNode.parent != null) {
       if (addOne(currentNode)) {
@@ -439,7 +439,7 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
    * @param node the node to add 1 to
    * @return whether the addition can be made within the value domain
    */
-  def addOne(node: Node): Boolean = {
+  private def addOne(node: Node): Boolean = {
     val dt = node.dt
     val value = node.currentValue
     var canAddOne: Boolean = true
@@ -569,7 +569,7 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
    * do a full evaluation for the remaining predicate based on all the cell values
    * @param kvs the list of cell
    */
-  def fullEvalution(kvs: java.util.List[Cell]) = {
+  private def fullEvalution(kvs: java.util.List[Cell]) = {
     resetRow(workingRow)
     cellMap.clear()
     for (i <- 0 to kvs.size() - 1) {
@@ -609,9 +609,14 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
   }
 
   override def filterRowCells(kvs: java.util.List[Cell]) = {
-    if (remainingPredicate != null) {
-      fullEvalution(kvs)
-    }
+    // In coprocessor, if the call to filterKeyValue returns INCLUDE on the very last record,
+    // the scanner runs past the end and never call filterKeyValue() before reaching here, leading
+    // to empty kvs and a subsequent NPE. This is observed with HBase 0.98.5.
+    //
+    // If a later HBase release has this addressed, this check will be made unnecessary
+    // to save some CPU cycles
+    if (kvs.isEmpty) filterRowFlag = true
+    else if (remainingPredicate != null) fullEvalution(kvs)
   }
 
   override def hasFilterRow: Boolean = {
