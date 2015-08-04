@@ -190,11 +190,40 @@ class HBaseAdditionalQuerySuite extends TestBase {
     assert(res, "One or more rows did not match expected")
   }
 
-  test("UDF Test") {
+  test("UDF Test with both coprocessor and custom filter") {
     def myFilter(s: String) = s contains "_1_2"
     TestHbase.udf.register("myFilter", myFilter _)
     val result = TestHbase.sql("Select count(*) from spark_teacher_3key WHERE myFilter(teacher_name)")
     result.foreach(r => require(r.getLong(0) == 3L))
+  }
+
+  test("UDF Test with custom filter but without coprocessor") {
+    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR, "false")
+    def myFilter(s: String) = s contains "_1_2"
+    TestHbase.udf.register("myFilter", myFilter _)
+    val result = TestHbase.sql("Select count(*) from spark_teacher_3key WHERE myFilter(teacher_name)")
+    result.foreach(r => require(r.getLong(0) == 3L))
+    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR, "true")
+  }
+
+  test("UDF Test with coprocessor but without custom filter") {
+    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER, "false")
+    def myFilter(s: String) = s contains "_1_2"
+    TestHbase.udf.register("myFilter", myFilter _)
+    val result = TestHbase.sql("Select count(*) from spark_teacher_3key WHERE myFilter(teacher_name)")
+    result.foreach(r => require(r.getLong(0) == 3L))
+    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER, "true")
+  }
+
+  test("UDF Test without coprocessor and custom filter") {
+    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR, "false")
+    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER, "false")
+    def myFilter(s: String) = s contains "_1_2"
+    TestHbase.udf.register("myFilter", myFilter _)
+    val result = TestHbase.sql("Select count(*) from spark_teacher_3key WHERE myFilter(teacher_name)")
+    result.foreach(r => require(r.getLong(0) == 3L))
+    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR, "true")
+    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER, "true")
   }
 
   test("group test for presplit table with coprocessor but without codegen") {
