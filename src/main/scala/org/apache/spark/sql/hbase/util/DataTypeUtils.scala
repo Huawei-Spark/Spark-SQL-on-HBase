@@ -34,16 +34,17 @@ object DataTypeUtils {
    * @param dt the data type
    * @return the actual data converted from byte array
    */
-  def bytesToData(src: HBaseRawType, offset: Int, length: Int, dt: DataType): Any = {
+  def bytesToData(src: HBaseRawType, offset: Int, length: Int, dt: DataType,
+                  bytesUtils: BytesUtils = BinaryBytesUtils): Any = {
     dt match {
-      case BooleanType => BytesUtils.toBoolean(src, offset)
-      case ByteType => BytesUtils.toByte(src, offset)
-      case DoubleType => BytesUtils.toDouble(src, offset)
-      case FloatType => BytesUtils.toFloat(src, offset)
-      case IntegerType => BytesUtils.toInt(src, offset)
-      case LongType => BytesUtils.toLong(src, offset)
-      case ShortType => BytesUtils.toShort(src, offset)
-      case StringType => BytesUtils.toUTF8String(src, offset, length)
+      case BooleanType => bytesUtils.toBoolean(src, offset, length)
+      case ByteType => bytesUtils.toByte(src, offset, length)
+      case DoubleType => bytesUtils.toDouble(src, offset, length)
+      case FloatType => bytesUtils.toFloat(src, offset, length)
+      case IntegerType => bytesUtils.toInt(src, offset, length)
+      case LongType => bytesUtils.toLong(src, offset, length)
+      case ShortType => bytesUtils.toShort(src, offset, length)
+      case StringType => bytesUtils.toUTF8String(src, offset, length)
       case _ => throw new Exception("Unsupported HBase SQL Data Type")
     }
   }
@@ -55,9 +56,10 @@ object DataTypeUtils {
    * @return the output byte array
    */
   def dataToBytes(src: Any,
-                  dt: DataType): HBaseRawType = {
+                  dt: DataType,
+                  bytesUtils: BytesUtils = BinaryBytesUtils): HBaseRawType = {
     // TODO: avoid new instance per invocation
-    lazy val bu = BytesUtils.create(dt)
+    lazy val bu = bytesUtils.create(dt)
     dt match {
       case BooleanType => bu.toBytes(src.asInstanceOf[Boolean])
       case ByteType => bu.toBytes(src.asInstanceOf[Byte])
@@ -85,16 +87,17 @@ object DataTypeUtils {
                                    src: HBaseRawType,
                                    offset: Int,
                                    length: Int,
-                                   dt: DataType): Unit = {
+                                   dt: DataType,
+                                   bytesUtils: BytesUtils = BinaryBytesUtils): Unit = {
     dt match {
-      case BooleanType => row.setBoolean(index, BytesUtils.toBoolean(src, offset))
-      case ByteType => row.setByte(index, BytesUtils.toByte(src, offset))
-      case DoubleType => row.setDouble(index, BytesUtils.toDouble(src, offset))
-      case FloatType => row.setFloat(index, BytesUtils.toFloat(src, offset))
-      case IntegerType => row.setInt(index, BytesUtils.toInt(src, offset))
-      case LongType => row.setLong(index, BytesUtils.toLong(src, offset))
-      case ShortType => row.setShort(index, BytesUtils.toShort(src, offset))
-      case StringType => row.update(index, BytesUtils.toUTF8String(src, offset, length))
+      case BooleanType => row.setBoolean(index, bytesUtils.toBoolean(src, offset, length))
+      case ByteType => row.setByte(index, bytesUtils.toByte(src, offset, length))
+      case DoubleType => row.setDouble(index, bytesUtils.toDouble(src, offset, length))
+      case FloatType => row.setFloat(index, bytesUtils.toFloat(src, offset, length))
+      case IntegerType => row.setInt(index, bytesUtils.toInt(src, offset, length))
+      case LongType => row.setLong(index, bytesUtils.toLong(src, offset, length))
+      case ShortType => row.setShort(index, bytesUtils.toShort(src, offset, length))
+      case StringType => row.update(index, bytesUtils.toUTF8String(src, offset, length))
       case _ => row.update(index, SparkSqlSerializer.deserialize[Any](src)) //TODO
     }
   }
@@ -124,10 +127,11 @@ object DataTypeUtils {
    * @param dt the data type
    * @return the data from the row based on index
    */
-  def getRowColumnInHBaseRawType(row: Row, index: Int, dt: DataType): HBaseRawType = {
+  def getRowColumnInHBaseRawType(row: Row, index: Int, dt: DataType,
+                                 bytesUtils: BytesUtils = BinaryBytesUtils): HBaseRawType = {
     if (row.isNullAt(index)) return new Array[Byte](0)
 
-    val bu = BytesUtils.create(dt)
+    val bu = bytesUtils.create(dt)
     dt match {
       case BooleanType => bu.toBytes(row.getBoolean(index))
       case ByteType => bu.toBytes(row.getByte(index))
@@ -147,7 +151,7 @@ object DataTypeUtils {
    * @param expression the input expression
    * @return the constructed binary comparator
    */
-  def getBinaryComparator(bu: BytesUtils, expression: Literal): BinaryComparator = {
+  def getBinaryComparator(bu: ToBytesUtils, expression: Literal): BinaryComparator = {
     expression.dataType match {
       case BooleanType => new BinaryComparator(bu.toBytes(expression.value.asInstanceOf[Boolean]))
       case ByteType => new BinaryComparator(bu.toBytes(expression.value.asInstanceOf[Byte]))

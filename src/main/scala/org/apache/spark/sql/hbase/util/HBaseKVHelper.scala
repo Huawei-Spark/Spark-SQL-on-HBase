@@ -104,7 +104,7 @@ object HBaseKVHelper {
    */
   def string2KV(values: Seq[String],
                 relation: HBaseRelation,
-                lineBuffer: Array[BytesUtils],
+                lineBuffer: Array[ToBytesUtils],
                 keyBytes: Array[(Array[Byte], DataType)],
                 valueBytes: Array[HBaseRawType]) = {
     assert(values.length == relation.output.length,
@@ -119,14 +119,14 @@ object HBaseKVHelper {
       val nkc = relation.nonKeyColumns(i)
       val bytes =  {
         // we should not use the same buffer in bulk-loading otherwise it will lead to corrupted
-        lineBuffer(nkc.ordinal) = BytesUtils.create(lineBuffer(nkc.ordinal).dataType)
+        lineBuffer(nkc.ordinal) = relation.bytesUtils.create(lineBuffer(nkc.ordinal).dataType)
         string2Bytes(values(nkc.ordinal), lineBuffer(nkc.ordinal))
       }
       valueBytes(i) = bytes
     }
   }
 
-  private def string2Bytes(v: String, bu: BytesUtils): Array[Byte] = {
+  private def string2Bytes(v: String, bu: ToBytesUtils): Array[Byte] = {
     v match {
       case "" => new Array[Byte](0)
       case null => new Array[Byte](0)
@@ -150,12 +150,10 @@ object HBaseKVHelper {
    * @param schema the schema of the line buffer
    * @return
    */
-  private[hbase] def createLineBuffer(schema: Seq[Attribute]): Array[BytesUtils] = {
-    val buffer = ArrayBuffer[BytesUtils]()
-    schema.foreach { x =>
-      buffer.append(BytesUtils.create(x.dataType))
-    }
-    buffer.toArray
+  private[hbase] def createLineBuffer(schema: Seq[Attribute]): Array[ToBytesUtils] = {
+    schema.map{x =>
+      BinaryBytesUtils.create(x.dataType)
+    }.toArray
   }
 
   /**

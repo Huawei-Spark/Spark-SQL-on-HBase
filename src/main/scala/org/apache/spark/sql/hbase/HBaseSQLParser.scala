@@ -78,11 +78,13 @@ class HBaseSQLParser extends SqlParser {
     CREATE ~> TABLE ~> ident ~
       ("(" ~> tableCols <~ ",") ~
       (PRIMARY ~> KEY ~> "(" ~> keys <~ ")" <~ ")") ~
+      (IN ~> ident).? ~
       (MAPPED ~> BY ~> "(" ~> opt(nameSpace)) ~
       (ident <~ ",") ~
       (COLS ~> "=" ~> "[" ~> expressions <~ "]" <~ ")") <~ opt(";") ^^ {
 
-      case tableName ~ tableColumns ~ keySeq ~ tableNameSpace ~ hbaseTableName ~ mappingInfo =>
+      case tableName ~ tableColumns ~ keySeq ~ encodingFormat ~
+        tableNameSpace ~ hbaseTableName ~ mappingInfo =>
         // Since the lexical can not recognize the symbol "=" as we expected, we compose it
         // to expression first and then translate it into Map[String, (String, String)].
         // TODO: Now get the info by hacking, need to change it into normal way if possible
@@ -147,7 +149,8 @@ class HBaseSQLParser extends SqlParser {
           ("hbaseTableName", hbaseTableName),
           ("colsSeq", colsSeqString),
           ("keyCols", keyColsString),
-          ("nonKeyCols", nonkeyColsString)
+          ("nonKeyCols", nonkeyColsString),
+          ("encodingFormat", encodingFormat.getOrElse("binaryformat").toLowerCase)
         ).toMap
 
         CreateTable(tableName, "org.apache.spark.sql.hbase.HBaseSource", opts)

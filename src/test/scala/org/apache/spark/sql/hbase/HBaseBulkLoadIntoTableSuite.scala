@@ -20,7 +20,7 @@ package org.apache.spark.sql.hbase
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.hbase.execution._
-import org.apache.spark.sql.hbase.util.BytesUtils
+import org.apache.spark.sql.hbase.util.BinaryBytesUtils
 import org.apache.spark.sql.types._
 
 class HBaseBulkLoadIntoTableSuite extends TestBase {
@@ -337,7 +337,7 @@ class HBaseBulkLoadIntoTableSuite extends TestBase {
 
   test("bulk load for presplit table") {
     val splitKeys = Seq(4, 8, 12).map { x =>
-      BytesUtils.create(IntegerType).toBytes(x)
+      BinaryBytesUtils.create(IntegerType).toBytes(x)
     }
     TestHbase.catalog.createHBaseUserTable("presplit_table", Set("cf1", "cf2"), splitKeys.toArray)
 
@@ -373,7 +373,7 @@ class HBaseBulkLoadIntoTableSuite extends TestBase {
 
   test("parall bulk load for presplit table") {
     val splitKeys = Seq(4, 8, 12).map { x =>
-      BytesUtils.create(IntegerType).toBytes(x)
+      BinaryBytesUtils.create(IntegerType).toBytes(x)
     }
     TestHbase.catalog.createHBaseUserTable("presplit_table", Set("cf1", "cf2"), splitKeys.toArray)
 

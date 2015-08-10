@@ -27,7 +27,7 @@ import org.apache.hadoop.hbase.{Cell, CellUtil, KeyValue}
 import org.apache.hadoop.io.Writable
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.hbase.catalyst.expressions.PartialPredicateOperations._
-import org.apache.spark.sql.hbase.util.{BytesUtils, DataTypeUtils, HBaseKVHelper}
+import org.apache.spark.sql.hbase.util.{BinaryBytesUtils, DataTypeUtils, HBaseKVHelper}
 import org.apache.spark.sql.types.{AtomicType, DataType, StringType}
 
 /**
@@ -444,11 +444,11 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
     val value = node.currentValue
     var canAddOne: Boolean = true
     if (dt == StringType) {
-      val newString = BytesUtils.addOneString(BytesUtils.create(dt).toBytes(value))
+      val newString = BinaryBytesUtils.addOneString(BinaryBytesUtils.create(dt).toBytes(value))
       val newValue = DataTypeUtils.bytesToData(newString, 0, newString.length, dt)
       node.currentValue = newValue
     } else {
-      val newArray = BytesUtils.addOne(BytesUtils.create(dt).toBytes(value))
+      val newArray = BinaryBytesUtils.addOne(BinaryBytesUtils.create(dt).toBytes(value))
       if (newArray == null) {
         canAddOne = false
       } else {
@@ -487,7 +487,7 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
       node.children(node.currentChildIndex).currentValue != null) {
       val levelNode: Node = node.children(node.currentChildIndex)
       val dt = levelNode.dt
-      val value = BytesUtils.create(dt).toBytes(levelNode.currentValue)
+      val value = BinaryBytesUtils.create(dt).toBytes(levelNode.currentValue)
       list = list :+(value, dt)
       if (levelNode.dimension < relation.dimSize - 1) {
         generateCPRs(levelNode)
@@ -581,7 +581,8 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
         val nkc = relation.nonKeyColumns.find(a =>
           Bytes.compareTo(a.familyRaw, family) == 0 &&
             Bytes.compareTo(a.qualifierRaw, qualifier) == 0).get
-        val value = DataTypeUtils.bytesToData(data, 0, data.length, nkc.dataType)
+        val value = DataTypeUtils.bytesToData(
+          data, 0, data.length, nkc.dataType, relation.bytesUtils)
         cellMap += (nkc -> value)
       }
     }

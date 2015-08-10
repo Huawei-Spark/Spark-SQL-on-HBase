@@ -36,9 +36,9 @@ class HBaseBasicOperationSuite extends TestBaseWithSplitData {
     super.afterAll()
   }
 
-  test("Insert Into table0") {
+  test("Insert Into table in stringFormat") {
     sql( """CREATE TABLE tb0 (column2 INTEGER, column1 INTEGER, column4 FLOAT,
-          column3 SHORT, PRIMARY KEY(column1, column2))
+          column3 SHORT, PRIMARY KEY(column1, column2)) IN stringFormat
           MAPPED BY (testNamespace.ht0, COLS=[column3=family1.qualifier1,
           column4=family2.qualifier2])"""
     )

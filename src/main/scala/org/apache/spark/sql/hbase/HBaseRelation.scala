@@ -30,7 +30,7 @@ import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.hbase.catalyst.expressions.PartialPredicateOperations.partialPredicateReducer
 import org.apache.spark.sql.hbase.catalyst.NotPusher
 import org.apache.spark.sql.hbase.types.Range
-import org.apache.spark.sql.hbase.util.{BytesUtils, DataTypeUtils, HBaseKVHelper, Util}
+import org.apache.spark.sql.hbase.util._
 import org.apache.spark.sql.sources.{BaseRelation, CatalystScan, InsertableRelation, LogicalRelation, RelationProvider}
 import org.apache.spark.sql.types._
 
@@ -48,6 +48,7 @@ class HBaseSource extends RelationProvider {
     val tableName = parameters("tableName")
     val rawNamespace = parameters("namespace")
     val hbaseTable = parameters("hbaseTableName")
+    val encodingFormat = parameters("encodingFormat")
     val colsSeq = parameters("colsSeq").split(",")
     val keyCols = parameters("keyCols").split(";")
       .map { case c => val cols = c.split(","); (cols(0), cols(1))}
@@ -73,7 +74,7 @@ class HBaseSource extends RelationProvider {
           )
         }
     }
-    catalog.createTable(tableName, rawNamespace, hbaseTable, allColumns, null)
+    catalog.createTable(tableName, rawNamespace, hbaseTable, allColumns, null, encodingFormat)
   }
 }
 
@@ -91,7 +92,8 @@ private[hbase] case class HBaseRelation(
                                          hbaseNamespace: String,
                                          hbaseTableName: String,
                                          allColumns: Seq[AbstractColumn],
-                                         deploySuccessfully: Option[Boolean])
+                                         deploySuccessfully: Option[Boolean],
+                                         encodingFormat: String = "binaryformat")
                                        (@transient var context: SQLContext)
   extends BaseRelation with CatalystScan with InsertableRelation with Serializable {
   @transient lazy val logger = Logger.getLogger(getClass.getName)
@@ -110,6 +112,11 @@ private[hbase] case class HBaseRelation(
           new KeyValue(empty, b.familyRaw, b.qualifierRaw)) < 0
       }
     )
+
+  @transient lazy val bytesUtils: BytesUtils = encodingFormat match {
+    case "stringformat" => println(tableName + " stringformat");StringBytesUtils
+    case _ => println(tableName + " binaryformat");BinaryBytesUtils
+  }
 
   lazy val partitionKeys = keyColumns.map(col =>
     logicalRelation.output.find(_.name == col.sqlName).get)
@@ -551,7 +558,7 @@ private[hbase] case class HBaseRelation(
       val filter = new SingleColumnValueFilter(column.familyRaw,
         column.qualifierRaw,
         compareOp,
-        DataTypeUtils.getBinaryComparator(BytesUtils.create(right.dataType), right))
+        DataTypeUtils.getBinaryComparator(bytesUtils.create(right.dataType), right))
       filter.setFilterIfMissing(true)
       Some(new FilterList(filter))
     } else {
@@ -600,7 +607,7 @@ private[hbase] case class HBaseRelation(
               val filter = new SingleColumnValueFilter(column.get.familyRaw,
                 column.get.qualifierRaw,
                 CompareFilter.CompareOp.EQUAL,
-                DataTypeUtils.getBinaryComparator(BytesUtils.create(dataType),
+                DataTypeUtils.getBinaryComparator(bytesUtils.create(dataType),
                   Literal.create(item, dataType)))
               filterList.addFilter(filter)
             }
@@ -680,7 +687,7 @@ private[hbase] case class HBaseRelation(
       nonKeyColumns.foreach(
         nkc => {
           val rowVal = DataTypeUtils.getRowColumnInHBaseRawType(
-            row, nkc.ordinal, nkc.dataType)
+            row, nkc.ordinal, nkc.dataType, bytesUtils)
           colIndexInBatch += 1
           put.add(nkc.familyRaw, nkc.qualifierRaw, rowVal)
         }
@@ -876,19 +883,20 @@ private[hbase] case class HBaseRelation(
    * @param projection the pair of projection and its index
    * @param row the row to set values on
    */
-  private def setColumn(kv: Cell, projection: (Attribute, Int), row: MutableRow): Unit = {
+  private def setColumn(kv: Cell, projection: (Attribute, Int), row: MutableRow,
+                        bytesUtils: BytesUtils = BinaryBytesUtils): Unit = {
     if (kv == null || kv.getValueLength == 0) {
       row.setNullAt(projection._2)
     } else {
       val dt = projection._1.dataType
       if (dt.isInstanceOf[AtomicType]) {
         DataTypeUtils.setRowColumnFromHBaseRawType(
-          row, projection._2, kv.getValueArray, kv.getValueOffset, kv.getValueLength, dt)
+          row, projection._2, kv.getValueArray, kv.getValueOffset, kv.getValueLength, dt, bytesUtils)
       } else {
         // for complex types, deserialiation is involved and we aren't sure about buffer safety
         val colValue = CellUtil.cloneValue(kv)
         DataTypeUtils.setRowColumnFromHBaseRawType(
-          row, projection._2, colValue, 0, colValue.length, dt)
+          row, projection._2, colValue, 0, colValue.length, dt, bytesUtils)
       }
     }
   }
@@ -947,7 +955,7 @@ private[hbase] case class HBaseRelation(
         columnMap.get(p._1.name).get match {
           case column: NonKeyColumn =>
             val kv = getColumnLatestCell(column.familyRaw, column.qualifierRaw)
-            setColumn(kv, p, row)
+            setColumn(kv, p, row, bytesUtils)
           case keyIndex: Int =>
             val (start, length) = rowKeys(keyIndex)
             DataTypeUtils.setRowColumnFromHBaseRawType(
@@ -966,7 +974,7 @@ private[hbase] case class HBaseRelation(
         columnMap.get(p._1.name).get match {
           case column: NonKeyColumn =>
             val kv: Cell = result.getColumnLatestCell(column.familyRaw, column.qualifierRaw)
-            setColumn(kv, p, row)
+            setColumn(kv, p, row, bytesUtils)
           case keyIndex: Int =>
             val (start, length) = rowKeys(keyIndex)
             DataTypeUtils.setRowColumnFromHBaseRawType(

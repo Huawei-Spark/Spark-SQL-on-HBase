@@ -19,7 +19,7 @@ package org.apache.spark.sql.hbase
 import org.apache.spark._
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.hbase.util.{BytesUtils, HBaseKVHelper}
+import org.apache.spark.sql.hbase.util.{BinaryBytesUtils, HBaseKVHelper}
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 import scala.collection.mutable.ArrayBuffer
@@ -321,28 +321,28 @@ class CriticalPointsTestSuite extends FunSuite with BeforeAndAfterAll with Loggi
     assert(expandedCPRs.size == 4)
 
     val rowkey0 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(0), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(7), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(0), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(7), IntegerType))
     )
 
     val rowkey1 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(1), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(2), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(1), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(2), IntegerType))
     )
 
     val rowkey2 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(2), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(2), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(2), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(2), IntegerType))
     )
 
     val rowkey3 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(3), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(4), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(3), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(4), IntegerType))
     )
 
     val rowkey4 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(3), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(6), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(3), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(6), IntegerType))
     )
 
     val p1 = new HBasePartition(0, 0, None, Some(rowkey0), relation = relation)
@@ -402,28 +402,28 @@ class CriticalPointsTestSuite extends FunSuite with BeforeAndAfterAll with Loggi
     assert(expandedCPRs.size == 4)
 
     val rowkey0 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(1), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(1), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(1), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(1), IntegerType))
     )
 
     val rowkey1 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(8), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(2), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(8), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(2), IntegerType))
     )
 
     val rowkey2 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(32), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(16), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(32), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(16), IntegerType))
     )
 
     val rowkey3 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(64), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(128), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(64), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(128), IntegerType))
     )
 
     val rowkey4 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(1024), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(256), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(1024), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(256), IntegerType))
     )
 
     val p1 = new HBasePartition(0, 0, None, Some(rowkey0), relation = relation)
@@ -494,28 +494,28 @@ class CriticalPointsTestSuite extends FunSuite with BeforeAndAfterAll with Loggi
     assert(expandedCPRs.size == 2)
 
     val rowkey0 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(1), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(1), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(1), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(1), IntegerType))
     )
 
     val rowkey1 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(8), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(2), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(8), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(2), IntegerType))
     )
 
     val rowkey2 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(32), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(16), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(32), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(16), IntegerType))
     )
 
     val rowkey3 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(64), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(128), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(64), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(128), IntegerType))
     )
 
     val rowkey4 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(1024), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(256), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(1024), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(256), IntegerType))
     )
 
     val p1 = new HBasePartition(0, 0, None, Some(rowkey0), relation = relation)
@@ -585,33 +585,33 @@ class CriticalPointsTestSuite extends FunSuite with BeforeAndAfterAll with Loggi
     assert(expandedCPRs.size == 1)
 
     val rowkey0 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(2), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(8), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(16), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(2), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(8), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(16), IntegerType))
     )
 
     val rowkey1 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(2), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(8), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(32), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(2), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(8), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(32), IntegerType))
     )
 
     val rowkey2 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(2), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(8), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(64), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(2), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(8), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(64), IntegerType))
     )
 
     val rowkey3 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(2), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(8), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(128), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(2), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(8), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(128), IntegerType))
     )
 
     val rowkey4 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(2), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(8), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(256), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(2), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(8), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(256), IntegerType))
     )
 
     val p1 = new HBasePartition(0, 0, None, Some(rowkey0), relation = relation)

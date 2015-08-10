@@ -21,7 +21,7 @@ import org.apache.hadoop.hbase.util.Bytes
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.ShuffledRDD
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.hbase.util.{BytesUtils, HBaseKVHelper}
+import org.apache.spark.sql.hbase.util.{BinaryBytesUtils, HBaseKVHelper}
 import org.apache.spark.sql.types._
 
 import scala.collection.mutable.ArrayBuffer
@@ -56,10 +56,10 @@ class HBasePartitionerSuite extends TestBase {
 
   test("empty string row key encode / decode") {
     val rowkey = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(DoubleType).toBytes(123.456), DoubleType),
-        (BytesUtils.create(StringType).toBytes("abcdef"), StringType),
-        (BytesUtils.create(StringType).toBytes(""), StringType),
-        (BytesUtils.create(IntegerType).toBytes(1234), IntegerType))
+      Seq((BinaryBytesUtils.create(DoubleType).toBytes(123.456), DoubleType),
+        (BinaryBytesUtils.create(StringType).toBytes("abcdef"), StringType),
+        (BinaryBytesUtils.create(StringType).toBytes(""), StringType),
+        (BinaryBytesUtils.create(IntegerType).toBytes(1234), IntegerType))
     )
 
     assert(rowkey.length === 8 + 6 + 1 + 1 + 4)
@@ -68,17 +68,17 @@ class HBasePartitionerSuite extends TestBase {
       Seq(KeyColumn("col1", DoubleType, 0), KeyColumn("col2", StringType, 1),
         KeyColumn("col3", StringType, 2), KeyColumn("col4", IntegerType, 3)))
 
-    assert(BytesUtils.toDouble(rowkey, keys.head._1) === 123.456)
-    assert(BytesUtils.toUTF8String(rowkey, keys(1)._1, keys(1)._2) === "abcdef")
-    assert(BytesUtils.toUTF8String(rowkey, keys(2)._1, keys(2)._2) === "")
-    assert(BytesUtils.toInt(rowkey, keys(3)._1) === 1234)
+    assert(BinaryBytesUtils.toDouble(rowkey, keys.head._1) === 123.456)
+    assert(BinaryBytesUtils.toUTF8String(rowkey, keys(1)._1, keys(1)._2) === "abcdef")
+    assert(BinaryBytesUtils.toUTF8String(rowkey, keys(2)._1, keys(2)._2) === "")
+    assert(BinaryBytesUtils.toInt(rowkey, keys(3)._1) === 1234)
   }
 
   test("row key encode / decode") {
     val rowkey = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(DoubleType).toBytes(123.456), DoubleType),
-        (BytesUtils.create(StringType).toBytes("abcdef"), StringType),
-        (BytesUtils.create(IntegerType).toBytes(1234), IntegerType))
+      Seq((BinaryBytesUtils.create(DoubleType).toBytes(123.456), DoubleType),
+        (BinaryBytesUtils.create(StringType).toBytes("abcdef"), StringType),
+        (BinaryBytesUtils.create(IntegerType).toBytes(1234), IntegerType))
     )
 
     assert(rowkey.length === 8 + 6 + 1 + 4)
@@ -87,9 +87,9 @@ class HBasePartitionerSuite extends TestBase {
       Seq(KeyColumn("col1", DoubleType, 0), KeyColumn("col2", StringType, 1),
         KeyColumn("col3", IntegerType, 2)))
 
-    assert(BytesUtils.toDouble(rowkey, keys.head._1) === 123.456)
-    assert(BytesUtils.toUTF8String(rowkey, keys(1)._1, keys(1)._2) === "abcdef")
-    assert(BytesUtils.toInt(rowkey, keys(2)._1) === 1234)
+    assert(BinaryBytesUtils.toDouble(rowkey, keys.head._1) === 123.456)
+    assert(BinaryBytesUtils.toUTF8String(rowkey, keys(1)._1, keys(1)._2) === "abcdef")
+    assert(BinaryBytesUtils.toInt(rowkey, keys(2)._1) === 1234)
   }
 
   test("test computePredicate in HBasePartition") {
@@ -143,28 +143,28 @@ class HBasePartitionerSuite extends TestBase {
     assert(expandedCPRs.size == 4)
 
     val rowkey0 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(1), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(1), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(1), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(1), IntegerType))
     )
 
     val rowkey1 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(8), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(2), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(8), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(2), IntegerType))
     )
 
     val rowkey2 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(32), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(16), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(32), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(16), IntegerType))
     )
 
     val rowkey3 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(64), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(128), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(64), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(128), IntegerType))
     )
 
     val rowkey4 = HBaseKVHelper.encodingRawKeyColumns(
-      Seq((BytesUtils.create(IntegerType).toBytes(1024), IntegerType)
-        , (BytesUtils.create(IntegerType).toBytes(256), IntegerType))
+      Seq((BinaryBytesUtils.create(IntegerType).toBytes(1024), IntegerType)
+        , (BinaryBytesUtils.create(IntegerType).toBytes(256), IntegerType))
     )
 
     val p1 = new HBasePartition(0, 0, None, Some(rowkey0), None, pred, relation)

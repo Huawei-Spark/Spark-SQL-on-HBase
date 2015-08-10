@@ -26,7 +26,7 @@ import org.apache.hadoop.hbase.filter.FilterBase
 import org.apache.hadoop.hbase.util.{Bytes, Writables}
 import org.apache.hadoop.io.Writable
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.hbase.util.{HBaseKVHelper, DataTypeUtils, BytesUtils}
+import org.apache.spark.sql.hbase.util.{HBaseKVHelper, DataTypeUtils, BinaryBytesUtils}
 import org.apache.spark.sql.types.{DataType, AtomicType, StringType}
 import org.apache.spark.sql.hbase.catalyst.expressions.PartialPredicateOperations._
 

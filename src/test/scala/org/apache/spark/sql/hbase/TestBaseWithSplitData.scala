@@ -23,7 +23,7 @@ import org.apache.hadoop.hbase._
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.spark.sql.catalyst.expressions.{GenericRow, Row}
-import org.apache.spark.sql.hbase.util.{BytesUtils, DataTypeUtils, HBaseKVHelper}
+import org.apache.spark.sql.hbase.util.{BinaryBytesUtils, DataTypeUtils, HBaseKVHelper}
 import org.apache.spark.sql.types._
 
 /**
@@ -211,7 +211,7 @@ class TestBaseWithSplitData extends TestBase {
                  colFamily: String, colQualifier: String) = {
     val bos = new ByteArrayOutputStream()
     val dos = new DataOutputStream(bos)
-    val bu = BytesUtils.create(rowType)
+    val bu = BinaryBytesUtils.create(rowType)
     rowType match {
       case StringType => dos.write(bu.toBytes(rowValue.asInstanceOf[String]))
       case IntegerType => dos.write(bu.toBytes(rowValue.asInstanceOf[Int]))

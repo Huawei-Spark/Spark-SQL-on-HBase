@@ -170,7 +170,8 @@ private[hbase] class HBaseCatalog(@transient hbaseContext: SQLContext,
   @transient var pwdIsAccessible = false
 
   def createTable(tableName: String, hbaseNamespace: String, hbaseTableName: String,
-                  allColumns: Seq[AbstractColumn], splitKeys: Array[Array[Byte]]): HBaseRelation = {
+                  allColumns: Seq[AbstractColumn], splitKeys: Array[Array[Byte]],
+                  encodingFormat: String = "binaryformat"): HBaseRelation = {
     val metadataTable = getMetadataTable
 
     if (checkLogicalTableExist(tableName, metadataTable)) {
@@ -200,7 +201,7 @@ private[hbase] class HBaseCatalog(@transient hbaseContext: SQLContext,
       throw new Exception(s"row key $tableName exists")
     } else {
       val hbaseRelation = HBaseRelation(tableName, hbaseNamespace, hbaseTableName,
-        allColumns, deploySuccessfully)(hbaseContext)
+        allColumns, deploySuccessfully, encodingFormat)(hbaseContext)
       hbaseRelation.setConfig(configuration)
 
       writeObjectToTable(hbaseRelation, metadataTable)

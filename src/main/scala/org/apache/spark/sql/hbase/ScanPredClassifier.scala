@@ -18,7 +18,7 @@
 package org.apache.spark.sql.hbase
 
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.hbase.util.{BytesUtils, DataTypeUtils}
+import org.apache.spark.sql.hbase.util.{BinaryBytesUtils, DataTypeUtils}
 
 /**
  * Classifies a predicate into a pair of (pushdownable, non-pushdownable) predicates
@@ -104,8 +104,9 @@ class ScanPredClassifier(relation: HBaseRelation) {
              * Use try-catch to make sure data type conversion is proper, for example,
              * Java throws casting exception while doing col2 in (1, 2, 3), if col2 data type
              * if ByteType and 1, 2, 3 is Integer.
-              */
-            DataTypeUtils.getBinaryComparator(BytesUtils.create(dataType), Literal.create(item, dataType))
+             */
+            DataTypeUtils.getBinaryComparator(
+              relation.bytesUtils.create(dataType), Literal.create(item, dataType))
           } catch {
             case e: Exception => errorOccurred = true
           }

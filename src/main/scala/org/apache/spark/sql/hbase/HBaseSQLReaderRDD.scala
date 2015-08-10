@@ -24,7 +24,7 @@ import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.codegen.GeneratePredicate
 import org.apache.spark.sql.execution.SparkPlan
 import org.apache.spark.sql.hbase.execution.HBaseSQLTableScan
-import org.apache.spark.sql.hbase.util.{BytesUtils, DataTypeUtils, HBaseKVHelper}
+import org.apache.spark.sql.hbase.util.{BinaryBytesUtils, DataTypeUtils, HBaseKVHelper}
 import org.apache.spark.sql.types.{AtomicType, DataType}
 import org.apache.spark.sql.{Row, SQLContext}
 
@@ -335,7 +335,7 @@ class HBaseSQLReaderRDD(val relation: HBaseRelation,
         val end = if (endRowKey != null) {
           val finalKey: HBaseRawType = {
             if (endInclusive || endKey.isEmpty) {
-              BytesUtils.addOne(endRowKey)
+              BinaryBytesUtils.addOne(endRowKey)
             } else {
               endRowKey
             }
