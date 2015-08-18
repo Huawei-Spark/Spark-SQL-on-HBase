@@ -18,6 +18,7 @@ package org.apache.spark.sql.hbase
 
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.catalyst.SqlParser
+import org.apache.spark.sql.catalyst.analysis.{UnresolvedRelation, UnresolvedAttribute}
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.execution.RunnableCommand
@@ -58,6 +59,11 @@ class HBaseSQLParser extends SqlParser {
   protected val TABLES = Keyword("TABLES")
   protected val VALUES = Keyword("VALUES")
   protected val TERMINATED = Keyword("TERMINATED")
+  protected val UPDATE = Keyword("UPDATE")
+  protected val DELETE = Keyword("DELETE")
+  protected val SET = Keyword("SET")
+  protected val EQ = Keyword("=")
+
 
   override protected lazy val start: Parser[LogicalPlan] =
     start1 | insert | cte |
@@ -72,6 +78,34 @@ class HBaseSQLParser extends SqlParser {
           else v.value.toString
         }
         InsertValueIntoTableCommand(tableName, valueStringSeq)
+    }
+
+  // Standard Syntax:
+  // UPDATE tablename SET column = value [, column = value ...] [WHERE expression]
+  protected lazy val update: Parser[LogicalPlan] =
+    (UPDATE ~> relation <~ SET) ~ rep1sep(updateColumn, ",") ~ (WHERE ~> expression) ^^ {
+      case table ~ updateColumns ~ exp =>
+        val (columns, values) = updateColumns.unzip
+        catalyst.logical.UpdateTable(
+          table.asInstanceOf[UnresolvedRelation].tableName,
+          columns.map(UnresolvedAttribute.quoted),
+          values,
+          Filter(exp, table))
+    }
+
+  protected lazy val updateColumn: Parser[(String, String)] =
+    ident ~ (EQ ~> ident) ^^ {
+      case column ~ value => (column, value)
+    }
+
+  // Standard Syntax:
+  // DELETE FROM tablename [WHERE expression]
+  protected lazy val delete: Parser[LogicalPlan] =
+    DELETE ~ FROM ~> relation ~ (WHERE ~> expression) ^^ {
+      case table ~ exp =>
+        catalyst.logical.DeleteFromTable(
+          table.asInstanceOf[UnresolvedRelation].tableName,
+          Filter(exp, table))
     }
 
   protected lazy val create: Parser[LogicalPlan] =

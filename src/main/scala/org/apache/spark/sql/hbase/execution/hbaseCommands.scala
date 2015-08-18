@@ -30,8 +30,8 @@ import org.apache.hadoop.mapreduce.{Job, RecordWriter}
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.mapreduce.SparkHadoopMapReduceUtil
 import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.expressions.{Attribute, Row}
-import org.apache.spark.sql.catalyst.plans.logical.Subquery
+import org.apache.spark.sql.catalyst.expressions.{Expression, Attribute, Row}
+import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, Subquery}
 import org.apache.spark.sql.execution.RunnableCommand
 import org.apache.spark.sql.hbase.HBasePartitioner.HBaseRawOrdering
 import org.apache.spark.sql.hbase._
@@ -303,4 +303,7 @@ case class BulkLoadIntoTableCommand(
 
   override def output = Nil
 }
+
+
+
 

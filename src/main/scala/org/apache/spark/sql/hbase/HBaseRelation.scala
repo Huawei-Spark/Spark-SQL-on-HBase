@@ -19,13 +19,14 @@ package org.apache.spark.sql.hbase
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{HBaseConfiguration, _}
-import org.apache.hadoop.hbase.client.{Get, HTable, Put, Result, Scan}
+import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.filter._
 import org.apache.log4j.Logger
 import org.apache.spark.TaskContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.catalyst.expressions.Row
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.hbase.catalyst.expressions.PartialPredicateOperations.partialPredicateReducer
 import org.apache.spark.sql.hbase.catalyst.NotPusher
@@ -701,6 +702,42 @@ private[hbase] case class HBaseRelation(
     closeHTable()
   }
 
+  def delete(data: DataFrame) = {
+    sqlContext.sparkContext.runJob(data.rdd, deleteFromHBase _)
+  }
+
+  def deleteFromHBase(context: TaskContext, iterator: Iterator[Row]) = {
+    // TODO:make the BatchMaxSize configurable
+    val BatchMaxSize = 100
+    var rowIndexInBatch = 0
+
+    var deletes = new ListBuffer[Delete]()
+    while (iterator.hasNext) {
+      val row = iterator.next()
+      val rawKeyCol = keyColumns.map(
+        kc => {
+          val rowColumn = DataTypeUtils.getRowColumnInHBaseRawType(
+            row, kc.ordinal, kc.dataType)
+          (rowColumn, kc.dataType)
+        }
+      )
+      val key = HBaseKVHelper.encodingRawKeyColumns(rawKeyCol)
+      val delete = new Delete(key)
+      deletes += delete
+      rowIndexInBatch += 1
+      if (rowIndexInBatch >= BatchMaxSize) {
+        htable.delete(deletes.toList)
+        deletes.clear()
+        rowIndexInBatch = 0
+      }
+    }
+    if (deletes.nonEmpty) {
+      htable.delete(deletes.toList)
+      deletes.clear()
+      rowIndexInBatch = 0
+    }
+    closeHTable()
+  }
 
   def buildScan(requiredColumns: Seq[Attribute], filters: Seq[Expression]): RDD[Row] = {
     require(filters.size < 2, "Internal logical error: unexpected filter list size")
