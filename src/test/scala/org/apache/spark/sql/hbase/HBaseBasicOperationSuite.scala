@@ -77,7 +77,7 @@ class HBaseBasicOperationSuite extends TestBaseWithSplitData {
            |          col5 LONG, col6 FLOAT, col7 DOUBLE,
            |          PRIMARY KEY(col1))
            |          MAPPED BY (ht2, COLS=[col2=cf1.cq11, col3=cf1.cq12, col4=cf1.cq13,
-           |          col5=cf2.cq21, col6=cf2.cq22, col7=cf2.cq23])""".stripMargin
+           |          col5=cf2.cq21, col6=cf2.cq22, col7=cf2.cq23]) In StringFormat""".stripMargin
     )
 
     assert(sql( """SELECT * FROM tb1""").collect().length == 0)
@@ -86,15 +86,15 @@ class HBaseBasicOperationSuite extends TestBaseWithSplitData {
     sql( """INSERT INTO TABLE tb1 VALUES ("row3", true , 555 , 999  , 100000, 500.05, 10000.01)""")
     sql( """SELECT col1 FROM tb1 where col2<true order by col2""")
       .collect().zip(Seq("row1", "row2")).foreach{case (r,s) => assert(r.getString(0) == s)}
-    sql( """SELECT col1 FROM tb1 where col3>500 order by col3""")
+    sql( """SELECT * FROM tb1 where col3>500 order by col3""")
       .collect().zip(Seq("row3", "row1")).foreach{case (r,s) => assert(r.getString(0) == s)}
-    sql( """SELECT col1 FROM tb1 where col4>5000 order by col4""")
+    sql( """SELECT * FROM tb1 where col4>5000 order by col4""")
       .collect().zip(Seq("row1", "row2")).foreach{case (r,s) => assert(r.getString(0) == s)}
-    sql( """SELECT col1 FROM tb1 where col5>50000 order by col5""")
+    sql( """SELECT * FROM tb1 where col5>50000 order by col5""")
       .collect().zip(Seq("row3")).foreach{case (r,s) => assert(r.getString(0) == s)}
-    sql( """SELECT col1 FROM tb1 where col6>500 order by col6""")
+    sql( """SELECT * FROM tb1 where col6>500 order by col6""")
       .collect().zip(Seq("row3", "row2")).foreach{case (r,s) => assert(r.getString(0) == s)}
-    sql( """SELECT col1 FROM tb1 where col7>5000 order by col7""")
+    sql( """SELECT * FROM tb1 where col7>5000 order by col7""")
       .collect().zip(Seq("row2", "row3")).foreach{case (r,s) => assert(r.getString(0) == s)}
 
     sql( """DROP TABLE tb1""")

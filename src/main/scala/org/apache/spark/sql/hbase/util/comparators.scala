@@ -148,8 +148,11 @@ object LongComparator {
 
 class LongComparator(value: Array[Byte]) extends CustomComparator(value) {
   override def compareTo(value: HBaseRawType, offset: Int, length: Int): Int = {
-    (StringBytesUtils.toLong(this.value, 0, this.value.length) -
-      StringBytesUtils.toLong(value, offset, length)).toInt
+    val r = StringBytesUtils.toLong(this.value, 0, this.value.length) -
+      StringBytesUtils.toLong(value, offset, length)
+    if (r > 0) 1
+    else if (r == 0) 0
+    else -1
   }
 }
 
@@ -175,8 +178,11 @@ object DoubleComparator {
 
 class DoubleComparator(value: Array[Byte]) extends CustomComparator(value) {
   override def compareTo(value: HBaseRawType, offset: Int, length: Int): Int = {
-    (StringBytesUtils.toDouble(this.value, 0, this.value.length) -
-      StringBytesUtils.toDouble(value, offset, length)).toInt
+    val r = StringBytesUtils.toDouble(this.value, 0, this.value.length) -
+      StringBytesUtils.toDouble(value, offset, length)
+    if (r > 0) 1
+    else if (r == 0) 0
+    else -1
   }
 }
 
@@ -202,8 +208,11 @@ object FloatComparator {
 
 class FloatComparator(value: Array[Byte]) extends CustomComparator(value) {
   override def compareTo(value: HBaseRawType, offset: Int, length: Int): Int = {
-    (StringBytesUtils.toFloat(this.value, 0, this.value.length) -
-      StringBytesUtils.toFloat(value, offset, length)).toInt
+    val r = StringBytesUtils.toFloat(this.value, 0, this.value.length) -
+      StringBytesUtils.toFloat(value, offset, length)
+    if (r > 0) 1
+    else if (r == 0) 0
+    else -1
   }
 }
 
