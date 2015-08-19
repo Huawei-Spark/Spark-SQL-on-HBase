@@ -114,8 +114,8 @@ private[hbase] case class HBaseRelation(
     )
 
   @transient lazy val bytesUtils: BytesUtils = encodingFormat match {
-    case "stringformat" => println(tableName + " stringformat");StringBytesUtils
-    case _ => println(tableName + " binaryformat");BinaryBytesUtils
+    case "stringformat" => StringBytesUtils
+    case _ => BinaryBytesUtils
   }
 
   lazy val partitionKeys = keyColumns.map(col =>

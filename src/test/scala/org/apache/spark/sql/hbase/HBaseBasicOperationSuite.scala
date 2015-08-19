@@ -36,16 +36,19 @@ class HBaseBasicOperationSuite extends TestBaseWithSplitData {
     super.afterAll()
   }
 
-  test("Insert Into table in stringFormat") {
+  test("Insert Into table in StringFormat") {
     sql( """CREATE TABLE tb0 (column2 INTEGER, column1 INTEGER, column4 FLOAT,
-          column3 SHORT, PRIMARY KEY(column1, column2)) IN stringFormat
-          MAPPED BY (testNamespace.ht0, COLS=[column3=family1.qualifier1,
-          column4=family2.qualifier2])"""
+          column3 SHORT, PRIMARY KEY(column1))
+          MAPPED BY (testNamespace.ht0, COLS=[column2=family0.qualifier0, column3=family1.qualifier1,
+          column4=family2.qualifier2]) IN StringFormat"""
     )
 
     assert(sql( """SELECT * FROM tb0""").collect().length == 0)
     sql( """INSERT INTO TABLE tb0 SELECT col4,col4,col6,col3 FROM ta""")
     assert(sql( """SELECT * FROM tb0""").collect().length == 14)
+
+    sql( """SELECT * FROM tb0""").show
+    sql( """SELECT * FROM tb0 where column2 > 200""").show
 
     sql( """DROP TABLE tb0""")
   }
@@ -65,6 +68,34 @@ class HBaseBasicOperationSuite extends TestBaseWithSplitData {
     assert(sql(
       """SELECT * FROM tb1 WHERE (column1 = 1024)
         |OR (column1 = 1028 AND column2 ="abd")""".stripMargin).collect().length == 2)
+
+    sql( """DROP TABLE tb1""")
+  }
+
+  test("Insert and Query Single Row in StringFormat") {
+    sql( """CREATE TABLE tb1 (col1 STRING, col2 BOOL, col3 SHORT, col4 INTEGER,
+           |          col5 LONG, col6 FLOAT, col7 DOUBLE,
+           |          PRIMARY KEY(col1))
+           |          MAPPED BY (ht2, COLS=[col2=cf1.cq11, col3=cf1.cq12, col4=cf1.cq13,
+           |          col5=cf2.cq21, col6=cf2.cq22, col7=cf2.cq23])""".stripMargin
+    )
+
+    assert(sql( """SELECT * FROM tb1""").collect().length == 0)
+    sql( """INSERT INTO TABLE tb1 VALUES ("row1", false, 1000, 5050 , 50000 , 99.99 , 999.999)""")
+    sql( """INSERT INTO TABLE tb1 VALUES ("row2", false, 99  , 10000, 9999  , 1000.1, 5000.5)""")
+    sql( """INSERT INTO TABLE tb1 VALUES ("row3", true , 555 , 999  , 100000, 500.05, 10000.01)""")
+    sql( """SELECT col1 FROM tb1 where col2<true order by col2""")
+      .collect().zip(Seq("row1", "row2")).foreach{case (r,s) => assert(r.getString(0) == s)}
+    sql( """SELECT col1 FROM tb1 where col3>500 order by col3""")
+      .collect().zip(Seq("row3", "row1")).foreach{case (r,s) => assert(r.getString(0) == s)}
+    sql( """SELECT col1 FROM tb1 where col4>5000 order by col4""")
+      .collect().zip(Seq("row1", "row2")).foreach{case (r,s) => assert(r.getString(0) == s)}
+    sql( """SELECT col1 FROM tb1 where col5>50000 order by col5""")
+      .collect().zip(Seq("row3")).foreach{case (r,s) => assert(r.getString(0) == s)}
+    sql( """SELECT col1 FROM tb1 where col6>500 order by col6""")
+      .collect().zip(Seq("row3", "row2")).foreach{case (r,s) => assert(r.getString(0) == s)}
+    sql( """SELECT col1 FROM tb1 where col7>5000 order by col7""")
+      .collect().zip(Seq("row2", "row3")).foreach{case (r,s) => assert(r.getString(0) == s)}
 
     sql( """DROP TABLE tb1""")
   }

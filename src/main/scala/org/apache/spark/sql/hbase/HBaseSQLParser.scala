@@ -78,13 +78,13 @@ class HBaseSQLParser extends SqlParser {
     CREATE ~> TABLE ~> ident ~
       ("(" ~> tableCols <~ ",") ~
       (PRIMARY ~> KEY ~> "(" ~> keys <~ ")" <~ ")") ~
-      (IN ~> ident).? ~
       (MAPPED ~> BY ~> "(" ~> opt(nameSpace)) ~
       (ident <~ ",") ~
-      (COLS ~> "=" ~> "[" ~> expressions <~ "]" <~ ")") <~ opt(";") ^^ {
+      (COLS ~> "=" ~> "[" ~> expressions <~ "]" <~ ")") ~
+      (IN ~> ident).? <~ opt(";") ^^ {
 
-      case tableName ~ tableColumns ~ keySeq ~ encodingFormat ~
-        tableNameSpace ~ hbaseTableName ~ mappingInfo =>
+      case tableName ~ tableColumns ~ keySeq ~
+        tableNameSpace ~ hbaseTableName ~ mappingInfo ~ encodingFormat =>
         // Since the lexical can not recognize the symbol "=" as we expected, we compose it
         // to expression first and then translate it into Map[String, (String, String)].
         // TODO: Now get the info by hacking, need to change it into normal way if possible
