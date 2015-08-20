@@ -68,7 +68,7 @@ class HBaseSQLParser extends SqlParser {
   override protected lazy val start: Parser[LogicalPlan] =
     start1 | insert | cte |
       create | drop | alterDrop | alterAdd |
-      insertValues | load | show | describe
+      insertValues | load | show | describe | update | delete
 
   protected lazy val insertValues: Parser[LogicalPlan] =
     INSERT ~> INTO ~> TABLE ~> ident ~ (VALUES ~> "(" ~> values <~ ")") ^^ {
