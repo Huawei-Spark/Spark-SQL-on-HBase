@@ -24,7 +24,7 @@ class HBaseUpdateDeleteSuite extends TestBase {
   test("update support") {
 
     val parser = new HBaseSQLParser()
-    val sql = raw"update tb1 set col1 = 2 where col2 = 0"
+    val sql = raw"update wf set col2 = value where col4=7"
 
     val plan: LogicalPlan = parser.parse(sql)
     assert(plan.isInstanceOf[catalyst.logical.UpdateTable])

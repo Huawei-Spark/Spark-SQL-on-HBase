@@ -710,7 +710,9 @@ private[hbase] case class HBaseRelation(
     val BatchMaxSize = 100
     var rowIndexInBatch = 0
 
-    var deletes = new ListBuffer[Delete]()
+    // note: this is a hack, we can not use scala list
+    // it will throw UnsupportedOperationException.
+    var deletes = new java.util.ArrayList[Delete]()
     while (iterator.hasNext) {
       val row = iterator.next()
       val rawKeyCol = keyColumns.map(
@@ -722,16 +724,16 @@ private[hbase] case class HBaseRelation(
       )
       val key = HBaseKVHelper.encodingRawKeyColumns(rawKeyCol)
       val delete = new Delete(key)
-      deletes += delete
+      deletes.add(delete)
       rowIndexInBatch += 1
       if (rowIndexInBatch >= BatchMaxSize) {
-        htable.delete(deletes.toList)
+        htable.delete(deletes)
         deletes.clear()
         rowIndexInBatch = 0
       }
     }
     if (deletes.nonEmpty) {
-      htable.delete(deletes.toList)
+      htable.delete(deletes)
       deletes.clear()
       rowIndexInBatch = 0
     }
