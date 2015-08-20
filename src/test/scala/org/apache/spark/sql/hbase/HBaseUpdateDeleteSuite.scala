@@ -15,29 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.spark.sql.hbase.catalyst.logical
+package org.apache.spark.sql.hbase
 
-import org.apache.spark.annotation.DeveloperApi
-import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.plans.logical.{UnaryNode, LogicalPlan}
-@DeveloperApi
-case class UpdateTable(
-    tableName: String,
-    columnsToUpdate: Seq[Expression],
-    values: Seq[String],
-    child: LogicalPlan) extends UnaryNode {
+import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 
-  override lazy val resolved: Boolean = columnsToUpdate.forall(_.resolved) && childrenResolved
+class HBaseUpdateDeleteSuite extends TestBase {
 
-  override def output: Seq[Attribute] = Seq.empty
+  test("update support") {
 
-}
+    val parser = new HBaseSQLParser()
+    val sql = raw"update tb1 set col1 = 2 where col2 = 0"
 
-@DeveloperApi
-case class DeleteFromTable(tableName: String, child: LogicalPlan) extends UnaryNode {
+    val plan: LogicalPlan = parser.parse(sql)
+    assert(plan.isInstanceOf[catalyst.logical.UpdateTable])
+  }
 
-  override lazy val resolved: Boolean = childrenResolved
+  test("delete support") {
 
-  override def output: Seq[Attribute] = Seq.empty
+    val parser = new HBaseSQLParser()
+    val sql = raw"delete from tb1 where col2 = 0"
 
+    val plan: LogicalPlan = parser.parse(sql)
+    assert(plan.isInstanceOf[catalyst.logical.DeleteFromTable])
+  }
 }

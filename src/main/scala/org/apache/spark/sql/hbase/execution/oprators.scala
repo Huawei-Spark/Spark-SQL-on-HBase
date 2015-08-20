@@ -31,7 +31,7 @@ import org.apache.spark.sql.sources.LogicalRelation
 @DeveloperApi
 case class UpdateTable(
     tableName: String,
-    columnsToUpdate: Seq[Attribute],
+    columnsToUpdate: Seq[Expression],
     values: Seq[String],
     child: SparkPlan) extends execution.UnaryNode {
 

@@ -94,8 +94,8 @@ class HBaseSQLParser extends SqlParser {
     }
 
   protected lazy val updateColumn: Parser[(String, String)] =
-    ident ~ (EQ ~> ident) ^^ {
-      case column ~ value => (column, value)
+    ident ~ (EQ ~> literal) ^^ {
+      case column ~ value => (column, value.value.toString)
     }
 
   // Standard Syntax:
