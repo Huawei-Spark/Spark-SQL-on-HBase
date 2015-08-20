@@ -649,12 +649,11 @@ private[hbase] case class HBaseRelation(
     case NonKeyColumn(name, dt, _, _) => StructField(name, dt, nullable = true)
   })
 
-  override def insert(data: DataFrame, overwrite: Boolean) = {
-    if (!overwrite) {
+  override def insert(data: DataFrame, overwrite: Boolean = true) = {
+    if (overwrite) {
       sqlContext.sparkContext.runJob(data.rdd, writeToHBase _)
     } else {
-      // TODO: Support INSERT OVERWRITE INTO
-      sys.error("HBASE Table does not support INSERT OVERWRITE for now.")
+      sys.error("HBASE Table does not support append mode.")
     }
   }
 

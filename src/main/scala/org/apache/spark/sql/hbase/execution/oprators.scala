@@ -65,7 +65,7 @@ case class UpdateTable(
       }
     }
     val inputValuesDF = sqlContext.createDataFrame(resRdd, relation.schema)
-    relation.insert(inputValuesDF, overwrite = false)
+    relation.insert(inputValuesDF)
     sqlContext.sparkContext.emptyRDD[Row]
   }
 

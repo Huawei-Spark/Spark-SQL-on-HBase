@@ -27,11 +27,12 @@ import org.apache.hadoop.hbase.mapreduce.{HFileOutputFormat2, LoadIncrementalHFi
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
 import org.apache.hadoop.mapreduce.{Job, RecordWriter}
+
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.mapreduce.SparkHadoopMapReduceUtil
 import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.expressions.{Expression, Attribute, Row}
-import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, Subquery}
+import org.apache.spark.sql.catalyst.expressions.{Attribute, Row}
+import org.apache.spark.sql.catalyst.plans.logical.Subquery
 import org.apache.spark.sql.execution.RunnableCommand
 import org.apache.spark.sql.hbase.HBasePartitioner.HBaseRawOrdering
 import org.apache.spark.sql.hbase._
@@ -55,11 +56,11 @@ case class AlterDropColCommand(tableName: String, columnName: String) extends Ru
 
 @DeveloperApi
 case class AlterAddColCommand(
-                               tableName: String,
-                               colName: String,
-                               colType: String,
-                               colFamily: String,
-                               colQualifier: String) extends RunnableCommand {
+    tableName: String,
+    colName: String,
+    colType: String,
+    colFamily: String,
+    colQualifier: String) extends RunnableCommand {
 
   def run(sqlContext: SQLContext): Seq[Row] = {
     val hbaseCatalog = sqlContext.catalog.asInstanceOf[HBaseCatalog]
@@ -137,7 +138,7 @@ case class InsertValueIntoTableCommand(tableName: String, valueSeq: Seq[String])
     
     val rows = sqlContext.sparkContext.makeRDD(Seq(Row.fromSeq(bytes)))
     val inputValuesDF = sqlContext.createDataFrame(rows, relation.schema)
-    relation.insert(inputValuesDF, overwrite = false)
+    relation.insert(inputValuesDF)
     
     Seq.empty[Row]
   }
@@ -147,11 +148,11 @@ case class InsertValueIntoTableCommand(tableName: String, valueSeq: Seq[String])
 
 @DeveloperApi
 case class BulkLoadIntoTableCommand(
-                                     inputPath: String,
-                                     tableName: String,
-                                     isLocal: Boolean,
-                                     delimiter: Option[String],
-                                     parallel: Boolean)
+    inputPath: String,
+    tableName: String,
+    isLocal: Boolean,
+    delimiter: Option[String],
+    parallel: Boolean)
   extends RunnableCommand
   with SparkHadoopMapReduceUtil
   with Logging {
@@ -303,7 +304,3 @@ case class BulkLoadIntoTableCommand(
 
   override def output = Nil
 }
-
-
-
-
