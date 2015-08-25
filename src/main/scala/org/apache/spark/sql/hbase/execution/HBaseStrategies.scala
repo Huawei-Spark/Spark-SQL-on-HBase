@@ -25,6 +25,7 @@ import org.apache.spark.sql.catalyst.plans.logical
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.execution.{Project, SparkPlan}
 import org.apache.spark.sql.hbase.{HBasePartition, HBaseRawType, HBaseRelation, KeyColumn}
+import org.apache.spark.sql.hbase.catalyst.{logical => hbaseLogical}
 import org.apache.spark.sql.sources.LogicalRelation
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{SQLContext, Strategy, execution}
@@ -66,6 +67,12 @@ private[hbase] trait HBaseStrategies {
           projectList,
           inPredicates,
           (a, f) => relation.buildScan(a, f)) :: Nil
+
+      case hbaseLogical.UpdateTable(tableName, columnsToUpdate, values, child) =>
+        UpdateTable(tableName, columnsToUpdate, values, planLater(child)) :: Nil
+
+      case hbaseLogical.DeleteFromTable(tableName, child) =>
+        DeleteFromTable(tableName, planLater(child)) :: Nil
 
       case _ => Nil
     }
