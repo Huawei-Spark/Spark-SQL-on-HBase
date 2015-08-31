@@ -1,0 +1,14 @@
+option java_package = "org.apache.spark.sql.hbase.util";
+option java_outer_classname = "AdditionalComparatorsProtos";
+option java_generic_services = true;
+option java_generate_equals_and_hash = true;
+option optimize_for = SPEED;
+
+
+message ByteArrayComparable {
+  optional bytes value = 1;
+}
+
+message CustomComparator {
+  required ByteArrayComparable comparable = 1;
+}

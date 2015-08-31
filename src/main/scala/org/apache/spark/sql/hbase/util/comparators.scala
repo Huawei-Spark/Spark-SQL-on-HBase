@@ -20,7 +20,6 @@ package org.apache.spark.sql.hbase.util
 import com.google.protobuf.InvalidProtocolBufferException
 import org.apache.hadoop.hbase.exceptions.DeserializationException
 import org.apache.hadoop.hbase.filter.ByteArrayComparable
-import org.apache.hadoop.hbase.protobuf.generated.ComparatorProtos
 import org.apache.hadoop.hbase.util.{ByteStringer, Bytes}
 import org.apache.spark.sql.hbase._
 
@@ -29,8 +28,8 @@ class CustomComparator(value: Array[Byte]) extends ByteArrayComparable(value) {
     Bytes.compareTo(this.value, 0, this.value.length, value, offset, length)
   }
 
-  def origConvert: ComparatorProtos.ByteArrayComparable = {
-    val builder = ComparatorProtos.ByteArrayComparable.newBuilder
+  def origConvert: AdditionalComparatorsProtos.ByteArrayComparable = {
+    val builder = AdditionalComparatorsProtos.ByteArrayComparable.newBuilder
     if (value != null) builder.setValue(ByteStringer.wrap(value))
     builder.build
   }
@@ -39,7 +38,7 @@ class CustomComparator(value: Array[Byte]) extends ByteArrayComparable(value) {
    * @return The comparator serialized using pb
    */
   def toByteArray: Array[Byte] = {
-    val builder = AdditionalComparators.CustomComparator.newBuilder()
+    val builder = AdditionalComparatorsProtos.CustomComparator.newBuilder()
     builder.setComparable(origConvert)
     builder.build.toByteArray
   }
@@ -53,9 +52,9 @@ object IntComparator {
    * @see #toByteArray
    */
   def parseFrom(pbBytes: Array[Byte]): IntComparator = {
-    var proto: AdditionalComparators.CustomComparator = null
+    var proto: AdditionalComparatorsProtos.CustomComparator = null
     try {
-      proto = AdditionalComparators.CustomComparator.parseFrom(pbBytes)
+      proto = AdditionalComparatorsProtos.CustomComparator.parseFrom(pbBytes)
     }
     catch {
       case e: InvalidProtocolBufferException =>
@@ -80,9 +79,9 @@ object ByteComparator {
    * @see #toByteArray
    */
   def parseFrom(pbBytes: Array[Byte]): ByteComparator = {
-    var proto: AdditionalComparators.CustomComparator = null
+    var proto: AdditionalComparatorsProtos.CustomComparator = null
     try {
-      proto = AdditionalComparators.CustomComparator.parseFrom(pbBytes)
+      proto = AdditionalComparatorsProtos.CustomComparator.parseFrom(pbBytes)
     }
     catch {
       case e: InvalidProtocolBufferException =>
@@ -107,9 +106,9 @@ object ShortComparator {
    * @see #toByteArray
    */
   def parseFrom(pbBytes: Array[Byte]): ShortComparator = {
-    var proto: AdditionalComparators.CustomComparator = null
+    var proto: AdditionalComparatorsProtos.CustomComparator = null
     try {
-      proto = AdditionalComparators.CustomComparator.parseFrom(pbBytes)
+      proto = AdditionalComparatorsProtos.CustomComparator.parseFrom(pbBytes)
     }
     catch {
       case e: InvalidProtocolBufferException =>
@@ -134,9 +133,9 @@ object LongComparator {
    * @see #toByteArray
    */
   def parseFrom(pbBytes: Array[Byte]): LongComparator = {
-    var proto: AdditionalComparators.CustomComparator = null
+    var proto: AdditionalComparatorsProtos.CustomComparator = null
     try {
-      proto = AdditionalComparators.CustomComparator.parseFrom(pbBytes)
+      proto = AdditionalComparatorsProtos.CustomComparator.parseFrom(pbBytes)
     }
     catch {
       case e: InvalidProtocolBufferException =>
@@ -164,9 +163,9 @@ object DoubleComparator {
    * @see #toByteArray
    */
   def parseFrom(pbBytes: Array[Byte]): DoubleComparator = {
-    var proto: AdditionalComparators.CustomComparator = null
+    var proto: AdditionalComparatorsProtos.CustomComparator = null
     try {
-      proto = AdditionalComparators.CustomComparator.parseFrom(pbBytes)
+      proto = AdditionalComparatorsProtos.CustomComparator.parseFrom(pbBytes)
     }
     catch {
       case e: InvalidProtocolBufferException =>
@@ -194,9 +193,9 @@ object FloatComparator {
    * @see #toByteArray
    */
   def parseFrom(pbBytes: Array[Byte]): FloatComparator = {
-    var proto: AdditionalComparators.CustomComparator = null
+    var proto: AdditionalComparatorsProtos.CustomComparator = null
     try {
-      proto = AdditionalComparators.CustomComparator.parseFrom(pbBytes)
+      proto = AdditionalComparatorsProtos.CustomComparator.parseFrom(pbBytes)
     }
     catch {
       case e: InvalidProtocolBufferException =>
@@ -224,9 +223,9 @@ object BoolComparator {
    * @see #toByteArray
    */
   def parseFrom(pbBytes: Array[Byte]): BoolComparator = {
-    var proto: AdditionalComparators.CustomComparator = null
+    var proto: AdditionalComparatorsProtos.CustomComparator = null
     try {
-      proto = AdditionalComparators.CustomComparator.parseFrom(pbBytes)
+      proto = AdditionalComparatorsProtos.CustomComparator.parseFrom(pbBytes)
     }
     catch {
       case e: InvalidProtocolBufferException =>
