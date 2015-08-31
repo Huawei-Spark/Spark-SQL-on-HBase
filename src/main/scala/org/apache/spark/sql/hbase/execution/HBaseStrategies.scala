@@ -149,14 +149,14 @@ private[hbase] trait HBaseStrategies {
             //or it missed some mid dimensions in the rowkey,
             //that means we have to do it with the partial aggregation.
             //
-            //If the groupingExpreesions are composed by all keys,
+            //If the groupingExpressions are composed by all keys,
             //that means it need to be grouped by rowkey in all dimensions,
             //so we could do the aggregation for all directly.
             if (keysForGroup.size != groupingExpressions.size) aggrWithPartial
             else if (keysForGroup.size == hbaseRelation.keyColumns.size) aggrForAll
             else {
               val partitionsAfterFilter = scanNode.result.partitions
-              val eachPartionApart = (0 to partitionsAfterFilter.length - 2).forall { case i =>
+              val eachPartitionApart = (0 to partitionsAfterFilter.length - 2).forall { case i =>
                 val headEnd = partitionsAfterFilter(i).asInstanceOf[HBasePartition]
                   .end.get.asInstanceOf[HBaseRawType]
                 val tailStart = partitionsAfterFilter(i + 1).asInstanceOf[HBasePartition]
@@ -165,7 +165,7 @@ private[hbase] trait HBaseStrategies {
                 // for the given rowkey dimensions, we could not do the aggregation for all.
                 distinguishedForGroupKeys(headEnd, tailStart, keysForGroup)
               }
-              if (eachPartionApart) aggrForAll
+              if (eachPartitionApart) aggrForAll
               else aggrWithPartial
             }
           }

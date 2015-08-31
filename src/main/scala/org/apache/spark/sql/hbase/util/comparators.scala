@@ -21,7 +21,7 @@ import com.google.protobuf.InvalidProtocolBufferException
 import org.apache.hadoop.hbase.exceptions.DeserializationException
 import org.apache.hadoop.hbase.filter.ByteArrayComparable
 import org.apache.hadoop.hbase.protobuf.generated.ComparatorProtos
-import org.apache.hadoop.hbase.util.{Bytes, ByteStringer}
+import org.apache.hadoop.hbase.util.{ByteStringer, Bytes}
 import org.apache.spark.sql.hbase._
 
 class CustomComparator(value: Array[Byte]) extends ByteArrayComparable(value) {

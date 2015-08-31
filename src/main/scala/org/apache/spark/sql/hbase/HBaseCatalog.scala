@@ -29,9 +29,9 @@ import org.apache.hadoop.hbase.{Coprocessor, HColumnDescriptor, HTableDescriptor
 import org.apache.log4j.Logger
 import org.apache.spark.Logging
 import org.apache.spark.sql.SQLContext
-import org.apache.spark.sql.catalyst.{SimpleCatalystConf, CatalystConf}
 import org.apache.spark.sql.catalyst.analysis.{Catalog, OverrideCatalog}
 import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, Subquery}
+import org.apache.spark.sql.catalyst.{CatalystConf, SimpleCatalystConf}
 import org.apache.spark.sql.hbase.HBaseCatalog._
 import org.apache.spark.sql.types._
 
@@ -150,7 +150,7 @@ private[hbase] class HBaseCatalog(@transient hbaseContext: SQLContext,
 
       deploySuccessfully_internal = Some(!results.isEmpty)
       if (results.isEmpty) {
-        logger.warn( """Not deplyed successfully""")
+        logger.warn( """CheckDirEndPoint coprocessor deployment failed.""")
       }
 
       pwdIsAccessible = !results.containsValue(false)
@@ -189,7 +189,7 @@ private[hbase] class HBaseCatalog(@transient hbaseContext: SQLContext,
       families.foreach {
         case family =>
           if (!checkFamilyExists(hbaseTableName, family)) {
-            throw new Exception(s"The HBase table doesn't contain the Column Family: $family")
+            throw new Exception(s"HBase table does not contain column family: $family")
           }
       }
     }
@@ -349,7 +349,7 @@ private[hbase] class HBaseCatalog(@transient hbaseContext: SQLContext,
   def deleteTable(tableName: String): Unit = {
     val metadataTable = getMetadataTable
     if (!checkLogicalTableExist(tableName, metadataTable)) {
-      throw new IllegalStateException(s"The logical table $tableName does not exist")
+      throw new IllegalStateException(s"Logical table $tableName does not exist.")
     }
 
     val delete = new Delete(Bytes.toBytes(tableName))

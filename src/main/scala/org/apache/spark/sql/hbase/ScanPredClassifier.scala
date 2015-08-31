@@ -18,7 +18,7 @@
 package org.apache.spark.sql.hbase
 
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.hbase.util.{BinaryBytesUtils, DataTypeUtils}
+import org.apache.spark.sql.hbase.util.DataTypeUtils
 
 /**
  * Classifies a predicate into a pair of (pushdownable, non-pushdownable) predicates

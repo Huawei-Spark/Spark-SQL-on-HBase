@@ -44,7 +44,7 @@ object CoprocessorConstants {
  * @param useCustomFilter whether custom filter is in effect
  * @param output projection. For post coprocessor processing,
  *               is the projection of the original scan
- * @param subplan coproecssor subplan to be sent to coprocessor
+ * @param subplan coprocessor subplan to be sent to coprocessor
  * @param dummyRDD in-memory scan RDD, might be used to reconstruct the original subplan.
  *                 This is possible when decision to use coprocessor has to be made
  *                 by the slaves when its partition-specific predicate is

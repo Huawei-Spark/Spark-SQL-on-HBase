@@ -21,8 +21,6 @@ import org.apache.spark.sql.catalyst.expressions.{Attribute, Row}
 import org.apache.spark.sql.hbase._
 import org.apache.spark.sql.types._
 
-import scala.collection.mutable.ArrayBuffer
-
 object HBaseKVHelper {
   val delimiter: Byte = 0
 

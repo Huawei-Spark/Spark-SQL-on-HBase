@@ -19,17 +19,6 @@ package org.apache.spark.sql.hbase
 
 import java.io._
 
-import org.apache.hadoop.hbase.{KeyValue, CellUtil, Cell}
-import org.apache.hadoop.hbase.exceptions.DeserializationException
-import org.apache.hadoop.hbase.filter.Filter.ReturnCode
-import org.apache.hadoop.hbase.filter.FilterBase
-import org.apache.hadoop.hbase.util.{Bytes, Writables}
-import org.apache.hadoop.io.Writable
-import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.hbase.util.{HBaseKVHelper, DataTypeUtils, BinaryBytesUtils}
-import org.apache.spark.sql.types.{DataType, AtomicType, StringType}
-import org.apache.spark.sql.hbase.catalyst.expressions.PartialPredicateOperations._
-
 /**
  * the serializer to serialize / de-serialize the objects for HBase embedded execution,
  * may be made configurable and use the ones provided by Spark in the future.

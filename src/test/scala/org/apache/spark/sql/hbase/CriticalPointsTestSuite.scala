@@ -18,8 +18,8 @@ package org.apache.spark.sql.hbase
 
 import org.apache.spark._
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.types._
 import org.apache.spark.sql.hbase.util.{BinaryBytesUtils, HBaseKVHelper}
+import org.apache.spark.sql.types._
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 import scala.collection.mutable.ArrayBuffer

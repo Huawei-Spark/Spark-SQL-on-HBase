@@ -17,9 +17,8 @@
 
 package org.apache.spark.sql.hbase
 
-import org.apache.hadoop.hbase.{HBaseTestingUtility, MiniHBaseCluster}
 import org.apache.hadoop.hbase.client.HBaseAdmin
-
+import org.apache.hadoop.hbase.{HBaseTestingUtility, MiniHBaseCluster}
 import org.apache.spark.{SparkConf, SparkContext}
 
 

@@ -17,19 +17,19 @@
 
 package org.apache.spark.sql.hbase.api.java;
 
-import java.io.Serializable;
-
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.MiniHBaseCluster;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.hbase.*;
+import org.apache.spark.sql.hbase.HBaseSQLContext;
+import org.apache.spark.sql.hbase.TestBase;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Row;
+import java.io.Serializable;
 
 public class JavaAPISuite extends TestBase implements Serializable {
     private transient JavaSparkContext sc;

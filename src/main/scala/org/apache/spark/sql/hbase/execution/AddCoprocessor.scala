@@ -19,9 +19,9 @@ package org.apache.spark.sql.hbase.execution
 
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.execution.expressions._
 import org.apache.spark.sql.catalyst.rules.Rule
 import org.apache.spark.sql.execution._
+import org.apache.spark.sql.execution.expressions._
 import org.apache.spark.sql.hbase._
 
 private[hbase] case class AddCoprocessor(sqlContext: SQLContext) extends Rule[SparkPlan] {

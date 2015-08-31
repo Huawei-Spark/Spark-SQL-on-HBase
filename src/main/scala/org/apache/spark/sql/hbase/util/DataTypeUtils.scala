@@ -16,15 +16,11 @@
 */
 package org.apache.spark.sql.hbase.util
 
-import com.google.protobuf.InvalidProtocolBufferException
-import org.apache.hadoop.hbase.exceptions.DeserializationException
-import org.apache.hadoop.hbase.filter.{ByteArrayComparable, BinaryComparator}
-import org.apache.hadoop.hbase.protobuf.generated.ComparatorProtos
-import org.apache.hadoop.hbase.util.{ByteStringer, Bytes}
+import org.apache.hadoop.hbase.filter.{BinaryComparator, ByteArrayComparable}
 import org.apache.spark.sql.catalyst.expressions.{Literal, MutableRow, Row}
 import org.apache.spark.sql.execution.SparkSqlSerializer
-import org.apache.spark.sql.types._
 import org.apache.spark.sql.hbase._
+import org.apache.spark.sql.types._
 
 /**
  * Data Type conversion utilities

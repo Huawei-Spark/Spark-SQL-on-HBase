@@ -31,13 +31,13 @@ import org.apache.spark.sql.hbase.util.{BinaryBytesUtils, DataTypeUtils, HBaseKV
 import org.apache.spark.sql.types.{AtomicType, DataType, StringType}
 
 /**
- * The custom filter, it will skip the scan to the proper next position based on predicate
- * this filter will only deal with the predicate which has key columns inside
+ * The custom filter.  It will skip the scanner to the proper next position based on predicate.
+ * This filter will only deal with the predicate containing key columns.
  *
- * The skip is multiple-dimensional on non-leading dimension keys in precense of the predicate's
- * range expressions; other types of expressions in the predicate will be eventually evaluated
+ * The skip is multiple-dimensional on non-leading dimension keys in presence of the predicate's
+ * range expressions; other types of expressions in the predicate will be eventually evaluated.
  *
- * The processing is stateful in that various info related to the previous processing is cahched,
+ * The processing is stateful in that various info related to the previous processing is cached
  * and checked in the next invocations for maximum reuse.
  */
 private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
@@ -180,18 +180,18 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
    * recursively reset the index of the current child and the value in the child's CPR
    * @param node the start level, it will also reset its children
    */
-  private def resetDecendents(node: Node): Unit = {
+  private def resetDescendants(node: Node): Unit = {
     if (node.children != null) {
       node.currentChildIndex = 0
       for (child <- node.children) {
         resetNode(child)
-        resetDecendents(child)
+        resetDescendants(child)
       }
     }
   }
 
   /**
-   * A quick top-down check whether the new row is in the current CPRs
+   * A quick top-down check whether the new row is in the current CPRs.
    * @param dimValues the current dimensional keys to check
    * @param dimLimit the lower bound of the dimensions to be checked with.
    *                 0 for the most significant dimension
@@ -241,7 +241,7 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
       remainingPredicate = null
       remainingPredicateBoundRef = null
       currentValues = inputValues
-      resetDecendents(node)
+      resetDescendants(node)
       val result = findNextHint(node)
       nextReturnCode = result._1
       if (nextReturnCode == ReturnCode.SEEK_NEXT_USING_HINT) {
@@ -384,7 +384,7 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
       // cannot find a containing child but there is a larger child
       node.currentChildIndex = childIndex
       val child = node.children(childIndex)
-      resetDecendents(child)
+      resetDescendants(child)
       if (child.cpr != null) {
         child.currentValue = child.cpr.start.orNull
         if (child.currentValue != null && !child.cpr.startInclusive) {
@@ -407,7 +407,7 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
       if (addOne(currentNode)) {
         val cmp = compareWithinRange(currentNode.cpr.dt, currentNode.currentValue, currentNode.cpr)
         if (cmp == 0) {
-          resetDecendents(currentNode)
+          resetDescendants(currentNode)
           return (ReturnCode.SEEK_NEXT_USING_HINT, buildRowKey())
         } else {
           require(cmp > 0, "Internal logical error: unexpected ordering of row key")
@@ -418,7 +418,7 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
               // no look back: release the memory
               currentNode.children = null
             }
-            resetDecendents(currentNode.parent)
+            resetDescendants(currentNode.parent)
             currentNode.parent.currentChildIndex = childIndex
             return (ReturnCode.SEEK_NEXT_USING_HINT, buildRowKey())
           } else {
@@ -562,14 +562,14 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
       node.children = Seq(Node(dt, dimIndex, node,
         cpr = new CriticalPointRange[t](None, false, None, false, dt, null)))
     }
-    resetDecendents(node)
+    resetDescendants(node)
   }
 
   /**
-   * do a full evaluation for the remaining predicate based on all the cell values
+   * Do a full evaluation for the remaining predicate based on all the cell values.
    * @param kvs the list of cell
    */
-  private def fullEvalution(kvs: java.util.List[Cell]) = {
+  private def fullEvaluation(kvs: java.util.List[Cell]) = {
     resetRow(workingRow)
     cellMap.clear()
     for (i <- 0 to kvs.size() - 1) {
@@ -617,7 +617,7 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
     // If a later HBase release has this addressed, this check will be made unnecessary
     // to save some CPU cycles
     if (kvs.isEmpty) filterRowFlag = true
-    else if (remainingPredicate != null) fullEvalution(kvs)
+    else if (remainingPredicate != null) fullEvaluation(kvs)
   }
 
   override def hasFilterRow: Boolean = {

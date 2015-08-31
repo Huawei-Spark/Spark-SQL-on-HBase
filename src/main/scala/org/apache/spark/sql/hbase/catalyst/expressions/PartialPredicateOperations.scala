@@ -19,9 +19,9 @@ package org.apache.spark.sql.hbase.catalyst.expressions
 
 import org.apache.spark.sql.catalyst.errors.TreeNodeException
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.hbase.types._
 import org.apache.spark.sql.hbase.types.RangeType._
+import org.apache.spark.sql.hbase.types._
+import org.apache.spark.sql.types._
 
 object PartialPredicateOperations {
   // When the checkNullness argument of the partialReduce method is false, the partial

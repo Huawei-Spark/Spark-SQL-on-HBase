@@ -17,12 +17,9 @@
 
 package org.apache.spark.sql.hbase
 
-import java.io.{IOException, ObjectInputStream, ObjectOutputStream}
-
 import org.apache.hadoop.hbase.util.Bytes
-import org.apache.spark.serializer.JavaSerializer
-import org.apache.spark.util.{CollectionsUtils, Utils}
-import org.apache.spark.{Partitioner, SparkEnv}
+import org.apache.spark.Partitioner
+import org.apache.spark.util.CollectionsUtils
 
 object HBasePartitioner {
   implicit object HBaseRawOrdering extends Ordering[HBaseRawType] {
