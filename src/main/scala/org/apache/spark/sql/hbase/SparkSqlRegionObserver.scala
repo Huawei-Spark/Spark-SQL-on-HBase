@@ -114,10 +114,11 @@ class HBaseCoprocessorSQLReaderRDD(var relation: HBaseRelation,
 }
 
 abstract class BaseRegionScanner extends RegionScanner {
+  override def getBatch={0}//Achieve this function inherited from RegionScanner
 
   override def isFilterDone = false
 
-  override def next(result: java.util.List[Cell], limit: Int) = next(result)
+  override def next(result: java.util.List[Cell],  scannerContext: ScannerContext)= next(result)// limit: Int=>scannerContext: ScannerContext
 
   override def reseek(row: Array[Byte]) = throw new DoNotRetryIOException("Unsupported")
 
@@ -125,7 +126,7 @@ abstract class BaseRegionScanner extends RegionScanner {
 
   override def nextRaw(result: java.util.List[Cell]) = next(result)
 
-  override def nextRaw(result: java.util.List[Cell], limit: Int) = next(result, limit)
+  override def nextRaw(result: java.util.List[Cell],  scannerContext: ScannerContext) = next(result, scannerContext)  //limit: Int=>scannerContext: ScannerContext
 }
 
 class SparkSqlRegionObserver extends BaseRegionObserver {
