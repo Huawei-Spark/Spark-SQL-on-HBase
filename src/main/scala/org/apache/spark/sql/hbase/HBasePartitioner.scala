@@ -41,7 +41,7 @@ class HBasePartitioner (var splitKeys: Array[HBaseRawType]) extends Partitioner 
 
   def numPartitions = if (len == 0) 1 else len
 
-  @transient private val binarySearch: ((Array[t], t) => Int) = CollectionsUtils.makeBinarySearch[t]
+  @transient private lazy val binarySearch: ((Array[t], t) => Int) = CollectionsUtils.makeBinarySearch[t]
 
   def getPartition(key: Any): Int = {
     val k = key.asInstanceOf[t]
