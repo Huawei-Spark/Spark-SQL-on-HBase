@@ -17,7 +17,9 @@
 package org.apache.spark.sql.hbase.util
 
 import org.apache.hadoop.hbase.filter.{BinaryComparator, ByteArrayComparable}
-import org.apache.spark.sql.catalyst.expressions.{Literal, MutableRow, Row}
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.expressions.{Literal, MutableRow}
 import org.apache.spark.sql.execution.SparkSqlSerializer
 import org.apache.spark.sql.hbase._
 import org.apache.spark.sql.types._
@@ -127,7 +129,7 @@ object DataTypeUtils {
    * @param dt the data type
    * @return the data from the row based on index
    */
-  def getRowColumnInHBaseRawType(row: Row, index: Int, dt: DataType,
+  def getRowColumnInHBaseRawType(row: InternalRow, index: Int, dt: DataType,
                                  bytesUtils: BytesUtils = BinaryBytesUtils): HBaseRawType = {
     if (row.isNullAt(index)) return new Array[Byte](0)
 

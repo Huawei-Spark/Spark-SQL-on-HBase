@@ -22,6 +22,7 @@ import org.apache.spark.Logging
 import org.apache.spark.sql.hbase.types.HBaseBytesType
 import org.apache.spark.sql.hbase.util.BinaryBytesUtils
 import org.apache.spark.sql.types._
+import org.apache.spark.unsafe.types.UTF8String
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 class BytesUtilsSuite extends FunSuite with BeforeAndAfterAll with Logging {
@@ -79,9 +80,9 @@ class BytesUtilsSuite extends FunSuite with BeforeAndAfterAll with Logging {
     assert(BinaryBytesUtils.toShort(BinaryBytesUtils.create(ShortType)
       .toBytes(-12.asInstanceOf[Short]), 0) === -12)
 
-    assert(BinaryBytesUtils.toUTF8String(BinaryBytesUtils.create(StringType).toBytes("abc"), 0, 3)
-      === UTF8String("abc"))
-    assert(BinaryBytesUtils.toUTF8String(BinaryBytesUtils.create(StringType).toBytes(""), 0, 0) === UTF8String(""))
+    assert(BinaryBytesUtils.toUTF8String(BinaryBytesUtils.create(StringType).toBytes("abc"), 0, 3).toString
+      == "abc")
+    assert(BinaryBytesUtils.toUTF8String(BinaryBytesUtils.create(StringType).toBytes(""), 0, 0).toString == "")
 
     assert(BinaryBytesUtils.toByte(BinaryBytesUtils.create(ByteType)
       .toBytes(5.asInstanceOf[Byte]), 0) === 5)

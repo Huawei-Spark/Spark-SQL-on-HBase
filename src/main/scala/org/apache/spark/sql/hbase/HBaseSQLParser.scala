@@ -242,7 +242,7 @@ class HBaseSQLParser extends SqlParser {
       "(?i)binary".r ^^^ BinaryType |
       "(?i)(?:bool|boolean)".r ^^^ BooleanType |
       fixedDecimalType |
-      "(?i)decimal".r ^^^ DecimalType.Unlimited |
+      "(?i)decimal".r ^^^ DecimalType.USER_DEFAULT |
       "(?i)date".r ^^^ DateType |
       "(?i)timestamp".r ^^^ TimestampType |
       varchar |

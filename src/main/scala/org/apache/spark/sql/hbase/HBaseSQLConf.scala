@@ -18,6 +18,7 @@
 package org.apache.spark.sql.hbase
 
 import org.apache.spark.sql.SQLConf
+import org.apache.spark.sql.SQLConf.SQLConfEntry
 
 object HBaseSQLConf {
   val PARTITION_EXPIRATION = "spark.sql.hbase.partition.expiration"
@@ -38,8 +39,12 @@ private[hbase] class HBaseSQLConf extends SQLConf {
   import HBaseSQLConf._
 
   /** The expiration of cached partition (i.e., region) info; defaults to 10 minutes . */
-  private[hbase] def partitionExpiration: Long = getConf(PARTITION_EXPIRATION, "600").toLong
-  private[hbase] def scannerFetchSize: Int = getConf(SCANNER_FETCH_SIZE, "1000").toInt
-  private[hbase] def useCoprocessor: Boolean = getConf(USE_COPROCESSOR, "true").toBoolean
-  private[hbase] def useCustomFilter: Boolean = getConf(USE_CUSTOMFILTER, "true").toBoolean
+  private[hbase] def partitionExpiration: Long = getConf(
+    SQLConfEntry.longConf(PARTITION_EXPIRATION, Some(600L)))
+  private[hbase] def scannerFetchSize: Int = getConf(
+    SQLConfEntry.intConf(SCANNER_FETCH_SIZE, Some(100)))
+  private[hbase] def useCoprocessor: Boolean = getConf(
+    SQLConfEntry.booleanConf(USE_COPROCESSOR, Some(true)))
+  private[hbase] def useCustomFilter: Boolean = getConf(
+    SQLConfEntry.booleanConf(USE_CUSTOMFILTER, Some(true)))
 }

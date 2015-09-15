@@ -24,13 +24,15 @@ import org.apache.hadoop.hbase.{HBaseConfiguration, _}
 import org.apache.log4j.Logger
 import org.apache.spark.TaskContext
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.execution.datasources.LogicalRelation
+import org.apache.spark.sql.{Row, DataFrame, SQLContext}
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.hbase.catalyst.NotPusher
 import org.apache.spark.sql.hbase.catalyst.expressions.PartialPredicateOperations.partialPredicateReducer
 import org.apache.spark.sql.hbase.types.Range
 import org.apache.spark.sql.hbase.util._
-import org.apache.spark.sql.sources.{BaseRelation, CatalystScan, InsertableRelation, LogicalRelation, RelationProvider}
+import org.apache.spark.sql.sources.{BaseRelation, CatalystScan, InsertableRelation, RelationProvider}
 import org.apache.spark.sql.types._
 
 import scala.collection.JavaConversions._
@@ -94,7 +96,7 @@ private[hbase] case class HBaseRelation(
                                          deploySuccessfully: Option[Boolean],
                                          encodingFormat: String = "binaryformat")
                                        (@transient var context: SQLContext)
-  extends BaseRelation with CatalystScan with InsertableRelation with Serializable {
+  extends BaseRelation with InsertableRelation with Serializable {
   @transient lazy val logger = Logger.getLogger(getClass.getName)
 
   @transient lazy val keyColumns = allColumns.filter(_.isInstanceOf[KeyColumn])
@@ -641,7 +643,7 @@ private[hbase] case class HBaseRelation(
     }
   }
 
-  def buildPut(row: Row): Put = {
+  def buildPut(row: InternalRow): Put = {
     // TODO: revisit this using new KeyComposer
     val rowKey: HBaseRawType = null
     new Put(rowKey)
@@ -676,7 +678,7 @@ private[hbase] case class HBaseRelation(
       val rawKeyCol = keyColumns.map(
         kc => {
           val rowColumn = DataTypeUtils.getRowColumnInHBaseRawType(
-            row, kc.ordinal, kc.dataType)
+            InternalRow(row.toSeq), kc.ordinal, kc.dataType)
           colIndexInBatch += 1
           (rowColumn, kc.dataType)
         }
@@ -686,7 +688,7 @@ private[hbase] case class HBaseRelation(
       nonKeyColumns.foreach(
         nkc => {
           val rowVal = DataTypeUtils.getRowColumnInHBaseRawType(
-            row, nkc.ordinal, nkc.dataType, bytesUtils)
+            InternalRow(row.toSeq), nkc.ordinal, nkc.dataType, bytesUtils)
           colIndexInBatch += 1
           put.add(nkc.familyRaw, nkc.qualifierRaw, rowVal)
         }
@@ -708,7 +710,7 @@ private[hbase] case class HBaseRelation(
   }
 
 
-  def buildScan(requiredColumns: Seq[Attribute], filters: Seq[Expression]): RDD[Row] = {
+  def buildScan(requiredColumns: Seq[Attribute], filters: Seq[Expression]): RDD[InternalRow] = {
     require(filters.size < 2, "Internal logical error: unexpected filter list size")
     val filterPredicate = filters.headOption
     new HBaseSQLReaderRDD(
@@ -802,7 +804,7 @@ private[hbase] case class HBaseRelation(
         // of c2 so we can restrict the interested qualifiers to "c2" only.
         distinctProjectionList = predicateNameSet.toSeq.distinct
         val boundPred = BindReferences.bindReference(pred, predRefs)
-        val row = new GenericRow(predRefs.size) // an all-null row
+        val row = new GenericInternalRow(predRefs.size) // an all-null row
         val prRes = boundPred.partialReduce(row, predRefs, checkNull = true)
         val (addColumn, nkcols) = prRes match {
           //  At least one existing column has to be fetched to qualify the record,
@@ -902,7 +904,7 @@ private[hbase] case class HBaseRelation(
 
   def buildRowAfterCoprocessor(projections: Seq[(Attribute, Int)],
                                result: Result,
-                               row: MutableRow): Row = {
+                               row: MutableRow): InternalRow = {
     for (i <- projections.indices) {
       setColumn(result.rawCells()(i), projections(i), row)
     }
@@ -911,7 +913,7 @@ private[hbase] case class HBaseRelation(
 
   def buildRowInCoprocessor(projections: Seq[(Attribute, Int)],
                             result: java.util.ArrayList[Cell],
-                            row: MutableRow): Row = {
+                            row: MutableRow): InternalRow = {
     def getColumnLatestCell(family: Array[Byte],
                             qualifier: Array[Byte]): Cell = {
       // 0 means equal, >0 means larger, <0 means smaller
@@ -966,7 +968,7 @@ private[hbase] case class HBaseRelation(
 
   def buildRow(projections: Seq[(Attribute, Int)],
                result: Result,
-               row: MutableRow): Row = {
+               row: MutableRow): InternalRow = {
     lazy val rowKeys = HBaseKVHelper.decodingRawKeyColumns(result.getRow, keyColumns)
     projections.foreach {
       p =>

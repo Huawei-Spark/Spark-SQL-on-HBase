@@ -18,10 +18,10 @@ package org.apache.spark.sql.hbase
 
 import org.apache.hadoop.hbase._
 import org.apache.hadoop.hbase.client.HBaseAdmin
-import org.apache.spark.sql.catalyst.expressions.GenericRow
+import org.apache.spark.sql.catalyst.expressions.{GenericInternalRow, GenericRow}
 import org.apache.spark.sql.catalyst.plans.logical.Subquery
+import org.apache.spark.sql.execution.datasources.LogicalRelation
 import org.apache.spark.sql.hbase.util.HBaseKVHelper
-import org.apache.spark.sql.sources.LogicalRelation
 import org.apache.spark.sql.types._
 
 class HBaseCatalogTestSuite extends TestBase {
@@ -50,9 +50,9 @@ class HBaseCatalogTestSuite extends TestBase {
     allColumns = allColumns :+ NonKeyColumn("column3", BooleanType, family1, "qualifier1")
 
     val splitKeys: Array[Array[Byte]] = Array(
-      new GenericRow(Array(1024.0, "Upen", 128: Short)),
-      new GenericRow(Array(1024.0, "Upen", 256: Short)),
-      new GenericRow(Array(4096.0, "SF", 512: Short))
+      new GenericInternalRow(Array(1024.0, "Upen", 128: Short)),
+      new GenericInternalRow(Array(1024.0, "Upen", 256: Short)),
+      new GenericInternalRow(Array(4096.0, "SF", 512: Short))
     ).map(HBaseKVHelper.makeRowKey(_, Seq(DoubleType, StringType, ShortType)))
 
     catalog.createTable(tableName, namespace, hbaseTableName, allColumns, splitKeys)

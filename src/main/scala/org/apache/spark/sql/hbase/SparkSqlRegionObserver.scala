@@ -26,6 +26,7 @@ import org.apache.log4j.Logger
 import org.apache.spark._
 import org.apache.spark.executor.TaskMetrics
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.codegen.GeneratePredicate
 import org.apache.spark.sql.hbase.util.DataTypeUtils
@@ -40,12 +41,12 @@ class HBaseCoprocessorSQLReaderRDD(var relation: HBaseRelation,
                                    var finalOutput: Seq[Attribute],
                                    var otherFilters: Option[Expression],
                                    @transient sqlContext: SQLContext)
-  extends RDD[Row](sqlContext.sparkContext, Nil) with Logging {
+  extends RDD[InternalRow](sqlContext.sparkContext, Nil) with Logging {
 
   @transient var scanner: RegionScanner = _
 
-  private def createIterator(context: TaskContext): Iterator[Row] = {
-    val otherFilter: (Row) => Boolean = {
+  private def createIterator(context: TaskContext): Iterator[InternalRow] = {
+    val otherFilter: (InternalRow) => Boolean = {
       if (otherFilters.isDefined) {
         if (codegenEnabled) {
           GeneratePredicate.generate(otherFilters.get, finalOutput)
@@ -61,7 +62,7 @@ class HBaseCoprocessorSQLReaderRDD(var relation: HBaseRelation,
     val results: java.util.ArrayList[Cell] = new java.util.ArrayList[Cell]()
     val row = new GenericMutableRow(finalOutput.size)
 
-    val iterator = new Iterator[Row] {
+    val iterator = new Iterator[InternalRow] {
       override def hasNext: Boolean = {
         if (!finished) {
           if (!gotNext) {
@@ -77,7 +78,7 @@ class HBaseCoprocessorSQLReaderRDD(var relation: HBaseRelation,
         !finished
       }
 
-      override def next(): Row = {
+      override def next(): InternalRow = {
         if (hasNext) {
           gotNext = false
           relation.buildRowInCoprocessor(projections, results, row)
@@ -107,7 +108,7 @@ class HBaseCoprocessorSQLReaderRDD(var relation: HBaseRelation,
     Array()
   }
 
-  override def compute(split: Partition, context: TaskContext): Iterator[Row] = {
+  override def compute(split: Partition, context: TaskContext): Iterator[InternalRow] = {
     scanner = split.asInstanceOf[HBasePartition].newScanner
     createIterator(context)
   }
@@ -152,7 +153,7 @@ class SparkSqlRegionObserver extends BaseRegionObserver {
       val taskParaInfo = scan.getAttribute(CoprocessorConstants.COTASK)
       val (stageId, partitionId, taskAttemptId, attemptNumber) =
         HBaseSerializer.deserialize(taskParaInfo).asInstanceOf[(Int, Int, Long, Int)]
-      val taskContext = new TaskContextImpl(
+      val taskContext = new TaskContextInHBase(
         stageId, partitionId, taskAttemptId, attemptNumber, null, false, new TaskMetrics)
 
       val regionInfo = s.getRegionInfo

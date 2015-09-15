@@ -17,11 +17,13 @@
 
 package org.apache.spark.sql.hbase
 
+import org.apache.spark.sql.SQLConf.SQLConfEntry
 import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.expressions.GenericRow
+import org.apache.spark.sql.catalyst.expressions.{GenericInternalRow, GenericRow}
 import org.apache.spark.sql.execution.Exchange
 import org.apache.spark.sql.hbase.util.HBaseKVHelper
 import org.apache.spark.sql.types._
+import org.apache.spark.unsafe.types._
 
 class HBaseAdditionalQuerySuite extends TestBase {
 
@@ -35,18 +37,18 @@ class HBaseAdditionalQuerySuite extends TestBase {
     val types = Seq(IntegerType, StringType, IntegerType)
 
     def generateRowKey(keys: Array[Any], length: Int = -1) = {
-      val completeRowKey = HBaseKVHelper.makeRowKey(new GenericRow(keys), types)
+      val completeRowKey = HBaseKVHelper.makeRowKey(new GenericInternalRow(keys), types)
       if (length < 0) completeRowKey
       else completeRowKey.take(length)
     }
 
     val splitKeys: Array[HBaseRawType] = Array(
-      generateRowKey(Array(1024, UTF8String("0b"), 0), 3),
-      generateRowKey(Array(2048, UTF8String("cc"), 1024), 4),
-      generateRowKey(Array(4096, UTF8String("0a"), 0), 4),
-      generateRowKey(Array(4096, UTF8String("0b"), 1024), 7),
-      generateRowKey(Array(4096, UTF8String("cc"), 0), 7),
-      generateRowKey(Array(4096, UTF8String("cc"), 1000))
+      generateRowKey(Array(1024, UTF8String.fromString("0b"), 0), 3),
+      generateRowKey(Array(2048, UTF8String.fromString("cc"), 1024), 4),
+      generateRowKey(Array(4096, UTF8String.fromString("0a"), 0), 4),
+      generateRowKey(Array(4096, UTF8String.fromString("0b"), 1024), 7),
+      generateRowKey(Array(4096, UTF8String.fromString("cc"), 0), 7),
+      generateRowKey(Array(4096, UTF8String.fromString("cc"), 1000))
     )
     TestHbase.catalog.createHBaseUserTable("presplit_table", Set("cf"), splitKeys, useCoprocessor)
 
@@ -159,8 +161,10 @@ class HBaseAdditionalQuerySuite extends TestBase {
   }
 
   test("NO Coprocessor and No CustomerFilter Test") {
-    val origValOfCoprocessor = TestHbase.conf.getConf(HBaseSQLConf.USE_COPROCESSOR, "true")
-    val origValOfCustomfilter = TestHbase.conf.getConf(HBaseSQLConf.USE_CUSTOMFILTER, "true")
+    val origValOfCoprocessor:String = TestHbase.conf.getConf(
+      SQLConfEntry.booleanConf(HBaseSQLConf.USE_COPROCESSOR, Some(true))).toString
+    val origValOfCustomfilter:String = TestHbase.conf.getConf(
+      SQLConfEntry.booleanConf(HBaseSQLConf.USE_CUSTOMFILTER, Some(true))).toString
 
     TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR, "false")
     TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER, "false")
@@ -236,16 +240,16 @@ class HBaseAdditionalQuerySuite extends TestBase {
 
   test("group test for presplit table with codegen and coprocessor") {
     val originalValue = TestHbase.conf.codegenEnabled
-    TestHbase.setConf(SQLConf.CODEGEN_ENABLED, "true")
+    TestHbase.setConf(SQLConf.CODEGEN_ENABLED.toString(), "true")
     aggregationTest()
-    TestHbase.setConf(SQLConf.CODEGEN_ENABLED, originalValue.toString)
+    TestHbase.setConf(SQLConf.CODEGEN_ENABLED.toString(), originalValue.toString)
   }
 
   test("group test for presplit table with codegen but without coprocessor") {
     val originalValue = TestHbase.conf.codegenEnabled
-    TestHbase.setConf(SQLConf.CODEGEN_ENABLED, "true")
+    TestHbase.setConf(SQLConf.CODEGEN_ENABLED.toString(), "true")
     aggregationTest(useCoprocessor = false)
-    TestHbase.setConf(SQLConf.CODEGEN_ENABLED, originalValue.toString)
+    TestHbase.setConf(SQLConf.CODEGEN_ENABLED.toString(), originalValue.toString)
   }
 
   def aggregationTest(useCoprocessor: Boolean = true) = {
@@ -288,8 +292,6 @@ class HBaseAdditionalQuerySuite extends TestBase {
   def checkResult(df: DataFrame, containExchange: Boolean, size: Int) = {
     df.queryExecution.executedPlan match {
       case a: org.apache.spark.sql.execution.Aggregate =>
-        assert(a.child.isInstanceOf[Exchange] == containExchange)
-      case a: org.apache.spark.sql.execution.GeneratedAggregate =>
         assert(a.child.isInstanceOf[Exchange] == containExchange)
       case _ => Nil
     }

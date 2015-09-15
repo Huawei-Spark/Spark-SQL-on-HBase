@@ -20,7 +20,6 @@ package org.apache.spark.sql.hbase
 import java.util.TimeZone
 
 import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.expressions.Row
 import org.apache.spark.sql.hbase.TestData._
 import org.apache.spark.sql.types._
 
@@ -80,9 +79,9 @@ class HBaseSQLQuerySuite extends TestBaseWithSplitData {
 
   test("aggregation with codegen") {
     val originalValue = conf.codegenEnabled
-    setConf(SQLConf.CODEGEN_ENABLED, "true")
+    setConf(SQLConf.CODEGEN_ENABLED.toString(), "true")
     sql("SELECT k FROM testData GROUP BY k").collect()
-    setConf(SQLConf.CODEGEN_ENABLED, originalValue.toString)
+    setConf(SQLConf.CODEGEN_ENABLED.toString(), originalValue.toString)
   }
 
   test("SPARK-3176 Added Parser of SQL LAST()") {

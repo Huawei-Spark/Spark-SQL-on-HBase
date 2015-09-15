@@ -17,6 +17,8 @@
 
 package org.apache.spark.sql.hbase.catalyst.expressions
 
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.errors.TreeNodeException
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.hbase.types.RangeType._
@@ -58,7 +60,7 @@ object PartialPredicateOperations {
      *                  for nullness checking purpose or not
      * @return
      */
-    def partialReduce(input: Row, schema: Seq[Attribute], checkNull: Boolean = false):
+    def partialReduce(input: InternalRow, schema: Seq[Attribute], checkNull: Boolean = false):
       (Any, Expression) = {
       e match {
         case And(left, right) =>
@@ -310,7 +312,7 @@ object PartialPredicateOperations {
 
     @inline
     protected def prc2(
-                        i: Row,
+                        i: InternalRow,
                         dataType1: DataType,
                         dataType2: DataType,
                         eval1: Any,

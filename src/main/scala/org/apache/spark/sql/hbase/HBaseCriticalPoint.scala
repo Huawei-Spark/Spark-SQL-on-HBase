@@ -246,7 +246,7 @@ object RangeCriticalPoint {
           }
           a
         case a@InSet(AttributeReference(_, _, _, _), list) =>
-          if (a.value.equals(key)) {
+          if (a.child.equals(key)) {
             list.foreach(v => checkAndAdd(v, CriticalPointType.bothInclusive))
           }
           a

@@ -19,6 +19,7 @@ package org.apache.spark.sql.hbase.execution
 
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.plans.physical.RangePartitioning
 import org.apache.spark.sql.execution.LeafNode
@@ -32,7 +33,7 @@ import org.apache.spark.sql.hbase._
 case class HBaseSQLTableScan(
                               relation: HBaseRelation,
                               output: Seq[Attribute],
-                              result: RDD[Row]) extends LeafNode {
+                              result: RDD[InternalRow]) extends LeafNode {
   override def outputPartitioning = {
     var ordering = List[SortOrder]()
     for (key <- relation.partitionKeys) {
@@ -41,5 +42,5 @@ case class HBaseSQLTableScan(
     RangePartitioning(ordering.toSeq, relation.partitions.size)
   }
 
-  override protected def doExecute(): RDD[Row] = result
+  override protected def doExecute(): RDD[InternalRow] = result
 }

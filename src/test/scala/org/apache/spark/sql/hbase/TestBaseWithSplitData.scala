@@ -22,7 +22,8 @@ import java.io.{ByteArrayOutputStream, DataOutputStream}
 import org.apache.hadoop.hbase._
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
-import org.apache.spark.sql.catalyst.expressions.{GenericRow, Row}
+import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.expressions.{GenericInternalRow, GenericRow}
 import org.apache.spark.sql.hbase.util.{BinaryBytesUtils, DataTypeUtils, HBaseKVHelper}
 import org.apache.spark.sql.types._
 
@@ -72,13 +73,13 @@ class TestBaseWithSplitData extends TestBase {
 
       val splitKeys: Array[Array[Byte]] = if (useMultiplePartitions) {
         Array(
-          new GenericRow(Array(256, " p256 ", 128: Short)),
-          new GenericRow(Array(32, " p32 ", 256: Short)),
-          new GenericRow(Array(-32, " n32 ", 128: Short)),
-          new GenericRow(Array(-256, " n256 ", 256: Short)),
-          new GenericRow(Array(-128, " n128 ", 128: Short)),
-          new GenericRow(Array(0, " zero ", 256: Short)),
-          new GenericRow(Array(128, " p128 ", 512: Short))
+          new GenericInternalRow(Array(256, " p256 ", 128: Short)),
+          new GenericInternalRow(Array(32, " p32 ", 256: Short)),
+          new GenericInternalRow(Array(-32, " n32 ", 128: Short)),
+          new GenericInternalRow(Array(-256, " n256 ", 256: Short)),
+          new GenericInternalRow(Array(-128, " n128 ", 128: Short)),
+          new GenericInternalRow(Array(0, " zero ", 256: Short)),
+          new GenericInternalRow(Array(128, " p128 ", 512: Short))
         ).map(HBaseKVHelper.makeRowKey(_, Seq(IntegerType, StringType, ShortType)))
       } else {
         null
@@ -111,7 +112,7 @@ class TestBaseWithSplitData extends TestBase {
 
     def putNewTableIntoHBase(keys: Seq[Any], keysType: Seq[DataType],
                              vals: Seq[Any], valsType: Seq[DataType]): Unit = {
-      val row = new GenericRow(keys.toArray)
+      val row = new GenericInternalRow(keys.toArray)
       val key = makeRowKey(row, keysType)
       val put = new Put(key)
       Seq((vals.head, valsType.head, "cf1", "cq11"),
@@ -197,7 +198,7 @@ class TestBaseWithSplitData extends TestBase {
     htable.close()
   }
 
-  def makeRowKey(row: Row, dataTypeOfKeys: Seq[DataType]) = {
+  def makeRowKey(row: InternalRow, dataTypeOfKeys: Seq[DataType]) = {
     val rawKeyCol = dataTypeOfKeys.zipWithIndex.map {
       case (dataType, index) =>
         (DataTypeUtils.getRowColumnInHBaseRawType(row, index, dataType),

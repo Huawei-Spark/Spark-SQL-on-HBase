@@ -17,7 +17,9 @@
 
 package org.apache.spark.sql.hbase.util
 
-import org.apache.spark.sql.catalyst.expressions.{Attribute, Row}
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.expressions.Attribute
 import org.apache.spark.sql.hbase._
 import org.apache.spark.sql.types._
 
@@ -160,7 +162,7 @@ object HBaseKVHelper {
    * @param dataTypeOfKeys sequence of data type
    * @return the row key
    */
-  def makeRowKey(row: Row, dataTypeOfKeys: Seq[DataType]): HBaseRawType = {
+  def makeRowKey(row: InternalRow, dataTypeOfKeys: Seq[DataType]): HBaseRawType = {
     val rawKeyCol = dataTypeOfKeys.zipWithIndex.map {
       case (dataType, index) =>
         (DataTypeUtils.getRowColumnInHBaseRawType(row, index, dataType), dataType)

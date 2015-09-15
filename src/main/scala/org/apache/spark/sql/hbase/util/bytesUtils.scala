@@ -19,6 +19,7 @@ package org.apache.spark.sql.hbase.util
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.spark.sql.hbase._
 import org.apache.spark.sql.types._
+import org.apache.spark.unsafe.types.UTF8String
 
 trait BytesUtils {
   def create(dataType: DataType): ToBytesUtils
@@ -115,7 +116,7 @@ object BinaryBytesUtils extends BytesUtils{
   }
 
   def toUTF8String(input: HBaseRawType, offset: Int, length: Int): UTF8String = {
-    UTF8String(input.slice(offset, offset + length))
+    UTF8String.fromBytes(input, offset, length)
   }
 
   def toByte(input: HBaseRawType, offset: Int, length: Int = 0): Byte = {
@@ -241,7 +242,7 @@ class BinaryBytesUtils(var buffer: HBaseRawType, dt: DataType) extends ToBytesUt
       case item: Int => toBytes(item)
       case item: Long => toBytes(item)
       case item: Short => toBytes(item)
-      case item: String => toBytes(UTF8String(item))
+      case item: String => toBytes(UTF8String.fromString(item))
       case item: UTF8String => toBytes(item)
     }
   }
@@ -263,11 +264,11 @@ object StringBytesUtils extends BytesUtils{
   }
 
   def toString(input: HBaseRawType, offset: Int, length: Int): String = {
-    toUTF8String(input, offset, length).toString()
+    toUTF8String(input, offset, length).toString
   }
 
   def toUTF8String(input: HBaseRawType, offset: Int, length: Int): UTF8String = {
-    UTF8String(input.slice(offset, offset + length))
+    UTF8String.fromBytes(input, offset, length)
   }
 
   def toByte(input: HBaseRawType, offset: Int, length: Int): Byte = {
@@ -351,7 +352,7 @@ class StringBytesUtils(var buffer: HBaseRawType, dt: DataType) extends ToBytesUt
       case item: Int => toBytes(item)
       case item: Long => toBytes(item)
       case item: Short => toBytes(item)
-      case item: String => toBytes(UTF8String(item))
+      case item: String => toBytes(UTF8String.fromString(item))
       case item: UTF8String => toBytes(item)
     }
   }
