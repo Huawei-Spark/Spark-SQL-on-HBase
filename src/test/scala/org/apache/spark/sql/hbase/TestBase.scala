@@ -98,7 +98,7 @@ abstract class TestBase
     checkAnswer(rdd, Seq(expectedAnswer))
   }
 
-  def runSql(sql: String): Array[Row] = {
+  def runSql(sql: String) = {
     logInfo(sql)
     TestHbase.sql(sql).collect()
   }

@@ -161,13 +161,11 @@ class HBaseAdditionalQuerySuite extends TestBase {
   }
 
   test("NO Coprocessor and No CustomerFilter Test") {
-    val origValOfCoprocessor:String = TestHbase.conf.getConf(
-      SQLConfEntry.booleanConf(HBaseSQLConf.USE_COPROCESSOR, Some(true))).toString
-    val origValOfCustomfilter:String = TestHbase.conf.getConf(
-      SQLConfEntry.booleanConf(HBaseSQLConf.USE_CUSTOMFILTER, Some(true))).toString
+    val origValOfCoprocessor = TestHbase.conf.getConf(HBaseSQLConf.USE_COPROCESSOR)
+    val origValOfCustomfilter = TestHbase.conf.getConf(HBaseSQLConf.USE_CUSTOMFILTER)
 
-    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR, "false")
-    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER, "false")
+    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR.key, "false")
+    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER.key, "false")
 
     val r1 = runSql(
       "select grade,class, subject , teacher_name, teacher_age from spark_teacher_3key where grade = 1 or class < 3")
@@ -202,32 +200,32 @@ class HBaseAdditionalQuerySuite extends TestBase {
   }
 
   test("UDF Test with custom filter but without coprocessor") {
-    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR, "false")
+    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR.key, "false")
     def myFilter(s: String) = s contains "_1_2"
     TestHbase.udf.register("myFilter", myFilter _)
     val result = TestHbase.sql("Select count(*) from spark_teacher_3key WHERE myFilter(teacher_name)")
     result.foreach(r => require(r.getLong(0) == 3L))
-    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR, "true")
+    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR.key, "true")
   }
 
   test("UDF Test with coprocessor but without custom filter") {
-    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER, "false")
+    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER.key, "false")
     def myFilter(s: String) = s contains "_1_2"
     TestHbase.udf.register("myFilter", myFilter _)
     val result = TestHbase.sql("Select count(*) from spark_teacher_3key WHERE myFilter(teacher_name)")
     result.foreach(r => require(r.getLong(0) == 3L))
-    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER, "true")
+    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER.key, "true")
   }
 
   test("UDF Test without coprocessor and custom filter") {
-    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR, "false")
-    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER, "false")
+    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR.key, "false")
+    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER.key, "false")
     def myFilter(s: String) = s contains "_1_2"
     TestHbase.udf.register("myFilter", myFilter _)
     val result = TestHbase.sql("Select count(*) from spark_teacher_3key WHERE myFilter(teacher_name)")
     result.foreach(r => require(r.getLong(0) == 3L))
-    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR, "true")
-    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER, "true")
+    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR.key, "true")
+    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER.key, "true")
   }
 
   test("group test for presplit table with coprocessor but without codegen") {

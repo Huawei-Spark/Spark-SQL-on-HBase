@@ -148,7 +148,7 @@ class SparkSqlRegionObserver extends BaseRegionObserver {
         HBaseSerializer.deserialize(serializedOutputDataType).asInstanceOf[Seq[DataType]]
 
       val serializedRDD = scan.getAttribute(CoprocessorConstants.COKEY)
-      val subPlanRDD: RDD[Row] = HBaseSerializer.deserialize(serializedRDD).asInstanceOf[RDD[Row]]
+      val subPlanRDD: RDD[InternalRow] = HBaseSerializer.deserialize(serializedRDD).asInstanceOf[RDD[InternalRow]]
 
       val taskParaInfo = scan.getAttribute(CoprocessorConstants.COTASK)
       val (stageId, partitionId, taskAttemptId, attemptNumber) =
@@ -174,11 +174,11 @@ class SparkSqlRegionObserver extends BaseRegionObserver {
         override def next(results: java.util.List[Cell]): Boolean = {
           val hasMore: Boolean = result.hasNext
           if (hasMore) {
-            val nextRow = result.next()
+            val nextRow:InternalRow = result.next()
             val numOfCells = outputDataType.length
             for (i <- 0 until numOfCells) {
-              val data = nextRow(i)
               val dataType = outputDataType(i)
+              val data = nextRow.get(i, dataType)
               val dataOfBytes: HBaseRawType = {
                 if (data == null) null else DataTypeUtils.dataToBytes(data, dataType)
               }
