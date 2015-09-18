@@ -240,8 +240,9 @@ class HBaseTpcMiniTestSuite extends TestBase {
   }
 
   test("Query 15") {
-    val sql = "SELECT count(ss_customer_sk) as count_customer FROM store_sales WHERE ss_customer_sk IN (1,25,50,75,100)"
+    val sql = "SELECT ss_customer_sk FROM store_sales WHERE ss_customer_sk IN (1,25,50,75,100)"
     val rows = runSql(sql)
+    rows.foreach(println)
     assert(rows(0).get(0) == 0)
   }
 

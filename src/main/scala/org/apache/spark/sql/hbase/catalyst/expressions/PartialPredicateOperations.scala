@@ -173,12 +173,13 @@ object PartialPredicateOperations {
               (null, InSet(evaluatedValue._2, newHset))
             }
           }
+        case b: BoundReference =>
+          //Todo: This is a hacking way to make it workable with spark 1.5 and it should be optimized
+          val res = input.copy().asInstanceOf[GenericInternalRow].values(b.ordinal)
+          (res, schema(b.ordinal))
         case l: LeafExpression =>
           val res = l.eval(input)
           (res, l)
-        case b: BoundReference =>
-          val res = b.eval(input)
-          (res, schema(b.ordinal))
         case n: NamedExpression =>
           val res = n.eval(input)
           (res, n)
