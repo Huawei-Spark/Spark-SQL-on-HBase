@@ -242,8 +242,25 @@ class HBaseTpcMiniTestSuite extends TestBase {
   test("Query 15") {
     val sql = "SELECT ss_customer_sk FROM store_sales WHERE ss_customer_sk IN (1,25,50,75,100)"
     val rows = runSql(sql)
-    rows.foreach(println)
-    assert(rows(0).get(0) == 0)
+    assert(rows.size == 0)
+  }
+
+  test("Query 15.1") {
+    val sql = "SELECT ss_customer_sk FROM store_sales WHERE ss_customer_sk IN (1,194284)"
+    val rows = runSql(sql)
+    assert(rows.size == 14)
+  }
+
+  test("Query 15.2") {
+    val sql = "SELECT ss_customer_sk FROM store_sales WHERE ss_customer_sk IN (1,225006)"
+    val rows = runSql(sql)
+    assert(rows.size == 14)
+  }
+
+  test("Query 15.3") {
+    val sql = "SELECT ss_customer_sk FROM store_sales WHERE ss_customer_sk IN (1,194284,225006)"
+    val rows = runSql(sql)
+    assert(rows.size == 28)
   }
 
   test("Query 16") {

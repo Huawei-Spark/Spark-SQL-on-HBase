@@ -616,6 +616,22 @@ private[hbase] case class HBaseRelation(
           } else {
             None
           }
+        case In(value@AttributeReference(name, dataType, _, _), list) =>
+          val column = nonKeyColumns.find(_.sqlName == name)
+          if (column.isDefined) {
+            val filterList = new FilterList(FilterList.Operator.MUST_PASS_ONE)
+            for (item <- list) {
+              val filter = new SingleColumnValueFilter(column.get.familyRaw,
+                column.get.qualifierRaw,
+                CompareFilter.CompareOp.EQUAL,
+                DataTypeUtils.getBinaryComparator(bytesUtils.create(dataType),
+                  item.asInstanceOf[Literal]))
+              filterList.addFilter(filter)
+            }
+            Some(filterList)
+          } else {
+            None
+          }
         case GreaterThan(left: AttributeReference, right: Literal) =>
           createSingleColumnValueFilter(left, right, CompareFilter.CompareOp.GREATER)
         case GreaterThan(left: Literal, right: AttributeReference) =>
