@@ -34,6 +34,7 @@ import org.apache.spark.sql.hbase.types.Range
 import org.apache.spark.sql.hbase.util._
 import org.apache.spark.sql.sources.{BaseRelation, CatalystScan, InsertableRelation, RelationProvider}
 import org.apache.spark.sql.types._
+import org.apache.spark.unsafe.types.UTF8String
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
@@ -691,10 +692,15 @@ private[hbase] case class HBaseRelation(
     var puts = new ListBuffer[Put]()
     while (iterator.hasNext) {
       val row = iterator.next()
+      val seq = row.toSeq.map{
+        case s:String => UTF8String.fromString(s)
+        case other => other
+      }
+      val internalRow = InternalRow.fromSeq(seq)
       val rawKeyCol = keyColumns.map(
         kc => {
           val rowColumn = DataTypeUtils.getRowColumnInHBaseRawType(
-            InternalRow(row.toSeq), kc.ordinal, kc.dataType)
+            internalRow, kc.ordinal, kc.dataType)
           colIndexInBatch += 1
           (rowColumn, kc.dataType)
         }
@@ -704,7 +710,7 @@ private[hbase] case class HBaseRelation(
       nonKeyColumns.foreach(
         nkc => {
           val rowVal = DataTypeUtils.getRowColumnInHBaseRawType(
-            InternalRow(row.toSeq), nkc.ordinal, nkc.dataType, bytesUtils)
+            internalRow, nkc.ordinal, nkc.dataType, bytesUtils)
           colIndexInBatch += 1
           put.add(nkc.familyRaw, nkc.qualifierRaw, rowVal)
         }

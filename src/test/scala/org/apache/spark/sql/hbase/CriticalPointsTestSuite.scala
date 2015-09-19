@@ -20,6 +20,7 @@ import org.apache.spark._
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.hbase.util.{BinaryBytesUtils, HBaseKVHelper}
 import org.apache.spark.sql.types._
+import org.apache.spark.unsafe.types.UTF8String
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 import scala.collection.mutable.ArrayBuffer
@@ -145,8 +146,8 @@ class CriticalPointsTestSuite extends FunSuite with BeforeAndAfterAll with Loggi
     val cprs = RangeCriticalPoint.generateCriticalPointRanges(relation, pred)
 
     assert(cprs._2.size == 1)
-    assert(cprs._2.head.start.get == "aaa" && cprs._2.head.startInclusive
-      && cprs._2.head.end.get == "aaa" && cprs._2.head.endInclusive)
+    assert(cprs._2.head.start.get == UTF8String.fromString("aaa") && cprs._2.head.startInclusive
+      && cprs._2.head.end.get == UTF8String.fromString("aaa") && cprs._2.head.endInclusive)
   }
 
   test("Generate CP Ranges for Multi-Dimension 0") {
@@ -193,7 +194,7 @@ class CriticalPointsTestSuite extends FunSuite with BeforeAndAfterAll with Loggi
 
     val prefix0 = expandedCPRs.head.prefix
     assert(prefix0.size == 2
-      && prefix0.head ==("abc", StringType)
+      && prefix0.head ==(UTF8String.fromString("abc"), StringType)
       && prefix0(1) ==(2048, IntegerType))
     val lastRange0 = expandedCPRs.head.lastRange
     assert(lastRange0.start.get == 9
@@ -203,7 +204,7 @@ class CriticalPointsTestSuite extends FunSuite with BeforeAndAfterAll with Loggi
 
     val prefix1 = expandedCPRs(1).prefix
     assert(prefix1.size == 2
-      && prefix1.head ==("cba", StringType)
+      && prefix1.head ==(UTF8String.fromString("cba"), StringType)
       && prefix1(1) ==(2048, IntegerType))
     val lastRange1 = expandedCPRs(1).lastRange
     assert(lastRange1.start.get == 9
@@ -233,11 +234,11 @@ class CriticalPointsTestSuite extends FunSuite with BeforeAndAfterAll with Loggi
     val l = Or(ll, lr)
 
     val rll = relation.output.find(_.name == "column1").get
-    val rlr = Literal.create("abc", StringType)
+    val rlr = Literal.create(UTF8String.fromString("abc"), StringType)
     val rl = EqualTo(rll, rlr)
 
     val rrl = rll
-    val rrr = Literal.create("cba", StringType)
+    val rrr = Literal.create(UTF8String.fromString("cba"), StringType)
     val rr = EqualTo(rrl, rrr)
 
     val r = Or(rl, rr)
@@ -254,25 +255,25 @@ class CriticalPointsTestSuite extends FunSuite with BeforeAndAfterAll with Loggi
     assert(expandedCPRs.size == 4)
 
     val prefix0 = expandedCPRs.head.prefix
-    assert(prefix0.size == 1 && prefix0.head ==("abc", StringType))
+    assert(prefix0.size == 1 && prefix0.head ==(UTF8String.fromString("abc"), StringType))
     val lastRange0 = expandedCPRs.head.lastRange
     assert(lastRange0.start.get == 8 && lastRange0.startInclusive
       && lastRange0.end.get == 8 && lastRange0.endInclusive)
 
     val prefix1 = expandedCPRs(1).prefix
-    assert(prefix1.size == 1 && prefix1.head ==("abc", StringType))
+    assert(prefix1.size == 1 && prefix1.head ==(UTF8String.fromString("abc"), StringType))
     val lastRange1 = expandedCPRs(1).lastRange
     assert(lastRange1.start.get == 2048 && lastRange1.startInclusive
       && lastRange1.end.get == 2048 && lastRange1.endInclusive)
 
     val prefix2 = expandedCPRs(2).prefix
-    assert(prefix2.size == 1 && prefix2.head ==("cba", StringType))
+    assert(prefix2.size == 1 && prefix2.head ==(UTF8String.fromString("cba"), StringType))
     val lastRange2 = expandedCPRs(2).lastRange
     assert(lastRange2.start.get == 8 && lastRange2.startInclusive
       && lastRange2.end.get == 8 && lastRange2.endInclusive)
 
     val prefix3 = expandedCPRs(3).prefix
-    assert(prefix3.size == 1 && prefix3.head ==("cba", StringType))
+    assert(prefix3.size == 1 && prefix3.head ==(UTF8String.fromString("cba"), StringType))
     val lastRange3 = expandedCPRs(3).lastRange
     assert(lastRange3.start.get == 2048 && lastRange3.startInclusive
       && lastRange3.end.get == 2048 && lastRange3.endInclusive)
