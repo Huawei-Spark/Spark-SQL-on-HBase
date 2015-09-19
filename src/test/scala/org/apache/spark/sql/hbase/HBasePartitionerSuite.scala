@@ -23,6 +23,7 @@ import org.apache.spark.rdd.ShuffledRDD
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.hbase.util.{BinaryBytesUtils, HBaseKVHelper}
 import org.apache.spark.sql.types._
+import org.apache.spark.unsafe.types.UTF8String
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -69,8 +70,8 @@ class HBasePartitionerSuite extends TestBase {
         KeyColumn("col3", StringType, 2), KeyColumn("col4", IntegerType, 3)))
 
     assert(BinaryBytesUtils.toDouble(rowkey, keys.head._1) === 123.456)
-    assert(BinaryBytesUtils.toUTF8String(rowkey, keys(1)._1, keys(1)._2) === "abcdef")
-    assert(BinaryBytesUtils.toUTF8String(rowkey, keys(2)._1, keys(2)._2) === "")
+    assert(BinaryBytesUtils.toUTF8String(rowkey, keys(1)._1, keys(1)._2) === UTF8String.fromString("abcdef"))
+    assert(BinaryBytesUtils.toUTF8String(rowkey, keys(2)._1, keys(2)._2) === UTF8String.fromString(""))
     assert(BinaryBytesUtils.toInt(rowkey, keys(3)._1) === 1234)
   }
 
@@ -88,7 +89,7 @@ class HBasePartitionerSuite extends TestBase {
         KeyColumn("col3", IntegerType, 2)))
 
     assert(BinaryBytesUtils.toDouble(rowkey, keys.head._1) === 123.456)
-    assert(BinaryBytesUtils.toUTF8String(rowkey, keys(1)._1, keys(1)._2) === "abcdef")
+    assert(BinaryBytesUtils.toUTF8String(rowkey, keys(1)._1, keys(1)._2) === UTF8String.fromString("abcdef"))
     assert(BinaryBytesUtils.toInt(rowkey, keys(2)._1) === 1234)
   }
 
