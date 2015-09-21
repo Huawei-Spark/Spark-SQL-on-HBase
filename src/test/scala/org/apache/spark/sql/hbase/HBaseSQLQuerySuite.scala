@@ -68,13 +68,13 @@ class HBaseSQLQuerySuite extends TestBaseWithSplitData {
   test("SPARK-3176 Added Parser of SQL ABS()") {
     checkAnswer(
       sql("SELECT ABS(-1.3)"),
-      Row(1.3))
+      Row(BigDecimal(1.3)))
     checkAnswer(
       sql("SELECT ABS(0.0)"),
-      Row(0.0))
+      Row(BigDecimal(0.0)))
     checkAnswer(
       sql("SELECT ABS(2.5)"),
-      Row(2.5))
+      Row(BigDecimal(2.5)))
   }
 
   test("aggregation with codegen") {
@@ -579,31 +579,31 @@ class HBaseSQLQuerySuite extends TestBaseWithSplitData {
     val nonexistentKey = "nonexistent"
 
     // "set" itself returns all config variables currently specified in SQLConf.
-    assert(sql("SET").collect().length == 0)
+    assert(sql("SET").collect().size == 0)
 
     // "set key=val"
     sql(s"SET $testKey=$testVal")
     checkAnswer(
       sql("SET"),
-      Row(s"$testKey=$testVal")
+      Row(testKey, testVal)
     )
 
     sql(s"SET ${testKey + testKey}=${testVal + testVal}")
     checkAnswer(
       sql("set"),
       Seq(
-        Row(s"$testKey=$testVal"),
-        Row(s"${testKey + testKey}=${testVal + testVal}"))
+        Row(testKey, testVal),
+        Row(testKey + testKey, testVal + testVal))
     )
 
     // "set key"
     checkAnswer(
       sql(s"SET $testKey"),
-      Row(s"$testKey=$testVal")
+      Row(testKey, testVal)
     )
     checkAnswer(
       sql(s"SET $nonexistentKey"),
-      Row(s"$nonexistentKey=<undefined>")
+      Row(nonexistentKey, "<undefined>")
     )
     conf.clear()
   }
@@ -790,19 +790,19 @@ class HBaseSQLQuerySuite extends TestBaseWithSplitData {
 
   test("Floating point number format") {
     checkAnswer(
-      sql("SELECT 0.3"), Row(0.3)
+      sql("SELECT 0.3"), Row(BigDecimal(0.3))
     )
 
     checkAnswer(
-      sql("SELECT -0.8"), Row(-0.8)
+      sql("SELECT -0.8"), Row(BigDecimal(-0.8))
     )
 
     checkAnswer(
-      sql("SELECT .5"), Row(0.5)
+      sql("SELECT .5"), Row(BigDecimal(0.5))
     )
 
     checkAnswer(
-      sql("SELECT -.18"), Row(-0.18)
+      sql("SELECT -.18"), Row(BigDecimal(-0.18))
     )
   }
 
@@ -827,19 +827,19 @@ class HBaseSQLQuerySuite extends TestBaseWithSplitData {
   test("Test to check we can apply sign to expression") {
 
     checkAnswer(
-      sql("SELECT -100"), Row(-100)
+      sql("SELECT -100"), Row(BigDecimal(-100))
     )
 
     checkAnswer(
-      sql("SELECT +230"), Row(230)
+      sql("SELECT +230"), Row(BigDecimal(230))
     )
 
     checkAnswer(
-      sql("SELECT -5.2"), Row(-5.2)
+      sql("SELECT -5.2"), Row(BigDecimal(-5.2))
     )
 
     checkAnswer(
-      sql("SELECT +6.8"), Row(6.8)
+      sql("SELECT +6.8"), Row(BigDecimal(6.8))
     )
 
     checkAnswer(
