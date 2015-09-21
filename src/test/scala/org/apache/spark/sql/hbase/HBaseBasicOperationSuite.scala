@@ -47,9 +47,6 @@ class HBaseBasicOperationSuite extends TestBaseWithSplitData {
     sql( """INSERT INTO TABLE tb0 SELECT col4,col4,col6,col3 FROM ta""")
     assert(sql( """SELECT * FROM tb0""").collect().length == 14)
 
-    sql( """SELECT * FROM tb0""").show
-    sql( """SELECT * FROM tb0 where column2 > 200""").show
-
     sql( """DROP TABLE tb0""")
   }
 

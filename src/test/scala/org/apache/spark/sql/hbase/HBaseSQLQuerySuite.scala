@@ -49,7 +49,7 @@ class HBaseSQLQuerySuite extends TestBaseWithSplitData {
   }
 
   test("grouping on nested fields") {
-    jsonRDD(sparkContext.parallelize( """{"nested": {"attribute": 1}, "v": 2}""" :: Nil))
+    read.json(sparkContext.parallelize( """{"nested": {"attribute": 1}, "v": 2}""" :: Nil))
       .registerTempTable("rows")
 
     checkAnswer(
@@ -920,7 +920,7 @@ class HBaseSQLQuerySuite extends TestBaseWithSplitData {
 
   test("SPARK-3483 Special chars in column names") {
     val data = sparkContext.parallelize(Seq( """{"k?number1": "value1", "k.number2": "value2"}"""))
-    jsonRDD(data).registerTempTable("records")
+    read.json(data).registerTempTable("records")
     sql("SELECT `k?number1` FROM records")
   }
 
@@ -961,11 +961,11 @@ class HBaseSQLQuerySuite extends TestBaseWithSplitData {
   }
 
   test("SPARK-4322 Grouping field with struct field as sub expression") {
-    jsonRDD(sparkContext.makeRDD( """{"a": {"b": [{"c": 1}]}}""" :: Nil)).registerTempTable("dt")
+    read.json(sparkContext.makeRDD( """{"a": {"b": [{"c": 1}]}}""" :: Nil)).registerTempTable("dt")
     checkAnswer(sql("SELECT a.b[0].c FROM dt GROUP BY a.b[0].c"), Row(1))
     dropTempTable("dt")
 
-    jsonRDD(sparkContext.makeRDD( """{"a": {"b": 1}}""" :: Nil)).registerTempTable("dt")
+    read.json(sparkContext.makeRDD( """{"a": {"b": 1}}""" :: Nil)).registerTempTable("dt")
     checkAnswer(sql("SELECT a.b + 1 FROM dt GROUP BY a.b + 1"), Row(2))
     dropTempTable("dt")
   }
