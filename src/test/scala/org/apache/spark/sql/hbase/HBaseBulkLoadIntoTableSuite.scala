@@ -17,6 +17,7 @@
 
 package org.apache.spark.sql.hbase
 
+import org.apache.hadoop.hbase.util.Bytes
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.hbase.execution._
@@ -405,5 +406,53 @@ class HBaseBulkLoadIntoTableSuite extends TestBase {
     // cleanup
     runSql("drop table testblk")
     dropNativeHbaseTable("presplit_table")
+  }
+
+  test("parall bulk load presplit table with more than 128 regions") {
+    // HBasePartitioner binarySearch throws NPE if # regions > 128
+    // commit dae6546373a14d4ceb22680954c3482ed33e346a
+
+    // Create > 130 split keys to generate 131 regions.
+    val splitKeys = Seq.range(1, 260, 2).map { x =>
+      BinaryBytesUtils.create(IntegerType).toBytes(x)
+    }
+
+    TestHbase.catalog.createHBaseUserTable(
+      "REGION_CNT_131_HTBL",
+      Set("f"),
+      splitKeys.toArray)
+
+    val sql1 =
+      s"""CREATE TABLE region_cnt_131(col1 INT, col2 INT, PRIMARY KEY(col1))
+          MAPPED BY (REGION_CNT_131_HTBL, COLS=[col2=f.a])"""
+        .stripMargin
+
+    val regionInfoList =
+      TestHbase.hbaseAdmin.getTableRegions(Bytes.toBytes("REGION_CNT_131_HTBL"))
+    assert(regionInfoList.size == 131, "Incorrect number of hbase tbl regions.")
+
+    val sql2 =
+      s"""select * from region_cnt_131 limit 5"""
+        .stripMargin
+
+    val executeSql1 = TestHbase.executeSql(sql1)
+    executeSql1.toRdd.collect()
+
+    val executeSql2 = TestHbase.executeSql(sql2)
+    executeSql2.toRdd.collect()
+
+    val inputFile = "'" + hbaseHome + "/131_regions.txt'"
+
+    // then load parall data into table
+    val loadSql = "LOAD PARALL DATA LOCAL INPATH " + inputFile + " INTO TABLE region_cnt_131"
+
+    val executeSql3 = TestHbase.executeSql(loadSql)
+    executeSql3.toRdd.collect()
+
+    assert(runSql("select * from region_cnt_131").length == 260)
+
+    // cleanup
+    runSql("drop table region_cnt_131")
+    dropNativeHbaseTable("REGION_CNT_131_HTBL")
   }
 }
