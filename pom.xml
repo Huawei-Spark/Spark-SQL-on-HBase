@@ -35,43 +35,43 @@
 
   <properties>
     <sbt.project.name>hbase</sbt.project.name>
-    <project.version>1.4.0</project.version>
-    <spark.version>1.4.0</spark.version>
+    <project.version>1.5.0</project.version>
+    <spark.version>1.5.0</spark.version>
     <hadoop.version>2.4.0</hadoop.version>
-    <hbase.version>0.98.5-hadoop2</hbase.version>
+    <hbase.version>0.98.7-hadoop2</hbase.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <akka.group>org.spark-project.akka</akka.group>
-    <akka.version>2.3.4-spark</akka.version>
-    <java.version>1.6</java.version>
+    <akka.group>com.typesafe.akka</akka.group>
+    <akka.version>2.3.11</akka.version>
+    <java.version>1.7</java.version>
     <scala.macros.version>2.0.1</scala.macros.version>
-    <mesos.version>0.21.0</mesos.version>
+    <mesos.version>0.21.1</mesos.version>
     <mesos.classifier>shaded-protobuf</mesos.classifier>
-    <slf4j.version>1.7.5</slf4j.version>
+    <slf4j.version>1.7.10</slf4j.version>
     <log4j.version>1.2.17</log4j.version>
     <protobuf.version>2.5.0</protobuf.version>
     <yarn.version>${hadoop.version}</yarn.version>
     <zookeeper.version>3.4.5</zookeeper.version>
-    <parquet.version>1.6.0rc3</parquet.version>
-    <jblas.version>1.2.3</jblas.version>
+    <parquet.version>1.7.0</parquet.version>
+    <jblas.version>1.2.4</jblas.version>
     <jetty.version>8.1.14.v20131031</jetty.version>
     <chill.version>0.5.0</chill.version>
-    <codahale.metrics.version>3.0.0</codahale.metrics.version>
-    <avro.version>1.7.6</avro.version>
-    <avro.mapred.classifier></avro.mapred.classifier>
+    <codahale.metrics.version>3.1.2</codahale.metrics.version>
+    <avro.version>1.7.7</avro.version>
+    <avro.mapred.classifier>hadoop2</avro.mapred.classifier>
     <jets3t.version>0.7.1</jets3t.version>
-    <aws.java.sdk.version>1.8.3</aws.java.sdk.version>
-    <aws.kinesis.client.version>1.1.0</aws.kinesis.client.version>
-    <commons.httpclient.version>4.2.6</commons.httpclient.version>
-    <commons.math3.version>3.1.1</commons.math3.version>
+    <aws.java.sdk.version>1.9.16</aws.java.sdk.version>
+    <aws.kinesis.client.version>1.2.1</aws.kinesis.client.version>
+    <commons.httpclient.version>4.3.2</commons.httpclient.version>
+    <commons.math3.version>3.4.1</commons.math3.version>
     <test_classpath_file>${project.build.directory}/spark-test-classpath.txt</test_classpath_file>
     <scala.version>2.10.4</scala.version>
     <scala.binary.version>2.10</scala.binary.version>
     <jline.version>${scala.version}</jline.version>
     <jline.groupid>org.scala-lang</jline.groupid>
-    <codehaus.jackson.version>1.8.8</codehaus.jackson.version>
-    <snappy.version>1.1.1.6</snappy.version>
+    <codehaus.jackson.version>1.9.13</codehaus.jackson.version>
+    <snappy.version>1.1.1.7</snappy.version>
 
     <!--
       Dependency scopes that can be overridden by enabling certain profiles. These profiles are
@@ -209,9 +209,24 @@
       <version>${spark.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-hive_${scala.binary.version}</artifactId>
+      <version>${spark.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-unsafe_${scala.binary.version}</artifactId>
+      <version>${spark.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${jline.groupid}</groupId>
+      <artifactId>jline</artifactId>
+      <version>${jline.version}</version>
+    </dependency>
+    <dependency>
       <groupId>jline</groupId>
       <artifactId>jline</artifactId>
-      <version>0.9.94</version>
+      <version>2.12</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
