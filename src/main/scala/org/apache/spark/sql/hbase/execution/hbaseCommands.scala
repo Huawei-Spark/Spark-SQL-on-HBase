@@ -25,6 +25,7 @@ import org.apache.hadoop.hbase._
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable
 import org.apache.hadoop.hbase.mapreduce.{HFileOutputFormat2, LoadIncrementalHFiles}
 import org.apache.hadoop.hbase.util.Bytes
+import org.apache.hadoop.mapred.JobConf
 import org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
 import org.apache.hadoop.mapreduce.{Job, RecordWriter}
 import org.apache.spark.annotation.DeveloperApi
@@ -166,7 +167,7 @@ case class BulkLoadIntoTableCommand(
     // tmp path for storing HFile
     @transient val tmpPath = Util.getTempFilePath(
       hbContext.sparkContext.hadoopConfiguration, relation.tableName)
-    @transient val job = new Job(hbContext.sparkContext.hadoopConfiguration)
+    @transient val job = Job.getInstance(hbContext.sparkContext.hadoopConfiguration)
     HFileOutputFormat2.configureIncrementalLoad(job, relation.htable)
     job.getConfiguration.set("mapreduce.output.fileoutputformat.outputdir", tmpPath)
 

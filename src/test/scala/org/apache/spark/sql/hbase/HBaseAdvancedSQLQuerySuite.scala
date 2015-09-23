@@ -27,10 +27,10 @@ class HBaseAdvancedSQLQuerySuite extends TestBaseWithSplitData {
 
   test("aggregation with codegen") {
     val originalValue = TestHbase.conf.codegenEnabled
-    setConf(SQLConf.CODEGEN_ENABLED.toString(), "true")
+    setConf(SQLConf.CODEGEN_ENABLED, true)
     val result = sql("SELECT col1 FROM ta GROUP BY col1").collect()
     assert(result.length == 14, s"aggregation with codegen test failed on size")
-    setConf(SQLConf.CODEGEN_ENABLED.toString(), originalValue.toString)
+    setConf(SQLConf.CODEGEN_ENABLED, originalValue)
   }
 
   test("dsl simple select 0") {

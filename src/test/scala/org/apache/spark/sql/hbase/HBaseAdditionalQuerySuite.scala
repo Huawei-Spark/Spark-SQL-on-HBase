@@ -21,6 +21,7 @@ import org.apache.spark.sql.SQLConf.SQLConfEntry
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.expressions.{GenericInternalRow, GenericRow}
 import org.apache.spark.sql.execution.Exchange
+import org.apache.spark.sql.hbase.TestHbase._
 import org.apache.spark.sql.hbase.util.HBaseKVHelper
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types._
@@ -164,8 +165,8 @@ class HBaseAdditionalQuerySuite extends TestBase {
     val origValOfCoprocessor = TestHbase.conf.getConf(HBaseSQLConf.USE_COPROCESSOR)
     val origValOfCustomfilter = TestHbase.conf.getConf(HBaseSQLConf.USE_CUSTOMFILTER)
 
-    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR.key, "false")
-    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER.key, "false")
+    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR, false)
+    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER, false)
 
     val r1 = runSql(
       "select grade,class, subject , teacher_name, teacher_age from spark_teacher_3key where grade = 1 or class < 3")
@@ -200,32 +201,37 @@ class HBaseAdditionalQuerySuite extends TestBase {
   }
 
   test("UDF Test with custom filter but without coprocessor") {
-    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR.key, "false")
+    val originalValue = TestHbase.conf.asInstanceOf[HBaseSQLConf].useCustomFilter
+    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR, false)
     def myFilter(s: String) = s contains "_1_2"
     TestHbase.udf.register("myFilter", myFilter _)
     val result = TestHbase.sql("Select count(*) from spark_teacher_3key WHERE myFilter(teacher_name)")
     result.foreach(r => require(r.getLong(0) == 3L))
-    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR.key, "true")
+    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR, originalValue)
   }
 
   test("UDF Test with coprocessor but without custom filter") {
-    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER.key, "false")
+    val originalValue = TestHbase.conf.asInstanceOf[HBaseSQLConf].useCoprocessor
+    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER, false)
     def myFilter(s: String) = s contains "_1_2"
     TestHbase.udf.register("myFilter", myFilter _)
     val result = TestHbase.sql("Select count(*) from spark_teacher_3key WHERE myFilter(teacher_name)")
     result.foreach(r => require(r.getLong(0) == 3L))
-    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER.key, "true")
+    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER, originalValue)
   }
 
   test("UDF Test without coprocessor and custom filter") {
-    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR.key, "false")
-    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER.key, "false")
+    val originalValueCopro = TestHbase.conf.asInstanceOf[HBaseSQLConf].useCoprocessor
+    val originalValueCF = TestHbase.conf.asInstanceOf[HBaseSQLConf].useCustomFilter
+
+    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR, false)
+    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER, false)
     def myFilter(s: String) = s contains "_1_2"
     TestHbase.udf.register("myFilter", myFilter _)
     val result = TestHbase.sql("Select count(*) from spark_teacher_3key WHERE myFilter(teacher_name)")
     result.foreach(r => require(r.getLong(0) == 3L))
-    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR.key, "true")
-    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER.key, "true")
+    TestHbase.setConf(HBaseSQLConf.USE_COPROCESSOR, originalValueCopro)
+    TestHbase.setConf(HBaseSQLConf.USE_CUSTOMFILTER, originalValueCF)
   }
 
   test("group test for presplit table with coprocessor but without codegen") {
@@ -238,16 +244,16 @@ class HBaseAdditionalQuerySuite extends TestBase {
 
   test("group test for presplit table with codegen and coprocessor") {
     val originalValue = TestHbase.conf.codegenEnabled
-    TestHbase.setConf(SQLConf.CODEGEN_ENABLED.toString(), "true")
+    TestHbase.setConf(SQLConf.CODEGEN_ENABLED, true)
     aggregationTest()
-    TestHbase.setConf(SQLConf.CODEGEN_ENABLED.toString(), originalValue.toString)
+    TestHbase.setConf(SQLConf.CODEGEN_ENABLED, originalValue)
   }
 
   test("group test for presplit table with codegen but without coprocessor") {
     val originalValue = TestHbase.conf.codegenEnabled
-    TestHbase.setConf(SQLConf.CODEGEN_ENABLED.toString(), "true")
+    TestHbase.setConf(SQLConf.CODEGEN_ENABLED, true)
     aggregationTest(useCoprocessor = false)
-    TestHbase.setConf(SQLConf.CODEGEN_ENABLED.toString(), originalValue.toString)
+    TestHbase.setConf(SQLConf.CODEGEN_ENABLED, originalValue)
   }
 
   def aggregationTest(useCoprocessor: Boolean = true) = {
