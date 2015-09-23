@@ -23,6 +23,7 @@ import org.apache.spark.sql.types._
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import scala.util.control.Breaks._
 
 object CriticalPointType extends Enumeration {
   type CriticalPointType = Value
@@ -502,20 +503,23 @@ object RangeCriticalPoint {
     var newLimit = limit
     var cmp = 0
     var prevEq = eq
-    while (incr * (newLimit - prevEq) >= 0) {
-      if (incr * (newLimit - prevEq) < threshold) {
-        // linear search
-        mid = prevEq + incr
-        while (incr * (newLimit - mid) > 0 && cmp == 0) {
-          prevEq = mid
-          mid = mid + incr
+    breakable {
+      while (incr * (newLimit - prevEq) >= 0) {
+        if (incr * (newLimit - prevEq) < threshold) {
+          // linear search
+          mid = prevEq + incr
+          while (incr * (newLimit - mid) > 0 && cmp == 0) {
+            prevEq = mid
+            mid = mid + incr
+            cmp = comp(src, tgt(mid))
+          }
+          break
+        } else {
+          mid = (prevEq + newLimit) / 2
           cmp = comp(src, tgt(mid))
+          if (cmp == 0) prevEq = mid
+          else newLimit = mid
         }
-      } else {
-        mid = (prevEq + newLimit) / 2
-        cmp = comp(src, tgt(mid))
-        if (cmp == 0) prevEq = mid
-        else newLimit = mid
       }
     }
     prevEq
@@ -577,7 +581,7 @@ object RangeCriticalPoint {
           } else {
             prevSmaller = binarySearchEquality(mid, prevLarger, src, tgt, threshold, comp)
           }
-          right = left // break the outer loop
+          right = left - 1 // break the outer loop
         } else if (cmp < 0) {
           prevLarger = mid
           right = mid - 1
