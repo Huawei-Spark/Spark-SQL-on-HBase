@@ -31,7 +31,7 @@ import org.apache.hadoop.mapreduce.{Job, RecordWriter}
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.mapreduce.SparkHadoopMapReduceUtil
 import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.expressions.Attribute
+import org.apache.spark.sql.catalyst.expressions.{Expression, Attribute}
 import org.apache.spark.sql.catalyst.plans.logical.Subquery
 import org.apache.spark.sql.execution.RunnableCommand
 import org.apache.spark.sql.execution.datasources.LogicalRelation
@@ -144,6 +144,74 @@ case class InsertValueIntoTableCommand(tableName: String, valueSeq: Seq[String])
   }
 
   override def output: Seq[Attribute] = Seq.empty
+
+  // Override the following two functions to solve the problem in inserting a null value
+  // Remove this part if you have found a better sollution
+
+  /**
+   * Runs [[transformDown]] with `rule` on all expressions present in this query operator.
+   * @param rule the rule to be applied to every expression in this operator.
+   */
+  override def transformExpressionsDown(rule: PartialFunction[Expression, Expression]): this.type = {
+    var changed = false
+
+    @inline def transformExpressionDown(e: Expression): Expression = {
+      val newE = e.transformDown(rule)
+      if (newE.fastEquals(e)) {
+        e
+      } else {
+        changed = true
+        newE
+      }
+    }
+
+    def recursiveTransform(arg: Any): AnyRef = arg match {
+      case e: Expression => transformExpressionDown(e)
+      case Some(e: Expression) => Some(transformExpressionDown(e))
+      case m: Map[_, _] => m
+      case d: DataType => d // Avoid unpacking Structs
+      case seq: Traversable[_] => seq.map(recursiveTransform)
+      case other: AnyRef => other
+      case null => null // !!! Important thing to add to handle the null value
+    }
+
+    val newArgs = productIterator.map(recursiveTransform).toArray
+
+    if (changed) makeCopy(newArgs).asInstanceOf[this.type] else this
+  }
+
+  /**
+   * Runs [[transformUp]] with `rule` on all expressions present in this query operator.
+   * @param rule the rule to be applied to every expression in this operator.
+   * @return
+   */
+  override def transformExpressionsUp(rule: PartialFunction[Expression, Expression]): this.type = {
+    var changed = false
+
+    @inline def transformExpressionUp(e: Expression): Expression = {
+      val newE = e.transformUp(rule)
+      if (newE.fastEquals(e)) {
+        e
+      } else {
+        changed = true
+        newE
+      }
+    }
+
+    def recursiveTransform(arg: Any): AnyRef = arg match {
+      case e: Expression => transformExpressionUp(e)
+      case Some(e: Expression) => Some(transformExpressionUp(e))
+      case m: Map[_, _] => m
+      case d: DataType => d // Avoid unpacking Structs
+      case seq: Traversable[_] => seq.map(recursiveTransform)
+      case other: AnyRef => other
+      case null => null // !!! Important thing to add to handle the null value
+    }
+
+    val newArgs = productIterator.map(recursiveTransform).toArray
+
+    if (changed) makeCopy(newArgs).asInstanceOf[this.type] else this
+  }
 }
 
 @DeveloperApi
