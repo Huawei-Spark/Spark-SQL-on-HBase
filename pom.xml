@@ -1205,8 +1205,17 @@
 	  <plugin>
 		  <groupId>org.apache.maven.plugins</groupId>
 		  <artifactId>maven-shade-plugin</artifactId>
-		  <version>2.3</version>
+		  <version>2.4.1</version>
 		  <configuration>
+            <artifactSet>
+              <excludes>
+                <exclude>org.json4s:json4s-jackson_2.10:jar:</exclude>
+                <exclude>org.json4s:json4s-core_2.10:jar:</exclude>
+                <exclude>org.json4s:json4s-ast_2.10:jar:</exclude>
+                <exclude>org.scala-lang:scalap:jar:</exclude>
+                <exclude>org.scala-lang:scala-compiler:jar:</exclude>
+              </excludes>
+            </artifactSet>
 			<createDependencyReducedPom>false</createDependencyReducedPom>
 			<filters>
 				<filter>
