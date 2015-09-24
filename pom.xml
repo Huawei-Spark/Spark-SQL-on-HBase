@@ -1335,7 +1335,7 @@
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>scala-maven-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.2.2</version>
         <executions>
           <execution>
             <id>scala-compile-first</id>
@@ -1361,6 +1361,7 @@
         </executions>
         <configuration>
           <scalaVersion>${scala.version}</scalaVersion>
+          <scalaCompatVersion>${scala.binary.version}</scalaCompatVersion>
           <recompileMode>incremental</recompileMode>
           <useZincServer>false</useZincServer>
           <args>
@@ -1395,17 +1396,18 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
+        <version>3.3</version>
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
           <encoding>UTF-8</encoding>
           <maxmem>1024m</maxmem>
           <fork>true</fork>
+          <compilerArgs>
+            <arg>-Xlint:all,-serial,-path</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
-
-
       <!-- Surefire runs all Java tests -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
