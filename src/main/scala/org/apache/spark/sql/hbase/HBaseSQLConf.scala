@@ -56,11 +56,11 @@ private[hbase] class HBaseSQLConf extends SQLConf {
   private[hbase] def useCustomFilter: Boolean = getConf(USE_CUSTOMFILTER)
 
   //Todo: this is a temporary solution to integrate with spark1.5
-  setConf(SQLConf.TUNGSTEN_ENABLED, false)
-  setConf(SQLConf.UNSAFE_ENABLED, false)
-  override def clear(): Unit = {
-    super.clear()
-    setConf(SQLConf.TUNGSTEN_ENABLED, false)
-    setConf(SQLConf.UNSAFE_ENABLED, false)
-  }
+//  setConf(SQLConf.TUNGSTEN_ENABLED, false)
+//  setConf(SQLConf.UNSAFE_ENABLED, false)
+//  override def clear(): Unit = {
+//    super.clear()
+//    setConf(SQLConf.TUNGSTEN_ENABLED, false)
+//    setConf(SQLConf.UNSAFE_ENABLED, false)
+//  }
 }

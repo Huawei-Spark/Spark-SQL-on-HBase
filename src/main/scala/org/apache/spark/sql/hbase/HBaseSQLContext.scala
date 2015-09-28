@@ -23,7 +23,7 @@ import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.analysis.OverrideCatalog
 import org.apache.spark.sql.catalyst.rules.RuleExecutor
-import org.apache.spark.sql.execution.{EnsureRequirements, SparkPlan}
+import org.apache.spark.sql.execution.{EnsureRowFormats, EnsureRequirements, SparkPlan}
 import org.apache.spark.sql.hbase.execution.{AddCoprocessor, HBaseStrategies}
 
 class HBaseSQLContext(sc: SparkContext) extends SQLContext(sc) {
@@ -42,9 +42,11 @@ class HBaseSQLContext(sc: SparkContext) extends SQLContext(sc) {
 
   experimental.extraStrategies = Seq((new SparkPlanner with HBaseStrategies).HBaseDataSource)
 
+  // Attention! : Update the following value when spark updates.
   @transient
   override protected[sql] val prepareForExecution = new RuleExecutor[SparkPlan] {
     val batches = Batch("Add exchange", Once, EnsureRequirements(self)) ::
+      Batch("Add row converters", Once, EnsureRowFormats) ::
       Batch("Add coprocessor", Once, AddCoprocessor(self)) ::
       Nil
   }
