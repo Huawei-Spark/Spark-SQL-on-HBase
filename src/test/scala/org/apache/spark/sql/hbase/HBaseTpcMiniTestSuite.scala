@@ -197,6 +197,20 @@ class HBaseTpcMiniTestSuite extends TestBase {
     assert(rows.length == 5)
   }
 
+  test("Query 7.1") {
+    val sql =
+      s"""SELECT ss_item_sk, ss_ticket_number, sum(ss_wholesale_cost) as sum_wholesale_cost
+         |FROM store_sales
+         |WHERE ss_item_sk > 17182
+         |AND ss_item_sk <= 17183
+         |GROUP BY ss_item_sk, ss_ticket_number""".stripMargin
+    val rows = runSql(sql)
+    assert(rows.length == 1)
+    assert(rows(0)(0) == 17183)
+    assert(rows(0)(1) == 6)
+    assert(rows(0)(2) == 0.0) // should not be null
+  }
+
   test("Query 8") {
     val sql = "SELECT ss_item_sk, ss_ticket_number, min(ss_wholesale_cost) as min_wholesale_cost, max(ss_wholesale_cost) as max_wholesale_cost, avg(ss_wholesale_cost) as avg_wholesale_cost FROM store_sales WHERE ss_item_sk > 4000 AND ss_item_sk <= 5000 GROUP BY ss_item_sk, ss_ticket_number"
     val rows = runSql(sql)
