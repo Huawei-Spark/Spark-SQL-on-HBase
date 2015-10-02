@@ -46,8 +46,8 @@ class HBaseSQLContext(sc: SparkContext) extends SQLContext(sc) {
   @transient
   override protected[sql] val prepareForExecution = new RuleExecutor[SparkPlan] {
     val batches = Batch("Add exchange", Once, EnsureRequirements(self)) ::
-      Batch("Add row converters", Once, EnsureRowFormats) ::
       Batch("Add coprocessor", Once, AddCoprocessor(self)) ::
+      Batch("Add row converters", Once, EnsureRowFormats) ::
       Nil
   }
 }

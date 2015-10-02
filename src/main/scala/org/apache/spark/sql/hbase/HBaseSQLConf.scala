@@ -29,7 +29,7 @@ object HBaseSQLConf {
     defaultValue = Some(100))
 
   val USE_COPROCESSOR = SQLConfEntry.booleanConf("spark.sql.hbase.coprocessor",
-    defaultValue = Some(false))
+    defaultValue = Some(true))
 
   val USE_CUSTOMFILTER = SQLConfEntry.booleanConf("spark.sql.hbase.customfilter",
     defaultValue = Some(false))

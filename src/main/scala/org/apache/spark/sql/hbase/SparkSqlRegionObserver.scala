@@ -32,6 +32,8 @@ import org.apache.spark.sql.catalyst.expressions.codegen.GeneratePredicate
 import org.apache.spark.sql.hbase.util.DataTypeUtils
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Row, SQLContext}
+import org.apache.spark.unsafe.memory.TaskMemoryManager
+import org.apache.spark.util.collection.unsafe.sort.UnsafeExternalSorter
 
 /**
  * HBaseCoprocessorSQLReaderRDD:
@@ -153,8 +155,18 @@ class SparkSqlRegionObserver extends BaseRegionObserver {
       val taskParaInfo = scan.getAttribute(CoprocessorConstants.COTASK)
       val (stageId, partitionId, taskAttemptId, attemptNumber) =
         HBaseSerializer.deserialize(taskParaInfo).asInstanceOf[(Int, Int, Long, Int)]
+      val taskMemoryManager = new TaskMemoryManager(SparkEnv.get.executorMemoryManager)
+      val internalAccumulators = Seq(
+        // Execution memory refers to the memory used by internal data structures created
+        // during shuffles, aggregations and joins. The value of this accumulator should be
+        // approximately the sum of the peak sizes across all such data structures created
+        // in this task. For SQL jobs, this only tracks all unsafe operators and ExternalSort.
+        new Accumulator(
+          0L, AccumulatorParam.LongAccumulatorParam, Some(InternalAccumulator.PEAK_EXECUTION_MEMORY), internal = true)
+      )
       val taskContext = new TaskContextInHBase(
-        stageId, partitionId, taskAttemptId, attemptNumber, null, false, new TaskMetrics)
+        stageId, partitionId, taskAttemptId, attemptNumber, taskMemoryManager, internalAccumulators)
+      TaskContext.setTaskContext(taskContext)
 
       val regionInfo = s.getRegionInfo
       val startKey = if (regionInfo.getStartKey.isEmpty) None else Some(regionInfo.getStartKey)
