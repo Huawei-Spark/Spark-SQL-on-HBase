@@ -173,4 +173,12 @@ abstract class TestBase
     val loadSql = s"LOAD PARALL DATA LOCAL INPATH '$loadFile' INTO TABLE $tableName"
     runSql(loadSql)
   }
+
+  def printRows(rows: Array[Row]) = {
+    println("======= QUERY RESULTS ======")
+    for (i <- rows.indices) {
+      println(rows(i).mkString(" | "))
+    }
+    println("============================")
+  }
 }

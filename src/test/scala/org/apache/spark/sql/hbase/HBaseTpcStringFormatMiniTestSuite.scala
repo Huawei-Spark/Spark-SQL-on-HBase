@@ -847,13 +847,4 @@ class HBaseTpcStringFormatMiniTestSuite extends TestBase {
     assert(rows(2).get(22) == null)
     assert(rows(2).get(23) == -4398.98f)
   }
-
-
-  private def printRows(rows: Array[Row]) = {
-    println("======= QUERY RESULTS ======")
-    for (i <- 0 until rows.size) {
-      println(rows(i).mkString(" | "))
-    }
-    println("============================")
-  }
 }
