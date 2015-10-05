@@ -184,6 +184,11 @@ class SparkSqlRegionObserver extends BaseRegionObserver {
         override def close(): Unit = s.close()
 
         override def next(results: java.util.List[Cell]): Boolean = {
+          val curTaskContext = TaskContext.get()
+          if (curTaskContext == null ||
+            curTaskContext.taskAttemptId() != taskAttemptId) {
+            TaskContext.setTaskContext(taskContext)
+          }
           val hasMore: Boolean = result.hasNext
           if (hasMore) {
             val nextRow:InternalRow = result.next()
