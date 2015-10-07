@@ -26,13 +26,15 @@ import org.apache.log4j.Logger
 import org.apache.spark._
 import org.apache.spark.executor.TaskMetrics
 import org.apache.spark.rdd.RDD
+import org.apache.spark.scheduler.LiveListenerBus
+import org.apache.spark.shuffle.ShuffleMemoryManager
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.codegen.GeneratePredicate
 import org.apache.spark.sql.hbase.util.DataTypeUtils
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Row, SQLContext}
-import org.apache.spark.unsafe.memory.TaskMemoryManager
+import org.apache.spark.unsafe.memory.{MemoryAllocator, ExecutorMemoryManager, TaskMemoryManager}
 import org.apache.spark.util.collection.unsafe.sort.UnsafeExternalSorter
 
 /**
@@ -144,6 +146,12 @@ class SparkSqlRegionObserver extends BaseRegionObserver {
       super.postScannerOpen(e, scan, s)
     } else {
       logger.debug("Work with coprocessor")
+      if (SparkEnv.get == null) {
+          val sparkConf = new SparkConf(true).set("spark.driver.host", "127.0.0.1").set("spark.driver.port", "0")
+          val newSparkEnv = SparkEnv.createDriverEnv(sparkConf, false, new LiveListenerBus)
+          SparkEnv.set(newSparkEnv)
+      }
+
       val partitionIndex: Int = Bytes.toInt(serializedPartitionIndex)
       val serializedOutputDataType = scan.getAttribute(CoprocessorConstants.COTYPE)
       val outputDataType: Seq[DataType] =
