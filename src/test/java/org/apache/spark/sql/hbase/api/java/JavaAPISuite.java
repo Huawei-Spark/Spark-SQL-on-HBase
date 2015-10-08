@@ -32,49 +32,49 @@ import org.junit.Test;
 import java.io.Serializable;
 
 public class JavaAPISuite extends TestBase implements Serializable {
-    private transient JavaSparkContext sc;
-    private transient SQLContext hsc;
-    private transient MiniHBaseCluster cluster;
-    private transient HBaseAdmin hbaseAdmin;
+  private transient JavaSparkContext sc;
+  private transient SQLContext hsc;
+  private transient MiniHBaseCluster cluster;
+  private transient HBaseAdmin hbaseAdmin;
 
-    private final String hb_staging_table = "HbStagingTable";
-    private final String staging_table = "StagingTable";
-    private final String create_sql = "CREATE TABLE " + staging_table + "(strcol STRING, bytecol String, shortcol String, intcol String, " +
-            "longcol string, floatcol string, doublecol string, PRIMARY KEY(doublecol, strcol, intcol))" +
-            " MAPPED BY (" + hb_staging_table + ", COLS=[bytecol=cf1.hbytecol, " +
-            "shortcol=cf1.hshortcol, longcol=cf2.hlongcol, floatcol=cf2.hfloatcol])";
-    private final String insert_sql = "INSERT INTO TABLE " + staging_table + " VALUES (\"strcol\" , \"bytecol\" , \"shortcol\" , \"intcol\" ," +
-            "  \"longcol\" , \"floatcol\" , \"doublecol\")";
-    private final String retrieve_sql = "SELECT * FROM " + staging_table;
+  private final String hb_staging_table = "HbStagingTable";
+  private final String staging_table = "StagingTable";
+  private final String create_sql = "CREATE TABLE " + staging_table + "(strcol STRING, bytecol String, shortcol String, intcol String, " +
+          "longcol string, floatcol string, doublecol string, PRIMARY KEY(doublecol, strcol, intcol))" +
+          " MAPPED BY (" + hb_staging_table + ", COLS=[bytecol=cf1.hbytecol, " +
+          "shortcol=cf1.hshortcol, longcol=cf2.hlongcol, floatcol=cf2.hfloatcol])";
+  private final String insert_sql = "INSERT INTO TABLE " + staging_table + " VALUES (\"strcol\" , \"bytecol\" , \"shortcol\" , \"intcol\" ," +
+          "  \"longcol\" , \"floatcol\" , \"doublecol\")";
+  private final String retrieve_sql = "SELECT * FROM " + staging_table;
 
-    @Before
-    public void setUp() {
-        System.setProperty("spark.hadoop.hbase.zookeeper.quorum", "localhost");
+  @Before
+  public void setUp() {
+    System.setProperty("spark.hadoop.hbase.zookeeper.quorum", "localhost");
 
-        sc = new JavaSparkContext("local[2]", "JavaAPISuite", new SparkConf(true));
-        hsc = new HBaseSQLContext(sc);
+    sc = new JavaSparkContext("local[2]", "JavaAPISuite", new SparkConf(true));
+    hsc = new HBaseSQLContext(sc);
 
-        HBaseTestingUtility testUtil = new HBaseTestingUtility(hsc.sparkContext().
-                hadoopConfiguration());
+    HBaseTestingUtility testUtil = new HBaseTestingUtility(hsc.sparkContext().
+            hadoopConfiguration());
 
-        int nRegionServers = 1;
-        int nDataNodes = 1;
-        int nMasters = 1;
+    int nRegionServers = 1;
+    int nDataNodes = 1;
+    int nMasters = 1;
 
-        try {
-            cluster = testUtil.startMiniCluster(nMasters, nRegionServers, nDataNodes);
-            hbaseAdmin = new HBaseAdmin(hsc.sparkContext().hadoopConfiguration());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    try {
+      cluster = testUtil.startMiniCluster(nMasters, nRegionServers, nDataNodes);
+      hbaseAdmin = new HBaseAdmin(hsc.sparkContext().hadoopConfiguration());
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+  }
 
-    @Test
-    public void testCreateInsertRetrieveTable() {
-        hsc.sql(create_sql).collect();
-        hsc.sql(insert_sql).collect();
-        Row[] row = hsc.sql(retrieve_sql).collect();
+  @Test
+  public void testCreateInsertRetrieveTable() {
+    hsc.sql(create_sql).collect();
+    hsc.sql(insert_sql).collect();
+    Row[] row = hsc.sql(retrieve_sql).collect();
 
-        assert (row[0].toString().equals("[strcol,bytecol,shortcol,intcol,longcol,floatcol,doublecol]"));
-    }
+    assert (row[0].toString().equals("[strcol,bytecol,shortcol,intcol,longcol,floatcol,doublecol]"));
+  }
 }

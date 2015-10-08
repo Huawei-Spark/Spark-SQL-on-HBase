@@ -18,7 +18,7 @@ package org.apache.spark.sql.hbase
 
 import org.apache.hadoop.hbase._
 import org.apache.hadoop.hbase.client.HBaseAdmin
-import org.apache.spark.sql.catalyst.expressions.{GenericInternalRow, GenericRow}
+import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
 import org.apache.spark.sql.catalyst.plans.logical.Subquery
 import org.apache.spark.sql.execution.datasources.LogicalRelation
 import org.apache.spark.sql.hbase.util.HBaseKVHelper

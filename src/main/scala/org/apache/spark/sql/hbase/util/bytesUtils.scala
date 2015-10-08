@@ -25,12 +25,19 @@ trait BytesUtils {
   def create(dataType: DataType): ToBytesUtils
 
   def toUTF8String(input: HBaseRawType, offset: Int, length: Int): UTF8String
+
   def toByte(input: HBaseRawType, offset: Int, length: Int): Byte
+
   def toBoolean(input: HBaseRawType, offset: Int, length: Int): Boolean
+
   def toDouble(input: HBaseRawType, offset: Int, length: Int): Double
+
   def toShort(input: HBaseRawType, offset: Int, length: Int): Short
+
   def toFloat(input: HBaseRawType, offset: Int, length: Int): Float
+
   def toInt(input: HBaseRawType, offset: Int, length: Int): Int
+
   def toLong(input: HBaseRawType, offset: Int, length: Int): Long
 
   /**
@@ -90,18 +97,27 @@ trait BytesUtils {
 
 trait ToBytesUtils {
   val dataType: DataType
+
   def toBytes(input: UTF8String): HBaseRawType
+
   def toBytes(input: Byte): HBaseRawType
+
   def toBytes(input: Boolean): HBaseRawType
+
   def toBytes(input: Double): HBaseRawType
+
   def toBytes(input: Short): HBaseRawType
+
   def toBytes(input: Float): HBaseRawType
+
   def toBytes(input: Int): HBaseRawType
+
   def toBytes(input: Long): HBaseRawType
+
   def toBytes(input: Any): HBaseRawType
 }
 
-object BinaryBytesUtils extends BytesUtils{
+object BinaryBytesUtils extends BytesUtils {
   def create(dataType: DataType): ToBytesUtils = {
     dataType match {
       case BooleanType => new BinaryBytesUtils(new HBaseRawType(Bytes.SIZEOF_BOOLEAN), BooleanType)
@@ -169,7 +185,7 @@ object BinaryBytesUtils extends BytesUtils{
   }
 }
 
-class BinaryBytesUtils(var buffer: HBaseRawType, dt: DataType) extends ToBytesUtils{
+class BinaryBytesUtils(var buffer: HBaseRawType, dt: DataType) extends ToBytesUtils {
   override val dataType = dt
 
   def toBytes(input: UTF8String): HBaseRawType = {
@@ -249,7 +265,7 @@ class BinaryBytesUtils(var buffer: HBaseRawType, dt: DataType) extends ToBytesUt
 }
 
 
-object StringBytesUtils extends BytesUtils{
+object StringBytesUtils extends BytesUtils {
   def create(dataType: DataType): ToBytesUtils = {
     dataType match {
       case BooleanType => new StringBytesUtils(new HBaseRawType(Bytes.SIZEOF_BOOLEAN), BooleanType)
@@ -300,7 +316,7 @@ object StringBytesUtils extends BytesUtils{
   }
 }
 
-class StringBytesUtils(var buffer: HBaseRawType, dt: DataType) extends ToBytesUtils{
+class StringBytesUtils(var buffer: HBaseRawType, dt: DataType) extends ToBytesUtils {
   override val dataType = dt
 
   def toBytes(input: UTF8String): HBaseRawType = {

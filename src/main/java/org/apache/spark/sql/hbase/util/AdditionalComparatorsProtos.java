@@ -4,37 +4,47 @@
 package org.apache.spark.sql.hbase.util;
 
 public final class AdditionalComparatorsProtos {
-  private AdditionalComparatorsProtos() {}
-  public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistry registry) {
+  private AdditionalComparatorsProtos() {
   }
+
+  public static void registerAllExtensions(
+          com.google.protobuf.ExtensionRegistry registry) {
+  }
+
   public interface ByteArrayComparableOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+          extends com.google.protobuf.MessageOrBuilder {
 
     // optional bytes value = 1;
+
     /**
      * <code>optional bytes value = 1;</code>
      */
     boolean hasValue();
+
     /**
      * <code>optional bytes value = 1;</code>
      */
     com.google.protobuf.ByteString getValue();
   }
+
   /**
    * Protobuf type {@code ByteArrayComparable}
    */
   public static final class ByteArrayComparable extends
-      com.google.protobuf.GeneratedMessage
-      implements ByteArrayComparableOrBuilder {
+          com.google.protobuf.GeneratedMessage
+          implements ByteArrayComparableOrBuilder {
     // Use ByteArrayComparable.newBuilder() to construct.
     private ByteArrayComparable(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private ByteArrayComparable(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private ByteArrayComparable(boolean noInit) {
+      this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+    }
 
     private static final ByteArrayComparable defaultInstance;
+
     public static ByteArrayComparable getDefaultInstance() {
       return defaultInstance;
     }
@@ -44,19 +54,21 @@ public final class AdditionalComparatorsProtos {
     }
 
     private final com.google.protobuf.UnknownFieldSet unknownFields;
+
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
+
     private ByteArrayComparable(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
+              com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -67,7 +79,7 @@ public final class AdditionalComparatorsProtos {
               break;
             default: {
               if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
+                      extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -83,33 +95,34 @@ public final class AdditionalComparatorsProtos {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+                e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
+
     public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
+    getDescriptor() {
       return org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.internal_static_ByteArrayComparable_descriptor;
     }
 
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
+    internalGetFieldAccessorTable() {
       return org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.internal_static_ByteArrayComparable_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.class, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.Builder.class);
+              .ensureFieldAccessorsInitialized(
+                      org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.class, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.Builder.class);
     }
 
     public static com.google.protobuf.Parser<ByteArrayComparable> PARSER =
-        new com.google.protobuf.AbstractParser<ByteArrayComparable>() {
-      public ByteArrayComparable parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ByteArrayComparable(input, extensionRegistry);
-      }
-    };
+            new com.google.protobuf.AbstractParser<ByteArrayComparable>() {
+              public ByteArrayComparable parsePartialFrom(
+                      com.google.protobuf.CodedInputStream input,
+                      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                      throws com.google.protobuf.InvalidProtocolBufferException {
+                return new ByteArrayComparable(input, extensionRegistry);
+              }
+            };
 
     @java.lang.Override
     public com.google.protobuf.Parser<ByteArrayComparable> getParserForType() {
@@ -120,12 +133,14 @@ public final class AdditionalComparatorsProtos {
     // optional bytes value = 1;
     public static final int VALUE_FIELD_NUMBER = 1;
     private com.google.protobuf.ByteString value_;
+
     /**
      * <code>optional bytes value = 1;</code>
      */
     public boolean hasValue() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
+
     /**
      * <code>optional bytes value = 1;</code>
      */
@@ -136,7 +151,9 @@ public final class AdditionalComparatorsProtos {
     private void initFields() {
       value_ = com.google.protobuf.ByteString.EMPTY;
     }
+
     private byte memoizedIsInitialized = -1;
+
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
@@ -146,7 +163,7 @@ public final class AdditionalComparatorsProtos {
     }
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
+            throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(1, value_);
@@ -155,6 +172,7 @@ public final class AdditionalComparatorsProtos {
     }
 
     private int memoizedSerializedSize = -1;
+
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
@@ -162,7 +180,7 @@ public final class AdditionalComparatorsProtos {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, value_);
+                .computeBytesSize(1, value_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -170,16 +188,17 @@ public final class AdditionalComparatorsProtos {
     }
 
     private static final long serialVersionUID = 0L;
+
     @java.lang.Override
     protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+            throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
-       return true;
+        return true;
       }
       if (!(obj instanceof org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable)) {
         return super.equals(obj);
@@ -190,14 +209,15 @@ public final class AdditionalComparatorsProtos {
       result = result && (hasValue() == other.hasValue());
       if (hasValue()) {
         result = result && getValue()
-            .equals(other.getValue());
+                .equals(other.getValue());
       }
       result = result &&
-          getUnknownFields().equals(other.getUnknownFields());
+              getUnknownFields().equals(other.getUnknownFields());
       return result;
     }
 
     private int memoizedHashCode = 0;
+
     @java.lang.Override
     public int hashCode() {
       if (memoizedHashCode != 0) {
@@ -215,87 +235,106 @@ public final class AdditionalComparatorsProtos {
     }
 
     public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+            com.google.protobuf.ByteString data)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
+
     public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+            com.google.protobuf.ByteString data,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
+
     public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
+
     public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+            byte[] data,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
+
     public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
+            throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
+
     public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+            java.io.InputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
+    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable parseDelimitedFrom(java.io.InputStream input)
+            throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+
+    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable parseDelimitedFrom(
+            java.io.InputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+
+    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable parseFrom(
+            com.google.protobuf.CodedInputStream input)
+            throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable parseFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return Builder.create();
+    }
+
+    public Builder newBuilderForType() {
+      return newBuilder();
+    }
+
     public static Builder newBuilder(org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable prototype) {
       return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() { return newBuilder(this); }
+
+    public Builder toBuilder() {
+      return newBuilder(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+            com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /**
      * Protobuf type {@code ByteArrayComparable}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparableOrBuilder {
+            com.google.protobuf.GeneratedMessage.Builder<Builder>
+            implements org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparableOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
+      getDescriptor() {
         return org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.internal_static_ByteArrayComparable_descriptor;
       }
 
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
+      internalGetFieldAccessorTable() {
         return org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.internal_static_ByteArrayComparable_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.class, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.Builder.class);
+                .ensureFieldAccessorsInitialized(
+                        org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.class, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.Builder.class);
       }
 
       // Construct using org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.newBuilder()
@@ -304,14 +343,16 @@ public final class AdditionalComparatorsProtos {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+              com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
+
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
+
       private static Builder create() {
         return new Builder();
       }
@@ -328,7 +369,7 @@ public final class AdditionalComparatorsProtos {
       }
 
       public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
+      getDescriptorForType() {
         return org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.internal_static_ByteArrayComparable_descriptor;
       }
 
@@ -359,7 +400,7 @@ public final class AdditionalComparatorsProtos {
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable) {
-          return mergeFrom((org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable)other);
+          return mergeFrom((org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable) other);
         } else {
           super.mergeFrom(other);
           return this;
@@ -367,7 +408,8 @@ public final class AdditionalComparatorsProtos {
       }
 
       public Builder mergeFrom(org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable other) {
-        if (other == org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.getDefaultInstance()) return this;
+        if (other == org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.getDefaultInstance())
+          return this;
         if (other.hasValue()) {
           setValue(other.getValue());
         }
@@ -380,9 +422,9 @@ public final class AdditionalComparatorsProtos {
       }
 
       public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+              com.google.protobuf.CodedInputStream input,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws java.io.IOException {
         org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
@@ -396,34 +438,39 @@ public final class AdditionalComparatorsProtos {
         }
         return this;
       }
+
       private int bitField0_;
 
       // optional bytes value = 1;
       private com.google.protobuf.ByteString value_ = com.google.protobuf.ByteString.EMPTY;
+
       /**
        * <code>optional bytes value = 1;</code>
        */
       public boolean hasValue() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+
       /**
        * <code>optional bytes value = 1;</code>
        */
       public com.google.protobuf.ByteString getValue() {
         return value_;
       }
+
       /**
        * <code>optional bytes value = 1;</code>
        */
       public Builder setValue(com.google.protobuf.ByteString value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000001;
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000001;
         value_ = value;
         onChanged();
         return this;
       }
+
       /**
        * <code>optional bytes value = 1;</code>
        */
@@ -446,36 +493,44 @@ public final class AdditionalComparatorsProtos {
   }
 
   public interface CustomComparatorOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+          extends com.google.protobuf.MessageOrBuilder {
 
     // required .ByteArrayComparable comparable = 1;
+
     /**
      * <code>required .ByteArrayComparable comparable = 1;</code>
      */
     boolean hasComparable();
+
     /**
      * <code>required .ByteArrayComparable comparable = 1;</code>
      */
     org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable getComparable();
+
     /**
      * <code>required .ByteArrayComparable comparable = 1;</code>
      */
     org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparableOrBuilder getComparableOrBuilder();
   }
+
   /**
    * Protobuf type {@code CustomComparator}
    */
   public static final class CustomComparator extends
-      com.google.protobuf.GeneratedMessage
-      implements CustomComparatorOrBuilder {
+          com.google.protobuf.GeneratedMessage
+          implements CustomComparatorOrBuilder {
     // Use CustomComparator.newBuilder() to construct.
     private CustomComparator(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
       this.unknownFields = builder.getUnknownFields();
     }
-    private CustomComparator(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private CustomComparator(boolean noInit) {
+      this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+    }
 
     private static final CustomComparator defaultInstance;
+
     public static CustomComparator getDefaultInstance() {
       return defaultInstance;
     }
@@ -485,19 +540,21 @@ public final class AdditionalComparatorsProtos {
     }
 
     private final com.google.protobuf.UnknownFieldSet unknownFields;
+
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
+
     private CustomComparator(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       initFields();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
+              com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -508,7 +565,7 @@ public final class AdditionalComparatorsProtos {
               break;
             default: {
               if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
+                      extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -532,33 +589,34 @@ public final class AdditionalComparatorsProtos {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+                e.getMessage()).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
+
     public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
+    getDescriptor() {
       return org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.internal_static_CustomComparator_descriptor;
     }
 
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
+    internalGetFieldAccessorTable() {
       return org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.internal_static_CustomComparator_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator.class, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator.Builder.class);
+              .ensureFieldAccessorsInitialized(
+                      org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator.class, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator.Builder.class);
     }
 
     public static com.google.protobuf.Parser<CustomComparator> PARSER =
-        new com.google.protobuf.AbstractParser<CustomComparator>() {
-      public CustomComparator parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new CustomComparator(input, extensionRegistry);
-      }
-    };
+            new com.google.protobuf.AbstractParser<CustomComparator>() {
+              public CustomComparator parsePartialFrom(
+                      com.google.protobuf.CodedInputStream input,
+                      com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+                      throws com.google.protobuf.InvalidProtocolBufferException {
+                return new CustomComparator(input, extensionRegistry);
+              }
+            };
 
     @java.lang.Override
     public com.google.protobuf.Parser<CustomComparator> getParserForType() {
@@ -569,18 +627,21 @@ public final class AdditionalComparatorsProtos {
     // required .ByteArrayComparable comparable = 1;
     public static final int COMPARABLE_FIELD_NUMBER = 1;
     private org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable comparable_;
+
     /**
      * <code>required .ByteArrayComparable comparable = 1;</code>
      */
     public boolean hasComparable() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
+
     /**
      * <code>required .ByteArrayComparable comparable = 1;</code>
      */
     public org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable getComparable() {
       return comparable_;
     }
+
     /**
      * <code>required .ByteArrayComparable comparable = 1;</code>
      */
@@ -591,7 +652,9 @@ public final class AdditionalComparatorsProtos {
     private void initFields() {
       comparable_ = org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.getDefaultInstance();
     }
+
     private byte memoizedIsInitialized = -1;
+
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
@@ -605,7 +668,7 @@ public final class AdditionalComparatorsProtos {
     }
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
+            throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeMessage(1, comparable_);
@@ -614,6 +677,7 @@ public final class AdditionalComparatorsProtos {
     }
 
     private int memoizedSerializedSize = -1;
+
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
@@ -621,7 +685,7 @@ public final class AdditionalComparatorsProtos {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, comparable_);
+                .computeMessageSize(1, comparable_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -629,16 +693,17 @@ public final class AdditionalComparatorsProtos {
     }
 
     private static final long serialVersionUID = 0L;
+
     @java.lang.Override
     protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
+            throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
 
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
-       return true;
+        return true;
       }
       if (!(obj instanceof org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator)) {
         return super.equals(obj);
@@ -649,14 +714,15 @@ public final class AdditionalComparatorsProtos {
       result = result && (hasComparable() == other.hasComparable());
       if (hasComparable()) {
         result = result && getComparable()
-            .equals(other.getComparable());
+                .equals(other.getComparable());
       }
       result = result &&
-          getUnknownFields().equals(other.getUnknownFields());
+              getUnknownFields().equals(other.getUnknownFields());
       return result;
     }
 
     private int memoizedHashCode = 0;
+
     @java.lang.Override
     public int hashCode() {
       if (memoizedHashCode != 0) {
@@ -674,87 +740,106 @@ public final class AdditionalComparatorsProtos {
     }
 
     public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+            com.google.protobuf.ByteString data)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
+
     public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+            com.google.protobuf.ByteString data,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
+
     public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
+
     public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+            byte[] data,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
+
     public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
+            throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
+
     public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
-    }
-    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
-    }
-    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
-    }
-    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return PARSER.parseFrom(input);
-    }
-    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
+            java.io.InputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
+    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator parseDelimitedFrom(java.io.InputStream input)
+            throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+
+    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator parseDelimitedFrom(
+            java.io.InputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+
+    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator parseFrom(
+            com.google.protobuf.CodedInputStream input)
+            throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+
+    public static org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator parseFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() {
+      return Builder.create();
+    }
+
+    public Builder newBuilderForType() {
+      return newBuilder();
+    }
+
     public static Builder newBuilder(org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator prototype) {
       return newBuilder().mergeFrom(prototype);
     }
-    public Builder toBuilder() { return newBuilder(this); }
+
+    public Builder toBuilder() {
+      return newBuilder(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+            com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
+
     /**
      * Protobuf type {@code CustomComparator}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparatorOrBuilder {
+            com.google.protobuf.GeneratedMessage.Builder<Builder>
+            implements org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparatorOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
+      getDescriptor() {
         return org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.internal_static_CustomComparator_descriptor;
       }
 
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
+      internalGetFieldAccessorTable() {
         return org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.internal_static_CustomComparator_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator.class, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator.Builder.class);
+                .ensureFieldAccessorsInitialized(
+                        org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator.class, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator.Builder.class);
       }
 
       // Construct using org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator.newBuilder()
@@ -763,15 +848,17 @@ public final class AdditionalComparatorsProtos {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+              com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
+
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getComparableFieldBuilder();
         }
       }
+
       private static Builder create() {
         return new Builder();
       }
@@ -792,7 +879,7 @@ public final class AdditionalComparatorsProtos {
       }
 
       public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
+      getDescriptorForType() {
         return org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.internal_static_CustomComparator_descriptor;
       }
 
@@ -827,7 +914,7 @@ public final class AdditionalComparatorsProtos {
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator) {
-          return mergeFrom((org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator)other);
+          return mergeFrom((org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator) other);
         } else {
           super.mergeFrom(other);
           return this;
@@ -835,7 +922,8 @@ public final class AdditionalComparatorsProtos {
       }
 
       public Builder mergeFrom(org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator other) {
-        if (other == org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator.getDefaultInstance()) return this;
+        if (other == org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator.getDefaultInstance())
+          return this;
         if (other.hasComparable()) {
           mergeComparable(other.getComparable());
         }
@@ -845,16 +933,16 @@ public final class AdditionalComparatorsProtos {
 
       public final boolean isInitialized() {
         if (!hasComparable()) {
-          
+
           return false;
         }
         return true;
       }
 
       public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
+              com.google.protobuf.CodedInputStream input,
+              com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+              throws java.io.IOException {
         org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.CustomComparator parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
@@ -868,18 +956,21 @@ public final class AdditionalComparatorsProtos {
         }
         return this;
       }
+
       private int bitField0_;
 
       // required .ByteArrayComparable comparable = 1;
       private org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable comparable_ = org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
-          org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.Builder, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparableOrBuilder> comparableBuilder_;
+              org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.Builder, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparableOrBuilder> comparableBuilder_;
+
       /**
        * <code>required .ByteArrayComparable comparable = 1;</code>
        */
       public boolean hasComparable() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+
       /**
        * <code>required .ByteArrayComparable comparable = 1;</code>
        */
@@ -890,6 +981,7 @@ public final class AdditionalComparatorsProtos {
           return comparableBuilder_.getMessage();
         }
       }
+
       /**
        * <code>required .ByteArrayComparable comparable = 1;</code>
        */
@@ -906,11 +998,12 @@ public final class AdditionalComparatorsProtos {
         bitField0_ |= 0x00000001;
         return this;
       }
+
       /**
        * <code>required .ByteArrayComparable comparable = 1;</code>
        */
       public Builder setComparable(
-          org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.Builder builderForValue) {
+              org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.Builder builderForValue) {
         if (comparableBuilder_ == null) {
           comparable_ = builderForValue.build();
           onChanged();
@@ -920,15 +1013,16 @@ public final class AdditionalComparatorsProtos {
         bitField0_ |= 0x00000001;
         return this;
       }
+
       /**
        * <code>required .ByteArrayComparable comparable = 1;</code>
        */
       public Builder mergeComparable(org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable value) {
         if (comparableBuilder_ == null) {
           if (((bitField0_ & 0x00000001) == 0x00000001) &&
-              comparable_ != org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.getDefaultInstance()) {
+                  comparable_ != org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.getDefaultInstance()) {
             comparable_ =
-              org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.newBuilder(comparable_).mergeFrom(value).buildPartial();
+                    org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.newBuilder(comparable_).mergeFrom(value).buildPartial();
           } else {
             comparable_ = value;
           }
@@ -939,6 +1033,7 @@ public final class AdditionalComparatorsProtos {
         bitField0_ |= 0x00000001;
         return this;
       }
+
       /**
        * <code>required .ByteArrayComparable comparable = 1;</code>
        */
@@ -952,6 +1047,7 @@ public final class AdditionalComparatorsProtos {
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
       }
+
       /**
        * <code>required .ByteArrayComparable comparable = 1;</code>
        */
@@ -960,6 +1056,7 @@ public final class AdditionalComparatorsProtos {
         onChanged();
         return getComparableFieldBuilder().getBuilder();
       }
+
       /**
        * <code>required .ByteArrayComparable comparable = 1;</code>
        */
@@ -970,15 +1067,16 @@ public final class AdditionalComparatorsProtos {
           return comparable_;
         }
       }
+
       /**
        * <code>required .ByteArrayComparable comparable = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.Builder, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparableOrBuilder> 
-          getComparableFieldBuilder() {
+              org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.Builder, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparableOrBuilder>
+      getComparableFieldBuilder() {
         if (comparableBuilder_ == null) {
           comparableBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.Builder, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparableOrBuilder>(
+                  org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparable.Builder, org.apache.spark.sql.hbase.util.AdditionalComparatorsProtos.ByteArrayComparableOrBuilder>(
                   comparable_,
                   getParentForChildren(),
                   isClean());
@@ -999,55 +1097,57 @@ public final class AdditionalComparatorsProtos {
   }
 
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_ByteArrayComparable_descriptor;
+          internal_static_ByteArrayComparable_descriptor;
   private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_ByteArrayComparable_fieldAccessorTable;
+  com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internal_static_ByteArrayComparable_fieldAccessorTable;
   private static com.google.protobuf.Descriptors.Descriptor
-    internal_static_CustomComparator_descriptor;
+          internal_static_CustomComparator_descriptor;
   private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_CustomComparator_fieldAccessorTable;
+  com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internal_static_CustomComparator_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
-      getDescriptor() {
+  getDescriptor() {
     return descriptor;
   }
+
   private static com.google.protobuf.Descriptors.FileDescriptor
-      descriptor;
+          descriptor;
+
   static {
     java.lang.String[] descriptorData = {
-      "\n\033AdditionalComparators.proto\"$\n\023ByteArr" +
-      "ayComparable\022\r\n\005value\030\001 \001(\014\"<\n\020CustomCom" +
-      "parator\022(\n\ncomparable\030\001 \002(\0132\024.ByteArrayC" +
-      "omparableBF\n\037org.apache.spark.sql.hbase." +
-      "utilB\033AdditionalComparatorsProtosH\001\210\001\001\240\001" +
-      "\001"
+            "\n\033AdditionalComparators.proto\"$\n\023ByteArr" +
+                    "ayComparable\022\r\n\005value\030\001 \001(\014\"<\n\020CustomCom" +
+                    "parator\022(\n\ncomparable\030\001 \002(\0132\024.ByteArrayC" +
+                    "omparableBF\n\037org.apache.spark.sql.hbase." +
+                    "utilB\033AdditionalComparatorsProtosH\001\210\001\001\240\001" +
+                    "\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_ByteArrayComparable_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_ByteArrayComparable_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_ByteArrayComparable_descriptor,
-              new java.lang.String[] { "Value", });
-          internal_static_CustomComparator_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_CustomComparator_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_CustomComparator_descriptor,
-              new java.lang.String[] { "Comparable", });
-          return null;
-        }
-      };
+            new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+              public com.google.protobuf.ExtensionRegistry assignDescriptors(
+                      com.google.protobuf.Descriptors.FileDescriptor root) {
+                descriptor = root;
+                internal_static_ByteArrayComparable_descriptor =
+                        getDescriptor().getMessageTypes().get(0);
+                internal_static_ByteArrayComparable_fieldAccessorTable = new
+                        com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+                        internal_static_ByteArrayComparable_descriptor,
+                        new java.lang.String[]{"Value",});
+                internal_static_CustomComparator_descriptor =
+                        getDescriptor().getMessageTypes().get(1);
+                internal_static_CustomComparator_fieldAccessorTable = new
+                        com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+                        internal_static_CustomComparator_descriptor,
+                        new java.lang.String[]{"Comparable",});
+                return null;
+              }
+            };
     com.google.protobuf.Descriptors.FileDescriptor
-      .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[] {
-        }, assigner);
+            .internalBuildGeneratedFileFrom(descriptorData,
+                    new com.google.protobuf.Descriptors.FileDescriptor[]{
+                    }, assigner);
   }
 
   // @@protoc_insertion_point(outer_class_scope)

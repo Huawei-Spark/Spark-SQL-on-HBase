@@ -31,8 +31,11 @@ import scala.reflect.runtime.universe.typeTag
  */
 private[hbase] case object HBaseBytesType extends AtomicType /*with PrimitiveType*/ {
   override def defaultSize: Int = 4096
+
   private[sql] type InternalType = HBaseRawType
-  @transient private[sql] lazy val tag =  ScalaReflectionLock.synchronized {typeTag[InternalType]}
+  @transient private[sql] lazy val tag = ScalaReflectionLock.synchronized {
+    typeTag[InternalType]
+  }
   private[sql] val ordering = new Ordering[InternalType] {
     def compare(x: Array[Byte], y: Array[Byte]): Int = {
       for (i <- x.indices if i < y.length) {
@@ -44,6 +47,6 @@ private[hbase] case object HBaseBytesType extends AtomicType /*with PrimitiveTyp
       x.length - y.length
     }
   }
- 
+
   private[spark] override def asNullable = this
 }

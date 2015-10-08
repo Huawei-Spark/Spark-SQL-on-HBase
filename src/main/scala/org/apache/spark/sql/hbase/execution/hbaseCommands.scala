@@ -25,13 +25,12 @@ import org.apache.hadoop.hbase._
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable
 import org.apache.hadoop.hbase.mapreduce.{HFileOutputFormat2, LoadIncrementalHFiles}
 import org.apache.hadoop.hbase.util.Bytes
-import org.apache.hadoop.mapred.JobConf
 import org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
 import org.apache.hadoop.mapreduce.{Job, RecordWriter}
 import org.apache.spark.annotation.DeveloperApi
 import org.apache.spark.mapreduce.SparkHadoopMapReduceUtil
 import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.expressions.{Expression, Attribute}
+import org.apache.spark.sql.catalyst.expressions.{Attribute, Expression}
 import org.apache.spark.sql.catalyst.plans.logical.Subquery
 import org.apache.spark.sql.execution.RunnableCommand
 import org.apache.spark.sql.execution.datasources.LogicalRelation
@@ -135,11 +134,11 @@ case class InsertValueIntoTableCommand(tableName: String, valueSeq: Seq[String])
 
     val bytes = valueSeq.zipWithIndex.map(v =>
       DataTypeUtils.string2TypeData(v._1, relation.schema(v._2).dataType))
-    
+
     val rows = sqlContext.sparkContext.makeRDD(Seq(Row.fromSeq(bytes)))
     val inputValuesDF = sqlContext.createDataFrame(rows, relation.schema)
     relation.insert(inputValuesDF, overwrite = false)
-    
+
     Seq.empty[Row]
   }
 
@@ -292,7 +291,9 @@ case class BulkLoadIntoTableCommand(
         var prevK: HBaseRawType = null
         val columnFamilyNames =
           relation.htable.getTableDescriptor.getColumnFamilies.map(
-          f => {f.getName})
+            f => {
+              f.getName
+            })
         var isEmptyRow = true
 
         try {
@@ -317,7 +318,7 @@ case class BulkLoadIntoTableCommand(
               }
             }
 
-            if(isEmptyRow) {
+            if (isEmptyRow) {
               bytesWritable.set(kv._1)
               writer.write(bytesWritable,
                 new KeyValue(

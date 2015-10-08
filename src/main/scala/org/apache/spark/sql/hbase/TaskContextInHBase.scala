@@ -17,23 +17,24 @@
 
 package org.apache.spark.sql.hbase
 
-import org.apache.spark.metrics.source.Source
-import org.apache.spark.{Accumulable, Accumulator, Logging, TaskContext}
 import org.apache.spark.executor.TaskMetrics
+import org.apache.spark.metrics.source.Source
 import org.apache.spark.unsafe.memory.TaskMemoryManager
 import org.apache.spark.util.{TaskCompletionListener, TaskCompletionListenerException}
+import org.apache.spark.{Accumulable, Accumulator, Logging, TaskContext}
 
-import scala.collection.mutable.{HashMap, ArrayBuffer}
+import scala.collection.mutable
+import scala.collection.mutable.{ArrayBuffer, HashMap}
 
 class TaskContextInHBase(
-                                      val stageId: Int,
-                                      val partitionId: Int,
-                                      override val taskAttemptId: Long,
-                                      override val attemptNumber: Int,
-                                      override val taskMemoryManager: TaskMemoryManager,
-                                      internalAccumulators: Seq[Accumulator[Long]],
-                                      val runningLocally: Boolean = false,
-                                      val taskMetrics: TaskMetrics = TaskMetrics.empty)
+                          val stageId: Int,
+                          val partitionId: Int,
+                          override val taskAttemptId: Long,
+                          override val attemptNumber: Int,
+                          override val taskMemoryManager: TaskMemoryManager,
+                          internalAccumulators: Seq[Accumulator[Long]],
+                          val runningLocally: Boolean = false,
+                          val taskMetrics: TaskMetrics = TaskMetrics.empty)
   extends TaskContext
   with Logging {
 
@@ -52,7 +53,7 @@ class TaskContextInHBase(
   //-----------------------------------------------
   override def getMetricsSources(sourceName: String): Seq[Source] = Seq.empty
 
-  @transient private val accumulators = new HashMap[Long, Accumulable[_, _]]
+  @transient private val accumulators = new mutable.HashMap[Long, Accumulable[_, _]]
 
   override def collectInternalAccumulators(): Map[Long, Any] = synchronized {
     accumulators.filter(_._2.isInternal).mapValues(_.localValue).toMap
@@ -70,7 +71,7 @@ class TaskContextInHBase(
     // Explicitly register internal accumulators here because these are
     // not captured in the task closure and are already deserialized
     internalAccumulators.foreach(registerAccumulator)
-    internalAccumulators.map { a => (a.name.get, a) }.toMap
+    internalAccumulators.map { a => (a.name.get, a)}.toMap
   }
   //-----------------------------------------------
 

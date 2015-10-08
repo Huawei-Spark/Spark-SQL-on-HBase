@@ -24,8 +24,9 @@ import org.apache.spark.sql.catalyst.plans.logical
 case class TestData(k: Int, v: String)
 
 object TestData {
-  import TestHbase.implicits._
-  
+
+  import org.apache.spark.sql.hbase.TestHbase.implicits._
+
   val testData = TestHbase.sparkContext.parallelize(
     (1 to 100).map(i => TestData(i, i.toString))).toDF()
   testData.registerTempTable("testData")

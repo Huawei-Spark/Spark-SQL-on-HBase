@@ -25,10 +25,10 @@ import scala.math.PartialOrdering
 import scala.reflect.runtime.universe.typeTag
 
 class Range[+T](val start: Option[T], // None for open ends
-               val startInclusive: Boolean,
-               val end: Option[T], // None for open ends
-               val endInclusive: Boolean,
-               val dt: AtomicType) extends Serializable {
+                val startInclusive: Boolean,
+                val end: Option[T], // None for open ends
+                val endInclusive: Boolean,
+                val dt: AtomicType) extends Serializable {
   require(dt != null && !(start.isDefined && end.isDefined &&
     ((dt.ordering.eq(start.get, end.get) &&
       (!startInclusive || !endInclusive)) ||
@@ -40,8 +40,11 @@ class Range[+T](val start: Option[T], // None for open ends
 
 private[hbase] class RangeType[T] extends PartialOrderingDataType {
   override def defaultSize: Int = 4096
+
   private[sql] type InternalType = Range[T]
-  @transient private[sql] lazy val tag = ScalaReflectionLock.synchronized { typeTag[InternalType] }
+  @transient private[sql] lazy val tag = ScalaReflectionLock.synchronized {
+    typeTag[InternalType]
+  }
 
   private[spark] override def asNullable: RangeType[T] = this
 
@@ -54,7 +57,7 @@ private[hbase] class RangeType[T] extends PartialOrderingDataType {
   override def toPartiallyOrderingDataType(s: Any, dt: AtomicType): InternalType = s match {
     case r: InternalType => r
     case _ =>
-      new Range(Some(s.asInstanceOf[T] ), true, Some(s.asInstanceOf[T] ), true, dt)
+      new Range(Some(s.asInstanceOf[T]), true, Some(s.asInstanceOf[T]), true, dt)
   }
 
   val partialOrdering = new PartialOrdering[InternalType] {
@@ -160,7 +163,9 @@ private[hbase] class RangeType[T] extends PartialOrderingDataType {
 }
 
 object RangeType {
+
   import scala.reflect.runtime.universe.TypeTag
+
   private val typeMap = new mutable.HashMap[TypeTag[_], RangeType[_]]
     with mutable.SynchronizedMap[TypeTag[_], RangeType[_]]
 
@@ -168,4 +173,5 @@ object RangeType {
     private[sql] def toRangeType[T]: RangeType[T] =
       typeMap.getOrElseUpdate(dt.tag, new RangeType[T]).asInstanceOf[RangeType[T]]
   }
+
 }

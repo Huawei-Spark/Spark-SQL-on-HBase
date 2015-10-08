@@ -17,11 +17,9 @@
 
 package org.apache.spark.sql.hbase
 
-import org.apache.spark.sql.SQLConf.SQLConfEntry
 import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.expressions.{GenericInternalRow, GenericRow}
+import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
 import org.apache.spark.sql.execution.Exchange
-import org.apache.spark.sql.hbase.TestHbase._
 import org.apache.spark.sql.hbase.util.HBaseKVHelper
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types._

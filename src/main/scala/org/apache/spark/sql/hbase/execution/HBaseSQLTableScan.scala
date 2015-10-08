@@ -44,5 +44,5 @@ case class HBaseSQLTableScan(
 
   override protected def doExecute(): RDD[InternalRow] = result
 
-//  override def outputsUnsafeRows:Boolean = true
+  //  override def outputsUnsafeRows:Boolean = true
 }

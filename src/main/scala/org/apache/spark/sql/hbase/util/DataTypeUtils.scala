@@ -17,7 +17,6 @@
 package org.apache.spark.sql.hbase.util
 
 import org.apache.hadoop.hbase.filter.{BinaryComparator, ByteArrayComparable}
-import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.{Literal, MutableRow}
 import org.apache.spark.sql.execution.SparkSqlSerializer

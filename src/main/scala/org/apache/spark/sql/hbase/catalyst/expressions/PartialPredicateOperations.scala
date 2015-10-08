@@ -17,7 +17,6 @@
 
 package org.apache.spark.sql.hbase.catalyst.expressions
 
-import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.errors.TreeNodeException
 import org.apache.spark.sql.catalyst.expressions._
@@ -26,6 +25,7 @@ import org.apache.spark.sql.hbase.types._
 import org.apache.spark.sql.types._
 
 object PartialPredicateOperations {
+
   // When the checkNullness argument of the partialReduce method is false, the partial
   // reduction is nullness-based, i.e., uninterested columns are assigned nulls,
   // which necessitates changes of the null handling from the normal evaluations
@@ -61,7 +61,7 @@ object PartialPredicateOperations {
      * @return
      */
     def partialReduce(input: InternalRow, schema: Seq[Attribute], checkNull: Boolean = false):
-      (Any, Expression) = {
+    (Any, Expression) = {
       e match {
         case And(left, right) =>
           val l = left.partialReduce(input, schema)
@@ -121,9 +121,9 @@ object PartialPredicateOperations {
         case In(value, list) =>
           val (evaluatedValue, expr) = value.partialReduce(input, schema)
           if (evaluatedValue == null) {
-            val evaluatedList = list.map(e=>e.partialReduce(input, schema) match {
+            val evaluatedList = list.map(e => e.partialReduce(input, schema) match {
               case (null, e: Expression) => e
-              case (d, _)  => Literal.create(d, e.dataType)
+              case (d, _) => Literal.create(d, e.dataType)
             })
             (null, In(expr, evaluatedList))
           } else {
@@ -160,7 +160,7 @@ object PartialPredicateOperations {
             for (item <- hset if !foundInSet) {
               val cmp = prc2(input, value.dataType, value.dataType, evaluatedValue._1, item)
               if (cmp.isDefined && cmp.get == 0) {
-                  foundInSet = true
+                foundInSet = true
               } else if (cmp.isEmpty || (cmp.isDefined && (cmp.get == 1 || cmp.get == -1))) {
                 newHset = newHset + item
               }
@@ -184,23 +184,23 @@ object PartialPredicateOperations {
           val res = n.eval(input)
           (res, n)
         case IsNull(child) => if (checkNull) {
-            if (child == null) {
-              (true, null)
-            } else {
-              (false, null)
-            }
+          if (child == null) {
+            (true, null)
           } else {
-            (null, unboundAttributeReference(e, schema))
+            (false, null)
           }
+        } else {
+          (null, unboundAttributeReference(e, schema))
+        }
         case IsNotNull(child) => if (checkNull) {
-            if (child == null) {
-              (false, null)
-            } else {
-              (true, null)
-            }
+          if (child == null) {
+            (false, null)
           } else {
-            (null, unboundAttributeReference(e, schema))
+            (true, null)
           }
+        } else {
+          (null, unboundAttributeReference(e, schema))
+        }
         // TODO: CAST/Arithmetic could be treated more nicely
         case Cast(_, _) => (null, unboundAttributeReference(e, schema))
         // case BinaryArithmetic => null
@@ -334,4 +334,5 @@ object PartialPredicateOperations {
       }
     }
   }
+
 }

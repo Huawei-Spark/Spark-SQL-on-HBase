@@ -20,13 +20,13 @@ package org.apache.spark.sql.hbase
 import org.apache.spark._
 import org.apache.spark.rdd.{RDD, ShuffledRDD, ShuffledRDDPartition}
 
-class HBaseShuffledRDD (
-    prevRdd: RDD[(HBaseRawType, Array[HBaseRawType])],
-    part: Partitioner,
-    @transient hbPartitions: Seq[HBasePartition] = Nil) extends ShuffledRDD(prevRdd, part){
+class HBaseShuffledRDD(
+                        prevRdd: RDD[(HBaseRawType, Array[HBaseRawType])],
+                        part: Partitioner,
+                        @transient hbPartitions: Seq[HBasePartition] = Nil) extends ShuffledRDD(prevRdd, part) {
 
   override def getPartitions: Array[Partition] = {
-    if (hbPartitions==null || hbPartitions.isEmpty) {
+    if (hbPartitions == null || hbPartitions.isEmpty) {
       Array.tabulate[Partition](part.numPartitions)(i => new ShuffledRDDPartition(i))
     } else {
       // only to be invoked by clients
@@ -35,7 +35,7 @@ class HBaseShuffledRDD (
   }
 
   override def getPreferredLocations(split: Partition): Seq[String] = {
-    if (hbPartitions==null || hbPartitions.isEmpty) {
+    if (hbPartitions == null || hbPartitions.isEmpty) {
       Seq.empty
     } else {
       split.asInstanceOf[HBasePartition].server.map {

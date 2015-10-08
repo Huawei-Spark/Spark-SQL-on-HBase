@@ -22,13 +22,16 @@ import org.apache.spark.Partitioner
 import org.apache.spark.util.CollectionsUtils
 
 object HBasePartitioner {
+
   implicit object HBaseRawOrdering extends Ordering[HBaseRawType] {
     def compare(a: HBaseRawType, b: HBaseRawType) = Bytes.compareTo(a, b)
   }
+
 }
 
-class HBasePartitioner (var splitKeys: Array[HBaseRawType]) extends Partitioner {
-  import HBasePartitioner.HBaseRawOrdering
+class HBasePartitioner(var splitKeys: Array[HBaseRawType]) extends Partitioner {
+
+  import org.apache.spark.sql.hbase.HBasePartitioner.HBaseRawOrdering
 
   type t = HBaseRawType
 

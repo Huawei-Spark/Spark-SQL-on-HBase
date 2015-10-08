@@ -24,9 +24,9 @@ import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.planning.PhysicalOperation
 import org.apache.spark.sql.catalyst.plans.logical
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
+import org.apache.spark.sql.execution.datasources.LogicalRelation
 import org.apache.spark.sql.execution.{Project, SparkPlan}
 import org.apache.spark.sql.hbase.{HBasePartition, HBaseRawType, HBaseRelation, KeyColumn}
-import org.apache.spark.sql.execution.datasources.LogicalRelation
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{SQLContext, Strategy, execution}
 
@@ -43,21 +43,21 @@ private[hbase] trait HBaseStrategies {
       case logical.Aggregate(groupingExpressions, aggregateExpressions, child)
         if groupingExpressions.nonEmpty &&
           canBeAggregatedForAll(groupingExpressions, aggregateExpressions, child) =>
-          val withCodeGen = canBeCodeGened(allAggregates(aggregateExpressions)) && codegenEnabled
-          if (withCodeGen) execution.Aggregate(
-            // In this case, 'partial = true' doesn't mean it is partial, actually, it is not.
-            // We made it to true to avoid adding Exchange operation.
-            partial = true,
-            groupingExpressions,
-            aggregateExpressions,
-            planLater(child)) :: Nil
-          else execution.Aggregate(
-            // In this case, 'partial = true' doesn't mean it is partial, actually, it is not.
-            // We made it to true to avoid adding Exchange operation.
-            partial = true,
-            groupingExpressions,
-            aggregateExpressions,
-            planLater(child)) :: Nil
+        val withCodeGen = canBeCodeGened(allAggregates(aggregateExpressions)) && codegenEnabled
+        if (withCodeGen) execution.Aggregate(
+          // In this case, 'partial = true' doesn't mean it is partial, actually, it is not.
+          // We made it to true to avoid adding Exchange operation.
+          partial = true,
+          groupingExpressions,
+          aggregateExpressions,
+          planLater(child)) :: Nil
+        else execution.Aggregate(
+          // In this case, 'partial = true' doesn't mean it is partial, actually, it is not.
+          // We made it to true to avoid adding Exchange operation.
+          partial = true,
+          groupingExpressions,
+          aggregateExpressions,
+          planLater(child)) :: Nil
 
       case PhysicalOperation(projectList, inPredicates,
       l@LogicalRelation(relation: HBaseRelation)) =>

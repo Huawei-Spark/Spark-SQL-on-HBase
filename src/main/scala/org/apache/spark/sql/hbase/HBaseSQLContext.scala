@@ -23,7 +23,7 @@ import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.analysis.OverrideCatalog
 import org.apache.spark.sql.catalyst.rules.RuleExecutor
-import org.apache.spark.sql.execution.{EnsureRowFormats, EnsureRequirements, SparkPlan}
+import org.apache.spark.sql.execution.{EnsureRequirements, EnsureRowFormats, SparkPlan}
 import org.apache.spark.sql.hbase.execution.{AddCoprocessor, HBaseStrategies}
 
 class HBaseSQLContext(sc: SparkContext) extends SQLContext(sc) {

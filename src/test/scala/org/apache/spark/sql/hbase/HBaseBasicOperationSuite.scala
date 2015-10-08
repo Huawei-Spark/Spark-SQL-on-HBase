@@ -82,17 +82,17 @@ class HBaseBasicOperationSuite extends TestBaseWithSplitData {
     sql( """INSERT INTO TABLE tb1 VALUES ("row2", false, 99  , 10000, 9999  , 1000.1, 5000.5)""")
     sql( """INSERT INTO TABLE tb1 VALUES ("row3", true , 555 , 999  , 100000, 500.05, 10000.01)""")
     sql( """SELECT col1 FROM tb1 where col2<true order by col2""")
-      .collect().zip(Seq("row1", "row2")).foreach{case (r,s) => assert(r.getString(0) == s)}
+      .collect().zip(Seq("row1", "row2")).foreach { case (r, s) => assert(r.getString(0) == s)}
     sql( """SELECT * FROM tb1 where col3>500 order by col3""")
-      .collect().zip(Seq("row3", "row1")).foreach{case (r,s) => assert(r.getString(0) == s)}
+      .collect().zip(Seq("row3", "row1")).foreach { case (r, s) => assert(r.getString(0) == s)}
     sql( """SELECT * FROM tb1 where col4>5000 order by col4""")
-      .collect().zip(Seq("row1", "row2")).foreach{case (r,s) => assert(r.getString(0) == s)}
+      .collect().zip(Seq("row1", "row2")).foreach { case (r, s) => assert(r.getString(0) == s)}
     sql( """SELECT * FROM tb1 where col5>50000 order by col5""")
-      .collect().zip(Seq("row3")).foreach{case (r,s) => assert(r.getString(0) == s)}
+      .collect().zip(Seq("row3")).foreach { case (r, s) => assert(r.getString(0) == s)}
     sql( """SELECT * FROM tb1 where col6>500 order by col6""")
-      .collect().zip(Seq("row3", "row2")).foreach{case (r,s) => assert(r.getString(0) == s)}
+      .collect().zip(Seq("row3", "row2")).foreach { case (r, s) => assert(r.getString(0) == s)}
     sql( """SELECT * FROM tb1 where col7>5000 order by col7""")
-      .collect().zip(Seq("row2", "row3")).foreach{case (r,s) => assert(r.getString(0) == s)}
+      .collect().zip(Seq("row2", "row3")).foreach { case (r, s) => assert(r.getString(0) == s)}
 
     sql( """DROP TABLE tb1""")
   }
