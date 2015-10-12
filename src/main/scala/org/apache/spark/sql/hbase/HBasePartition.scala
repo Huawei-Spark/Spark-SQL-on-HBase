@@ -18,6 +18,7 @@ package org.apache.spark.sql.hbase
 
 import org.apache.hadoop.hbase.regionserver.RegionScanner
 import org.apache.spark.sql.catalyst.expressions._
+import org.apache.spark.sql.hbase.catalyst.expressions.HBaseMutableRows
 import org.apache.spark.sql.hbase.catalyst.expressions.PartialPredicateOperations._
 import org.apache.spark.sql.hbase.types.{HBaseBytesType, Range}
 import org.apache.spark.{Logging, Partition}
@@ -53,7 +54,7 @@ private[hbase] class HBasePartition(
       val oriPredicate = filterPredicates.get
       val predicateReferences = oriPredicate.references.toSeq
       val boundReference = BindReferences.bindReference(oriPredicate, predicateReferences)
-      val row = new GenericMutableRow(predicateReferences.size)
+      val row = new HBaseMutableRows(predicateReferences.size)
       var rowIndex = 0
       var i = 0
       var range: Range[_] = null

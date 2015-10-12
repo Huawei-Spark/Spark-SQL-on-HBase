@@ -30,6 +30,7 @@ import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.codegen.GeneratePredicate
+import org.apache.spark.sql.hbase.catalyst.expressions.HBaseMutableRows
 import org.apache.spark.sql.hbase.util.DataTypeUtils
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.memory.TaskMemoryManager
@@ -61,7 +62,7 @@ class HBaseCoprocessorSQLReaderRDD(var relation: HBaseRelation,
     var finished: Boolean = false
     var gotNext: Boolean = false
     val results: java.util.ArrayList[Cell] = new java.util.ArrayList[Cell]()
-    val row = new GenericMutableRow(finalOutput.size)
+    val row = new HBaseMutableRows(finalOutput.size)
 
     val iterator = new Iterator[InternalRow] {
       override def hasNext: Boolean = {

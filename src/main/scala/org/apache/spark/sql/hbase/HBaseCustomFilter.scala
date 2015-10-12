@@ -26,6 +26,7 @@ import org.apache.hadoop.hbase.util.{Bytes, Writables}
 import org.apache.hadoop.hbase.{Cell, CellUtil, KeyValue}
 import org.apache.hadoop.io.Writable
 import org.apache.spark.sql.catalyst.expressions._
+import org.apache.spark.sql.hbase.catalyst.expressions.HBaseMutableRows
 import org.apache.spark.sql.hbase.catalyst.expressions.PartialPredicateOperations._
 import org.apache.spark.sql.hbase.util.{BinaryBytesUtils, DataTypeUtils, HBaseKVHelper}
 import org.apache.spark.sql.types.{AtomicType, DataType, StringType}
@@ -106,7 +107,7 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
   private var remainingPredicateBoundRef: Expression = null
 
   // the working row
-  private var workingRow: GenericMutableRow = null
+  private var workingRow: HBaseMutableRows = null
 
   /**
    * constructor method
@@ -153,7 +154,7 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
    */
   private def initialize() = {
     predReferences = predExpr.references.toSeq
-    workingRow = new GenericMutableRow(predReferences.size)
+    workingRow = new HBaseMutableRows(predReferences.size)
     predicateMap = predReferences.map(a => a.name).zipWithIndex
     root = Node()
 
@@ -468,7 +469,7 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
    * reset all the value in the row to be null
    * @param row the row to be reset
    */
-  private def resetRow(row: GenericMutableRow) = {
+  private def resetRow(row: HBaseMutableRows) = {
     // reset the row
     for (i <- 0 to row.numFields - 1) {
       row.update(i, null)

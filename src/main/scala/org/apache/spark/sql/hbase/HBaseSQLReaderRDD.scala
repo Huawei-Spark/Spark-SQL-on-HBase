@@ -25,6 +25,7 @@ import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.codegen.GeneratePredicate
 import org.apache.spark.sql.execution.SparkPlan
+import org.apache.spark.sql.hbase.catalyst.expressions.HBaseMutableRows
 import org.apache.spark.sql.hbase.execution.HBaseSQLTableScan
 import org.apache.spark.sql.hbase.util.{BinaryBytesUtils, DataTypeUtils, HBaseKVHelper}
 import org.apache.spark.sql.types.{AtomicType, DataType}
@@ -152,7 +153,7 @@ class HBaseSQLReaderRDD(val relation: HBaseRelation,
       output.distinct
     }
 
-    val row = new GenericMutableRow(finalOutput.size)
+    val row = new HBaseMutableRows(finalOutput.size)
     val projections = finalOutput.zipWithIndex
 
     var finished: Boolean = false
@@ -300,7 +301,7 @@ class HBaseSQLReaderRDD(val relation: HBaseRelation,
         val projections = output.zipWithIndex
         val resultRows: Seq[InternalRow] = for {
           (result, predicate) <- resultsWithPred
-          row = new GenericMutableRow(output.size)
+          row = new HBaseMutableRows(output.size)
           resultRow = relation.buildRow(projections, result, row)
           if predicate == null || evalResultForBoundPredicate(resultRow, predicate)
         } yield resultRow

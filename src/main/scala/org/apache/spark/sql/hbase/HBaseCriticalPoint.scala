@@ -17,6 +17,7 @@
 package org.apache.spark.sql.hbase
 
 import org.apache.spark.sql.catalyst.expressions._
+import org.apache.spark.sql.hbase.catalyst.expressions.HBaseMutableRows
 import org.apache.spark.sql.hbase.catalyst.expressions.PartialPredicateOperations._
 import org.apache.spark.sql.hbase.types.Range
 import org.apache.spark.sql.types._
@@ -413,7 +414,7 @@ object RangeCriticalPoint {
     else {
       val predExpr = pred.get
       val predRefs = predExpr.references.toSeq
-      val row = new GenericMutableRow(predRefs.size)
+      val row = new HBaseMutableRows(predRefs.size)
       // Step 1
       generateCriticalPointRangesHelper(relation, predExpr, 0, row, predRefs)
     }
