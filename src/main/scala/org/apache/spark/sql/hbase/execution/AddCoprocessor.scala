@@ -49,10 +49,6 @@ private[hbase] case class AddCoprocessor(sqlContext: SQLContext) extends Rule[Sp
         val rdd = new HBaseCoprocessorSQLReaderRDD(
           null, codegenEnabled, oldScan.output, None, sqlContext)
         HBaseSQLTableScan(oldScan.relation, oldScan.output, rdd)
-      case Aggregate(partial, groupingExpressions, aggregateExpressions, child) if codegenEnabled =>
-        // For now we do not support unsafe ops inside coprocessor for lack of memory manager
-        Aggregate(
-          partial, groupingExpressions, aggregateExpressions, child)
     }
 
     val oldRDD: HBaseSQLReaderRDD = oldScan.result.asInstanceOf[HBaseSQLReaderRDD]
@@ -120,37 +116,6 @@ private[hbase] case class AddCoprocessor(sqlContext: SQLContext) extends Rule[Sp
           case takeOrdered: TakeOrderedAndProject if needToCreateSubplan =>
             needToCreateSubplanSeq = needToCreateSubplanSeq.init :+ false
             takeOrdered
-
-          // The following expressions contain 'TaskContext.get().partitionId()'
-          // And, in coprocessor, 'TaskContext.get()' might be null.
-          //
-          // Thus, for the project contains those expressions,
-          // we will process them without coprocessor.
-          case proj: Project if needToCreateSubplan =>
-            val foundExprShouldBeSkipped = proj.expressions.exists(exp => {
-              var found = false
-              exp transform {
-                case r: Rand =>
-                  found = true
-                  r
-                case r: Randn =>
-                  found = true
-                  r
-                case m: MonotonicallyIncreasingID =>
-                  found = true
-                  m
-                // The expression, 'SparkPartitionID', also contains 'TaskContext.get()'
-                // However, we think it can only be access via DataFrame.
-                // Hence, we comment it out.
-                //
-                // case s:SparkPartitionID => s
-              }
-              found
-            })
-            if (foundExprShouldBeSkipped) {
-              needToCreateSubplanSeq = needToCreateSubplanSeq.init :+ false
-            }
-            proj
         }
         // Use coprocessor even without shuffling
         if (needToCreateSubplan) generateNewSubplan(result) else result
