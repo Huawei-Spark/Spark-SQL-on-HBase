@@ -6,7 +6,7 @@ Although HBase is a very useful big data store, its access mechanism is very pri
 
 Currently Spark supports queries against HBase data through HBase’s Map/Reduce interface (i.e., TableInputFormat). Spark SQL supports use of Hive data, which theoretically should be able to support HBase data access, out-of-box, through HBase’s Map/Reduce interface and therefore falls into the first category of the “SQL on HBase” technologies.
 
-We believe, as a unified big data processing engine, Spark is in good position to provide better HBase support.
+We believe, as an unified big data processing engine, Spark is in good position to provide better HBase support.
 
 ## HUAWEI's Clone
 
