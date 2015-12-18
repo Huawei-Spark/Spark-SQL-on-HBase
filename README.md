@@ -8,10 +8,7 @@ Currently Spark supports queries against HBase data through HBase’s Map/Reduce
 
 We believe, as an unified big data processing engine, Spark is in good position to provide better HBase support.
 
-## HUAWEI's Clone
 
-HUAWEI has made its clone at https://github.com/huaweibigdata/astro to facilitate discussions and contributions therein. That clone, however, is under no auspices of the original designer of the Astro project.
- 
 ## Online Documentation
 
 Online documentation https://github.com/Huawei-Spark/Spark-SQL-on-HBase/blob/master/doc/SparkSQLOnHBase_v2.2.docx
