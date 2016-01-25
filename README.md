@@ -120,3 +120,5 @@ You can also make those setting to be the default by setting to the "Defaults ->
 
 Please refer to the [Configuration guide](http://spark.apache.org/docs/latest/configuration.html)
 in the online documentation for an overview on how to configure Spark.
+
+For HBase 1.1, it is recommended to use higher "open files" and "max user processes" ulimit values. A typical value is 65536(64K). 

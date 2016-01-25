@@ -19,11 +19,12 @@ package org.apache.spark.sql.hbase
 
 import java.io._
 
+import org.apache.hadoop.hbase.KeyValue.KeyOnlyKeyValue
 import org.apache.hadoop.hbase.exceptions.DeserializationException
 import org.apache.hadoop.hbase.filter.Filter.ReturnCode
 import org.apache.hadoop.hbase.filter.FilterBase
 import org.apache.hadoop.hbase.util.{Bytes, Writables}
-import org.apache.hadoop.hbase.{Cell, CellUtil, KeyValue}
+import org.apache.hadoop.hbase.{HConstants, Cell, CellUtil, KeyValue}
 import org.apache.hadoop.io.Writable
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.hbase.catalyst.expressions.PartialPredicateOperations._
@@ -75,9 +76,6 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
 
   // the root node: a placeholder for tree processing convenience
   private var root: Node = null
-
-  // the current row key
-  private var currentRowKey: HBaseRawType = null
 
   // the current row key values? may be useful ??
   private var currentValues: Seq[Any] = null
@@ -215,14 +213,11 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
     }
   }
 
-  /**
-   * Given the input kv (cell), filter it out, or keep it, or give the next hint
-   * the decision is based on input predicate
-   */
-  override def filterKeyValue(kv: Cell): ReturnCode = {
+  override def filterRowKey(buffer: Array[Byte], offset: Int, length: Int): Boolean = {
+    // reset the index of each level
     if (!nextColFlag) {
-      // reset the index of each level
-      currentRowKey = CellUtil.cloneRow(kv)
+      val currentRowKey = new Array[Byte](length)
+      Array.copy(buffer, offset, currentRowKey, 0, length)
       nextColFlag = true
       val inputValues = relation.nativeKeyConvert(Some(currentRowKey))
 
@@ -236,7 +231,8 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
         node.currentValue = inputValues(node.dimension)
       }
       if (inRange) {
-        return ReturnCode.INCLUDE
+        nextReturnCode = ReturnCode.INCLUDE_AND_NEXT_COL
+        return false
       }
       remainingPredicate = null
       remainingPredicateBoundRef = null
@@ -246,14 +242,25 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
       nextReturnCode = result._1
       if (nextReturnCode == ReturnCode.SEEK_NEXT_USING_HINT) {
         nextRowKey = result._2
-        nextKeyValue = new KeyValue(nextRowKey, CellUtil.cloneFamily(kv),
-          HBaseCustomFilter.empty, HBaseCustomFilter.empty)
+        nextKeyValue = new KeyValue(nextRowKey, HConstants.LATEST_TIMESTAMP)
+        false
       } else if (nextReturnCode == ReturnCode.SKIP) {
         filterAllRemainingSetting = true
+        true
+      } else {
+        false
       }
+    } else {
+      nextReturnCode == ReturnCode.SKIP
     }
+  }
 
-    nextReturnCode
+  /**
+   * Given the input kv (cell), filter it out, or keep it, or give the next hint
+   * the decision is based on input predicate
+   */
+  override def filterKeyValue(kv: Cell): ReturnCode = {
+    nextReturnCode 
   }
 
   /**
@@ -368,7 +375,7 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
           remainingPredicateBoundRef = BindReferences.bindReference(child.cpr.pred,
             predReferences)
         }
-        (ReturnCode.INCLUDE, nextRowKey)
+        (ReturnCode.INCLUDE_AND_NEXT_COL, nextRowKey)
       } else {
         findNextHint(node.children(node.currentChildIndex))
       }
@@ -621,7 +628,8 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
   }
 
   override def hasFilterRow: Boolean = {
-    if (remainingPredicate != null) true else false
+    //if (remainingPredicate != null) true else false
+    true
   }
 
   override def filterRow(): Boolean = {
@@ -633,7 +641,7 @@ private[hbase] class HBaseCustomFilter extends FilterBase with Writable {
    * @return
    */
   override def filterAllRemaining() = {
-    filterAllRemainingSetting
+     filterAllRemainingSetting
   }
 
   /**

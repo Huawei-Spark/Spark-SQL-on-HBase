@@ -100,12 +100,13 @@ abstract class TestBase
 
   def runSql(sql: String): Array[Row] = {
     logInfo(sql)
-    TestHbase.sql(sql).collect()
+    TestHbase.hsc.sql(sql).collect()
   }
 
   override protected def afterAll(): Unit = {
     val msg = s"Test ${getClass.getName} completed at ${(new java.util.Date).toString} duration=${((new java.util.Date).getTime - startTime) / 1000}"
     logInfo(msg)
+    super.afterAll()
   }
 
   val CompareTol = 1e-6
@@ -160,8 +161,8 @@ abstract class TestBase
   def dropNativeHbaseTable(tableName: String) = {
     try {
       val hbaseAdmin = TestHbase.hbaseAdmin
-      hbaseAdmin.disableTable(tableName)
-      hbaseAdmin.deleteTable(tableName)
+      hbaseAdmin.disableTable(TableName.valueOf(tableName))
+      hbaseAdmin.deleteTable(TableName.valueOf(tableName))
     } catch {
       case e: TableExistsException =>
         logError(s"Table already exists $tableName", e)

@@ -28,7 +28,7 @@ private[hbase] case class AddCoprocessor(sqlContext: SQLContext) extends Rule[Sp
   private lazy val catalog = sqlContext.asInstanceOf[HBaseSQLContext].catalog
 
   private def coprocessorIsAvailable(relation: HBaseRelation): Boolean = {
-    catalog.deploySuccessfully.get && catalog.hasCoprocessor(relation.hbaseTableName)
+    catalog.deploySuccessfully.get && relation.hasCoprocessor
   }
 
   private def generateNewSubplan(origPlan: SparkPlan): SparkPlan = {

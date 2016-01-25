@@ -41,6 +41,7 @@ class TestBaseWithNonSplitData extends TestBase {
 
   override protected def beforeAll() = {
     super.beforeAll()
+    TestHbase.start
     val testTableCreationSQL = s"""CREATE TABLE $TestTableName(strcol STRING, bytecol BYTE,
                                shortcol SHORT, intcol INTEGER,
             longcol LONG, floatcol FLOAT, doublecol DOUBLE, PRIMARY KEY(doublecol, strcol, intcol))
@@ -52,8 +53,10 @@ class TestBaseWithNonSplitData extends TestBase {
   }
 
   override protected def afterAll() = {
-    super.afterAll()
     runSql("DROP TABLE " + TestTableName)
+    dropNativeHbaseTable(TestHBaseTableName)
+    TestHbase.stop
+    super.afterAll()
   }
 
   def createTable(tableName: String, hbaseTable: String, creationSQL: String) = {
@@ -62,7 +65,7 @@ class TestBaseWithNonSplitData extends TestBase {
       createNativeHbaseTable(hbaseTable, TestHbaseColFamilies)
     }
 
-    if (TestHbase.catalog.checkLogicalTableExist(tableName)) {
+    if (TestHbase.hsc.catalog.tableExists(Seq(tableName))) {
       val dropSql = s"DROP TABLE $tableName"
       runSql(dropSql)
     }

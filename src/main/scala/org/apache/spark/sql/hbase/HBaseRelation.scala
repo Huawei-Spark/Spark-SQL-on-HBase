@@ -17,7 +17,8 @@
 package org.apache.spark.sql.hbase
 
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.hbase.client.{Get, HTable, Put, Result, Scan}
+import org.apache.hadoop.hbase.client.{Get, Table, Put, Result, Scan,
+                                       Connection, ConnectionFactory}
 import org.apache.hadoop.hbase.filter._
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.{HBaseConfiguration, _}
@@ -46,7 +47,7 @@ class HBaseSource extends RelationProvider {
 
     val tableName = parameters("tableName")
     val rawNamespace = parameters("namespace")
-    val hbaseTable = parameters("hbaseTableName")
+    val hbaseTableName = parameters("hbaseTableName")
     val encodingFormat = parameters("encodingFormat")
     val colsSeq = parameters("colsSeq").split(",")
     val keyCols = parameters("keyCols").split(";")
@@ -73,7 +74,7 @@ class HBaseSource extends RelationProvider {
           )
         }
     }
-    catalog.createTable(tableName, rawNamespace, hbaseTable, allColumns, null, encodingFormat)
+    catalog.createTable(tableName, rawNamespace, hbaseTableName, allColumns, null, encodingFormat)
   }
 }
 
@@ -92,13 +93,17 @@ private[hbase] case class HBaseRelation(
                                          hbaseTableName: String,
                                          allColumns: Seq[AbstractColumn],
                                          deploySuccessfully: Option[Boolean],
-                                         encodingFormat: String = "binaryformat")
+                                         hasCoprocessor: Boolean = false,
+                                         encodingFormat: String = "binaryformat",
+                                         @transient connection : Connection = null)
                                        (@transient var context: SQLContext)
   extends BaseRelation with CatalystScan with InsertableRelation with Serializable {
   @transient lazy val logger = Logger.getLogger(getClass.getName)
 
   @transient lazy val keyColumns = allColumns.filter(_.isInstanceOf[KeyColumn])
     .asInstanceOf[Seq[KeyColumn]].sortBy(_.order)
+
+  @transient lazy val hTableName = TableName.valueOf(hbaseNamespace, hbaseTableName)
 
   // The sorting is by the ordering of the Column Family and Qualifier. This is for avoidance
   // to sort cells per row, as needed in bulk loader
@@ -155,10 +160,17 @@ private[hbase] case class HBaseRelation(
   logger.debug(s"HBaseRelation config has zkPort="
     + s"${getConf.get("hbase.zookeeper.property.clientPort")}")
 
-  @transient private var htable_ : HTable = _
+  @transient lazy val connection_ =
+    if (connection == null) {
+      ConnectionFactory.createConnection(getConf)
+    } else {
+      connection
+    }
+
+  @transient private var htable_ : Table = _
 
   def htable = {
-    if (htable_ == null) htable_ = new HTable(getConf, hbaseTableName)
+    if (htable_ == null) htable_ = connection_.getTable(hTableName)
     htable_
   }
 
@@ -174,12 +186,6 @@ private[hbase] case class HBaseRelation(
   // find the index in a sequence of AttributeReferences that is a key; -1 if not present
   def rowIndex(refs: Seq[Attribute], keyIndex: Int): Int = {
     refs.indexWhere(_.exprId == partitionKeys(keyIndex).exprId)
-  }
-
-  def flushHTable() = {
-    if (htable_ != null) {
-      htable_.flushCommits()
-    }
   }
 
   def closeHTable() = {
@@ -207,30 +213,31 @@ private[hbase] case class HBaseRelation(
     if (System.currentTimeMillis - partitionTS >= partitionExpiration) {
       partitionTS = System.currentTimeMillis
       partitions = {
-        val regionLocations = htable.getRegionLocations.asScala.toSeq
+        val regionLocations : Seq[HRegionLocation] = connection_.getRegionLocator(hTableName)
+          .getAllRegionLocations.asScala.toSeq
         logger.info(s"Number of HBase regions for " +
           s"table ${htable.getName.getNameAsString}: ${regionLocations.size}")
         regionLocations.zipWithIndex.map {
           case p =>
             val start: Option[HBaseRawType] = {
-              if (p._1._1.getStartKey.isEmpty) {
+              if (p._1.getRegionInfo.getStartKey.isEmpty) {
                 None
               } else {
-                Some(p._1._1.getStartKey)
+                Some(p._1.getRegionInfo.getStartKey)
               }
             }
             val end: Option[HBaseRawType] = {
-              if (p._1._1.getEndKey.isEmpty) {
+              if (p._1.getRegionInfo.getEndKey.isEmpty) {
                 None
               } else {
-                Some(p._1._1.getEndKey)
+                Some(p._1.getRegionInfo.getEndKey)
               }
             }
             new HBasePartition(
               p._2, p._2,
               start,
               end,
-              Some(p._1._2.getHostname), relation = this)
+              Some(p._1.getHostname), relation = this)
         }
       }
     }
@@ -273,7 +280,8 @@ private[hbase] case class HBaseRelation(
    * as a list of SparkImmutableBytesWritable.
    */
   def getRegionStartKeys = {
-    val byteKeys: Array[HBaseRawType] = htable.getStartKeys
+    val byteKeys: Array[HBaseRawType] = connection_.getRegionLocator(hTableName).getStartKeys
+
     val ret = ArrayBuffer[HBaseRawType]()
 
     // Since the size of byteKeys will be 1 if there is only one partition in the table,
@@ -688,7 +696,7 @@ private[hbase] case class HBaseRelation(
           val rowVal = DataTypeUtils.getRowColumnInHBaseRawType(
             row, nkc.ordinal, nkc.dataType, bytesUtils)
           colIndexInBatch += 1
-          put.add(nkc.familyRaw, nkc.qualifierRaw, rowVal)
+          put.addImmutable(nkc.familyRaw, nkc.qualifierRaw, rowVal)
         }
       )
 

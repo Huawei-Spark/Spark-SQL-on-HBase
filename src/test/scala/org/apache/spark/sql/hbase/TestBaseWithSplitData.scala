@@ -33,19 +33,24 @@ import org.apache.spark.sql.types._
 class TestBaseWithSplitData extends TestBase {
   val TableName_a: String = "ta"
   val TableName_b: String = "tb"
-  val HbaseTableName: String = "ht"
-  val Metadata_Table = "metadata"
+  val HbaseTableName = TableName.valueOf("ht")
+  val Metadata_Table = TableName.valueOf("metadata")
   var alreadyInserted = false
+  var hsc: HBaseSQLContext = _
 
   override protected def beforeAll() = {
     super.beforeAll()
+    TestHbase.start
+    hsc = TestHbase.hsc
     setupData(useMultiplePartitions = true, needInsertData = true)
-    TestData
   }
 
   override protected def afterAll() = {
     runSql("DROP TABLE " + TableName_a)
     runSql("DROP TABLE " + TableName_b)
+    dropNativeHbaseTable("ht")
+    TestHbase.stop
+    super.afterAll()
   }
 
   def createTable(useMultiplePartitions: Boolean) = {
@@ -55,7 +60,6 @@ class TestBaseWithSplitData extends TestBase {
         TestHbase.hbaseAdmin.disableTable(HbaseTableName)
         TestHbase.hbaseAdmin.deleteTable(HbaseTableName)
       }
-
       if (TestHbase.hbaseAdmin.tableExists(Metadata_Table)) {
         TestHbase.hbaseAdmin.disableTable(Metadata_Table)
         TestHbase.hbaseAdmin.deleteTable(Metadata_Table)
@@ -84,7 +88,8 @@ class TestBaseWithSplitData extends TestBase {
         null
       }
 
-      TestHbase.catalog.createTable(TableName_a, null, HbaseTableName, allColumns, splitKeys)
+      hsc.catalog.createTable(TableName_a, null,
+        HbaseTableName.getNameAsString, allColumns, splitKeys)
 
       runSql( s"""CREATE TABLE $TableName_b(col1 STRING, col2 BYTE, col3 SHORT, col4 INTEGER,
           col5 LONG, col6 FLOAT, col7 INTEGER, PRIMARY KEY(col7, col1, col3))
@@ -97,17 +102,14 @@ class TestBaseWithSplitData extends TestBase {
     }
   }
 
-  def checkHBaseTableExists(hbaseTable: String): Boolean = {
-    val tableName = TableName.valueOf(hbaseTable)
-    TestHbase.hbaseAdmin.tableExists(tableName)
+  def checkHBaseTableExists(hbaseTable: TableName): Boolean = {
+    TestHbase.hbaseAdmin.tableExists(hbaseTable)
   }
 
   def insertTestData() = {
     if (!checkHBaseTableExists(HbaseTableName)) {
       throw new IllegalStateException(s"Unable to find table $HbaseTableName")
     }
-
-    val htable = new HTable(TestHbase.sparkContext.hadoopConfiguration, HbaseTableName)
 
     def putNewTableIntoHBase(keys: Seq[Any], keysType: Seq[DataType],
                              vals: Seq[Any], valsType: Seq[DataType]): Unit = {
@@ -121,7 +123,9 @@ class TestBaseWithSplitData extends TestBase {
         case (rowValue, rowType, colFamily, colQualifier) =>
           addRowVals(put, rowValue, rowType, colFamily, colQualifier)
       }
+      val htable = hsc.catalog.connection.getTable(HbaseTableName)
       htable.put(put)
+      htable.close()
     }
 
     putNewTableIntoHBase(Seq(-257, " n257 ", 128: Short),
@@ -193,8 +197,6 @@ class TestBaseWithSplitData extends TestBase {
       Seq(IntegerType, StringType, ShortType),
       Seq[Any](14.toByte, 1024, 12345678901234L, 1234.5678F),
       Seq(ByteType, IntegerType, LongType, FloatType))
-
-    htable.close()
   }
 
   def makeRowKey(row: Row, dataTypeOfKeys: Seq[DataType]) = {
@@ -223,18 +225,7 @@ class TestBaseWithSplitData extends TestBase {
       case ShortType => dos.write(bu.toBytes(rowValue.asInstanceOf[Short]))
       case _ => throw new Exception("Unsupported HBase SQL Data Type")
     }
-    put.add(Bytes.toBytes(colFamily), Bytes.toBytes(colQualifier), bos.toByteArray)
-  }
-
-  def testHBaseScanner() = {
-    val scan = new Scan
-    val htable = new HTable(TestHbase.sparkContext.hadoopConfiguration, HbaseTableName)
-    val scanner = htable.getScanner(scan)
-    var res: Result = null
-    do {
-      res = scanner.next
-      if (res != null) logInfo(s"Row ${res.getRow} has map=${res.getNoVersionMap.toString}")
-    } while (res != null)
+    put.addImmutable(Bytes.toBytes(colFamily), Bytes.toBytes(colQualifier), bos.toByteArray)
   }
 
   def setupData(useMultiplePartitions: Boolean, needInsertData: Boolean = false) {

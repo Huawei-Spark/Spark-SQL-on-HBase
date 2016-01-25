@@ -16,8 +16,9 @@
  */
 package org.apache.spark.sql.hbase
 
+import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase._
-import org.apache.hadoop.hbase.client.HBaseAdmin
+import org.apache.hadoop.hbase.client.{ConnectionFactory}
 import org.apache.spark.sql.catalyst.expressions.GenericRow
 import org.apache.spark.sql.catalyst.plans.logical.Subquery
 import org.apache.spark.sql.hbase.util.HBaseKVHelper
@@ -25,22 +26,37 @@ import org.apache.spark.sql.sources.LogicalRelation
 import org.apache.spark.sql.types._
 
 class HBaseCatalogTestSuite extends TestBase {
-  val (catalog, configuration) = (TestHbase.catalog, TestHbase.sparkContext.hadoopConfiguration)
+  var catalog: HBaseCatalog = _
+  var configuration: Configuration = _
+  override def beforeAll() = {
+    super.beforeAll()
+    TestHbase.start
+    catalog = TestHbase.hsc.catalog
+    configuration = TestHbase.hsc.sparkContext.hadoopConfiguration
+  }
 
+  override def afterAll() = {
+    catalog = null
+    configuration = null
+    TestHbase.stop
+    super.afterAll()
+  }
+  
   test("Create Table") {
     // prepare the test data
-    val namespace = "testNamespace"
+    val namespace = "default"
     val tableName = "testTable"
     val hbaseTableName = "hbaseTable"
     val family1 = "family1"
     val family2 = "family2"
 
-    if (!catalog.checkHBaseTableExists(hbaseTableName)) {
-      val admin = new HBaseAdmin(configuration)
-      val desc = new HTableDescriptor(TableName.valueOf(hbaseTableName))
+    if (!catalog.checkHBaseTableExists(TableName.valueOf(namespace, hbaseTableName))) {
+      val admin = catalog.admin
+      val desc = new HTableDescriptor(hbaseTableName)
       desc.addFamily(new HColumnDescriptor(family1))
       desc.addFamily(new HColumnDescriptor(family2))
       admin.createTable(desc)
+      admin.close()
     }
 
     var allColumns = List[AbstractColumn]()
@@ -57,12 +73,13 @@ class HBaseCatalogTestSuite extends TestBase {
 
     catalog.createTable(tableName, namespace, hbaseTableName, allColumns, splitKeys)
 
-    assert(catalog.checkLogicalTableExist(tableName) === true)
+    assert(catalog.tableExists(Seq(tableName)) === true)
+    catalog.stopAdmin()
   }
 
   test("Get Table") {
     // prepare the test data
-    val hbaseNamespace = "testNamespace"
+    val hbaseNamespace = "default"
     val tableName = "testTable"
     val hbaseTableName = "hbaseTable"
 
@@ -89,6 +106,7 @@ class HBaseCatalogTestSuite extends TestBase {
     val keyColumns = Seq(KeyColumn("column1", StringType, 0), KeyColumn("column2", IntegerType, 1))
     assert(hbRelation.keyColumns.equals(keyColumns))
     assert(relation.childrenResolved)
+    catalog.stopAdmin()
   }
 
   test("Alter Table") {
@@ -107,6 +125,7 @@ class HBaseCatalogTestSuite extends TestBase {
     result = catalog.getTable(tableName)
     table = result.get
     assert(table.allColumns.size === 4)
+    catalog.stopAdmin()
   }
 
   test("Delete Table") {
@@ -114,13 +133,14 @@ class HBaseCatalogTestSuite extends TestBase {
     val tableName = "testTable"
 
     catalog.deleteTable(tableName)
-
-    assert(catalog.checkLogicalTableExist(tableName) === false)
+    assert(catalog.tableExists(Seq(tableName)) === false)
+    catalog.stopAdmin()
   }
 
   test("Check Logical Table Exist") {
     val tableName = "non-exist"
 
-    assert(catalog.checkLogicalTableExist(tableName) === false)
+    assert(catalog.tableExists(Seq(tableName)) === false)
+    catalog.stopAdmin()
   }
 }

@@ -25,6 +25,7 @@ import org.apache.hadoop.hbase._
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable
 import org.apache.hadoop.hbase.mapreduce.{HFileOutputFormat2, LoadIncrementalHFiles}
 import org.apache.hadoop.hbase.util.Bytes
+import org.apache.hadoop.mapred.JobConf
 import org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
 import org.apache.hadoop.mapreduce.{Job, RecordWriter}
 import org.apache.spark.annotation.DeveloperApi
@@ -47,6 +48,7 @@ case class AlterDropColCommand(tableName: String, columnName: String) extends Ru
 
   def run(sqlContext: SQLContext): Seq[Row] = {
     sqlContext.catalog.asInstanceOf[HBaseCatalog].alterTableDropNonKey(tableName, columnName)
+    sqlContext.catalog.asInstanceOf[HBaseCatalog].stopAdmin()
     Seq.empty[Row]
   }
 
@@ -67,6 +69,7 @@ case class AlterAddColCommand(
       NonKeyColumn(
         colName, hbaseCatalog.getDataType(colType), colFamily, colQualifier)
     )
+    hbaseCatalog.stopAdmin()
     Seq.empty[Row]
   }
 
@@ -79,6 +82,7 @@ case class DropHbaseTableCommand(tableName: String) extends RunnableCommand {
   def run(sqlContext: SQLContext): Seq[Row] = {
     val hbaseCatalog = sqlContext.catalog.asInstanceOf[HBaseCatalog]
     hbaseCatalog.deleteTable(tableName)
+    hbaseCatalog.stopAdmin()
     Seq.empty[Row]
   }
 
@@ -92,6 +96,7 @@ case object ShowTablesCommand extends RunnableCommand {
     val buffer = new ArrayBuffer[Row]()
     val tables = sqlContext.catalog.asInstanceOf[HBaseCatalog].getAllTableName
     tables.foreach(x => buffer.append(Row(x)))
+    sqlContext.catalog.asInstanceOf[HBaseCatalog].stopAdmin()
     buffer.toSeq
   }
 
@@ -113,6 +118,7 @@ case class DescribeTableCommand(tableName: String) extends RunnableCommand {
           buffer.append(Row(nonKeyColumn.sqlName, nonKeyColumn.dataType.toString,
             "NON KEY COLUMN", nonKeyColumn.family, nonKeyColumn.qualifier))
       }
+      sqlContext.catalog.asInstanceOf[HBaseCatalog].stopAdmin
       buffer.toSeq
     } else {
       sys.error(s"can not find table $tableName")
@@ -166,8 +172,9 @@ case class BulkLoadIntoTableCommand(
     // tmp path for storing HFile
     @transient val tmpPath = Util.getTempFilePath(
       hbContext.sparkContext.hadoopConfiguration, relation.tableName)
-    @transient val job = new Job(hbContext.sparkContext.hadoopConfiguration)
-    HFileOutputFormat2.configureIncrementalLoad(job, relation.htable)
+    @transient val job = new Job(new JobConf(hbContext.sparkContext.hadoopConfiguration))
+    HFileOutputFormat2.configureIncrementalLoad(job, relation.htable,
+      relation.connection_.getRegionLocator(relation.hTableName))
     job.getConfiguration.set("mapreduce.output.fileoutputformat.outputdir", tmpPath)
 
     @transient val conf = job.getConfiguration
@@ -275,7 +282,8 @@ case class BulkLoadIntoTableCommand(
           // there maybe no target path
           logInfo(s"written $recordsWritten records")
           if (recordsWritten > 0) {
-            load.doBulkLoad(targetPath, relation.htable)
+            load.doBulkLoad(targetPath, relation.connection_.getAdmin, relation.htable,
+              relation.connection_.getRegionLocator(relation.hTableName))
             relation.closeHTable()
           }
         }
@@ -293,7 +301,8 @@ case class BulkLoadIntoTableCommand(
     if (!parallel) {
       val tablePath = new Path(tmpPath)
       val load = new LoadIncrementalHFiles(conf)
-      load.doBulkLoad(tablePath, relation.htable)
+      load.doBulkLoad(tablePath, relation.connection_.getAdmin, relation.htable,
+      relation.connection_.getRegionLocator(relation.hTableName))
     }
     relation.closeHTable()
     logDebug(s"finish BulkLoad on table ${relation.htable.getName}:" +

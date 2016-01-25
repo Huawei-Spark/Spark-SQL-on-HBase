@@ -36,26 +36,28 @@ class HBaseTpcMiniTestSuite extends TestBase {
   private[hbase] val csvPath = tpath(0)
 
   override protected def beforeAll() = {
-    val hbaseAdmin = TestHbase.hbaseAdmin
-
     /**
      * create hbase table if it does not exists
      */
-    if (!hbaseAdmin.tableExists(TableName.valueOf(hbaseTableName))) {
+    super.beforeAll()
+    TestHbase.start
+    if (!TestHbase.hsc.catalog.admin.tableExists(TableName.valueOf(hbaseTableName))) {
       val descriptor = new HTableDescriptor(TableName.valueOf(tableName))
       hbaseFamilies.foreach { f => descriptor.addFamily(new HColumnDescriptor(f))}
       try {
-        hbaseAdmin.createTable(descriptor)
+        TestHbase.hsc.catalog.admin.createTable(descriptor)
       } catch {
         case e: TableExistsException =>
           logError(s"Table already exists $tableName", e)
+      } finally {
+
       }
     }
 
     /**
      * drop the existing logical table if it exists
      */
-    if (TestHbase.catalog.checkLogicalTableExist(tableName)) {
+    if (TestHbase.hsc.catalog.tableExists(Seq(tableName))) {
       val dropSql = "DROP TABLE " + tableName
       try {
         runSql(dropSql)
@@ -141,6 +143,8 @@ class HBaseTpcMiniTestSuite extends TestBase {
 
   override protected def afterAll() = {
     runSql("DROP TABLE " + tableName)
+    TestHbase.stop
+    super.afterAll()
   }
 
   test("Query 0") {

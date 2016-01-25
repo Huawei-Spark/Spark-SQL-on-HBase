@@ -15,26 +15,31 @@
  * limitations under the License.
  */
 
-package org.apache.spark.sql.hbase
+package org.apache.spark.hsc.sql.hbase
 
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.{SQLConf, _}
+import org.apache.spark.sql.types.{StructType, MetadataBuilder}
+import org.apache.spark.sql.{DataFrame, Row, SQLConf}
+import org.apache.spark.sql.hbase.{TestDataStore, TestBaseWithSplitData}
 
 class HBaseAdvancedSQLQuerySuite extends TestBaseWithSplitData {
-
-  import org.apache.spark.sql.hbase.TestHbase._
-  import org.apache.spark.sql.hbase.TestHbase.implicits._
+  var testData : TestDataStore = _
+  override def beforeAll() = {
+    super.beforeAll()
+    testData = new TestDataStore(hsc)
+  }
+  override def afterAll() = super.afterAll()
 
   test("aggregation with codegen") {
-    val originalValue = TestHbase.conf.codegenEnabled
-    setConf(SQLConf.CODEGEN_ENABLED, "true")
-    val result = sql("SELECT col1 FROM ta GROUP BY col1").collect()
+    hsc.setConf(SQLConf.CODEGEN_ENABLED, "true")
+    val result = hsc.sql("SELECT col1 FROM ta GROUP BY col1").collect()
     assert(result.length == 14, s"aggregation with codegen test failed on size")
-    setConf(SQLConf.CODEGEN_ENABLED, originalValue.toString)
+    hsc.setConf(SQLConf.CODEGEN_ENABLED, "false")
   }
 
   test("dsl simple select 0") {
-    val tableA = sql("SELECT * FROM ta")
+    val hsc_ =  hsc
+    import hsc_.implicits._
+    val tableA = hsc.sql("SELECT * FROM ta")
     checkAnswer(
       tableA.where('col7 === 1).orderBy('col2.asc).select('col4),
       Row(1) :: Nil)
@@ -44,7 +49,9 @@ class HBaseAdvancedSQLQuerySuite extends TestBaseWithSplitData {
   }
 
   test("metadata is propagated correctly") {
-    val tableA = sql("SELECT col7, col1, col3 FROM ta")
+    val hsc_ =  hsc
+    import hsc_.implicits._
+    val tableA = hsc.sql("SELECT col7, col1, col3 FROM ta")
     val schema = tableA.schema
     val docKey = "doc"
     val docValue = "first name"
@@ -53,7 +60,7 @@ class HBaseAdvancedSQLQuerySuite extends TestBaseWithSplitData {
       .build()
     val schemaWithMeta = new StructType(Array(
       schema("col7"), schema("col1").copy(metadata = metadata), schema("col3")))
-    val personWithMeta = createDataFrame(tableA.rdd, schemaWithMeta)
+    val personWithMeta = hsc.createDataFrame(tableA.rdd, schemaWithMeta)
     def validateMetadata(rdd: DataFrame): Unit = {
       assert(rdd.schema("col1").metadata.getString(docKey) == docValue)
     }
@@ -61,9 +68,9 @@ class HBaseAdvancedSQLQuerySuite extends TestBaseWithSplitData {
     validateMetadata(personWithMeta.select($"col1"))
     validateMetadata(personWithMeta.select($"col1"))
     validateMetadata(personWithMeta.select($"col7", $"col1"))
-    validateMetadata(sql("SELECT * FROM personWithMeta"))
-    validateMetadata(sql("SELECT col7, col1 FROM personWithMeta"))
-    validateMetadata(sql("SELECT * FROM personWithMeta JOIN salary ON col7 = personId"))
-    validateMetadata(sql("SELECT col1, salary FROM personWithMeta JOIN salary ON col7 = personId"))
+    validateMetadata(hsc.sql("SELECT * FROM personWithMeta"))
+    validateMetadata(hsc.sql("SELECT col7, col1 FROM personWithMeta"))
+    validateMetadata(hsc.sql("SELECT * FROM personWithMeta JOIN salary ON col7 = personId"))
+    validateMetadata(hsc.sql("SELECT col1, salary FROM personWithMeta JOIN salary ON col7 = personId"))
   }
 }

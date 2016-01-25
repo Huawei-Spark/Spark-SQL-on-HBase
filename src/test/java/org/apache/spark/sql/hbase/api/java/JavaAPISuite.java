@@ -17,60 +17,67 @@
 
 package org.apache.spark.sql.hbase.api.java;
 
+import java.util.Map;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
-import org.apache.hadoop.hbase.MiniHBaseCluster;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.hbase.HBaseSQLContext;
 import org.apache.spark.sql.hbase.TestBase;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.Serializable;
 
 public class JavaAPISuite extends TestBase implements Serializable {
-    private transient JavaSparkContext sc;
     private transient SQLContext hsc;
-    private transient MiniHBaseCluster cluster;
-    private transient HBaseAdmin hbaseAdmin;
-
-    private final String hb_staging_table = "HbStagingTable";
-    private final String staging_table = "StagingTable";
-    private final String create_sql = "CREATE TABLE " + staging_table + "(strcol STRING, bytecol String, shortcol String, intcol String, " +
-            "longcol string, floatcol string, doublecol string, PRIMARY KEY(doublecol, strcol, intcol))" +
-            " MAPPED BY (" + hb_staging_table + ", COLS=[bytecol=cf1.hbytecol, " +
-            "shortcol=cf1.hshortcol, longcol=cf2.hlongcol, floatcol=cf2.hfloatcol])";
-    private final String insert_sql = "INSERT INTO TABLE " + staging_table + " VALUES (\"strcol\" , \"bytecol\" , \"shortcol\" , \"intcol\" ," +
-            "  \"longcol\" , \"floatcol\" , \"doublecol\")";
-    private final String retrieve_sql = "SELECT * FROM " + staging_table;
+    private transient HBaseTestingUtility testUtil = null;
+    private transient JavaSparkContext sc = null;
 
     @Before
     public void setUp() {
-        System.setProperty("spark.hadoop.hbase.zookeeper.quorum", "localhost");
+      System.setProperty("spark.hadoop.hbase.zookeeper.quorum", "localhost");
+      SparkConf scf = new SparkConf(true);
+      sc = new JavaSparkContext("local", "JavaAPISuite", scf);
+      hsc = new HBaseSQLContext(sc);
+      testUtil = new HBaseTestingUtility(hsc.sparkContext().hadoopConfiguration());
+      try {
+        testUtil.cleanupTestDir();
+        testUtil.startMiniZKCluster();
+        testUtil.startMiniHBaseCluster(1, 1);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
 
-        sc = new JavaSparkContext("local[2]", "JavaAPISuite", new SparkConf(true));
-        hsc = new HBaseSQLContext(sc);
-
-        HBaseTestingUtility testUtil = new HBaseTestingUtility(hsc.sparkContext().
-                hadoopConfiguration());
-
-        int nRegionServers = 1;
-        int nDataNodes = 1;
-        int nMasters = 1;
-
-        try {
-            cluster = testUtil.startMiniCluster(nMasters, nRegionServers, nDataNodes);
-            hbaseAdmin = new HBaseAdmin(hsc.sparkContext().hadoopConfiguration());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    @After
+    public void tearDown() {
+      try {
+        testUtil.shutdownMiniHBaseCluster();
+        testUtil.shutdownMiniZKCluster();
+        testUtil.cleanupTestDir();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+      hsc = null;
+      sc.stop();
+      sc = null;
     }
 
     @Test
     public void testCreateInsertRetrieveTable() {
+        final String hb_staging_table = "HbStagingTable";
+        final String staging_table = "StagingTable";
+        final String insert_sql = "INSERT INTO TABLE " + staging_table + " VALUES (\"strcol\" , \"bytecol\" , \"shortcol\" , \"intcol\" ," +
+                "  \"longcol\" , \"floatcol\" , \"doublecol\")";
+        final String retrieve_sql = "SELECT * FROM " + staging_table;
+        String create_sql = "CREATE TABLE " + staging_table + "(strcol STRING, bytecol String, shortcol String, intcol String, " +
+                "longcol string, floatcol string, doublecol string, PRIMARY KEY(doublecol, strcol, intcol))" +
+                " MAPPED BY (" + hb_staging_table + ", COLS=[bytecol=cf1.hbytecol, " +
+                "shortcol=cf1.hshortcol, longcol=cf2.hlongcol, floatcol=cf2.hfloatcol])";
         hsc.sql(create_sql).collect();
         hsc.sql(insert_sql).collect();
         Row[] row = hsc.sql(retrieve_sql).collect();

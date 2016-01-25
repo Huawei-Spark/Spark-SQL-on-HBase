@@ -27,14 +27,25 @@ import org.apache.spark.sql.types._
 import scala.collection.mutable.ArrayBuffer
 
 class HBasePartitionerSuite extends TestBase {
-  val sc: SparkContext = TestHbase.sparkContext
+
+  override def beforeAll() = {
+    super.beforeAll()
+    TestHbase.start
+  }
+
+  override def afterAll() = {
+    TestHbase.stop
+    super.afterAll()
+  }
+  
+  val sc: SparkContext = TestHbase.hsc.sparkContext
 
   test("test hbase partitioner") {
     val data = (1 to 40).map { r =>
       val rowKey = Bytes.toBytes(r)
       (rowKey, r)
     }
-    val rdd = TestHbase.sparkContext.parallelize(data, 4)
+    val rdd = TestHbase.hsc.sparkContext.parallelize(data, 4)
     val splitKeys = new ArrayBuffer[HBaseRawType]()
     splitKeys += Array.empty[Byte]
     (1 to 40).filter(_ % 5 == 0).filter(_ != 40).map { r =>
@@ -93,7 +104,7 @@ class HBasePartitionerSuite extends TestBase {
   }
 
   test("test computePredicate in HBasePartition") {
-    val namespace = "testNamespace"
+    val namespace = "default"
     val tableName = "testTable"
     val hbaseTableName = "ht"
     val family1 = "family1"
@@ -220,7 +231,7 @@ class HBasePartitionerSuite extends TestBase {
   }
 
   test("test k = 8 OR k > 8 (k is int)") {
-    val namespace = "testNamespace"
+    val namespace = "default"
     val tableName = "testTable"
     val hbaseTableName = "ht"
     val family1 = "family1"
@@ -254,7 +265,7 @@ class HBasePartitionerSuite extends TestBase {
   }
 
   test("test k < 8 AND k > 8 (k is int)") {
-    val namespace = "testNamespace"
+    val namespace = "default"
     val tableName = "testTable"
     val hbaseTableName = "ht"
     val family1 = "family1"

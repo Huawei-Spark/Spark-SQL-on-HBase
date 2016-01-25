@@ -42,7 +42,6 @@ class CheckDirEndPointImpl
   extends CheckDirProtos.CheckDirService with Coprocessor with CoprocessorService {
 
   private lazy val logger = Logger.getLogger(getClass.getName)
-  private var env: RegionCoprocessorEnvironment = null
 
   override def start(env: CoprocessorEnvironment) = {
     env match {

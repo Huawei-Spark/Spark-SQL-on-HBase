@@ -38,7 +38,7 @@
     <project.version>1.4.0</project.version>
     <spark.version>1.4.0</spark.version>
     <hadoop.version>2.4.0</hadoop.version>
-    <hbase.version>0.98.5-hadoop2</hbase.version>
+    <hbase.version>1.1.2</hbase.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -237,10 +237,6 @@
           <artifactId>netty</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.jruby</groupId>
           <artifactId>jruby-complete</artifactId>
         </exclusion>
@@ -266,10 +262,6 @@
           <artifactId>netty</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.jruby</groupId>
           <artifactId>jruby-complete</artifactId>
         </exclusion>
@@ -293,10 +285,6 @@
           <artifactId>netty</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.jruby</groupId>
           <artifactId>jruby-complete</artifactId>
         </exclusion>
@@ -318,10 +306,6 @@
         <exclusion>
           <groupId>io.netty</groupId>
           <artifactId>netty</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.jruby</groupId>
@@ -347,10 +331,6 @@
         <exclusion>
           <groupId>io.netty</groupId>
           <artifactId>netty</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.jruby</groupId>
@@ -376,10 +356,6 @@
           <artifactId>netty</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.jruby</groupId>
           <artifactId>jruby-complete</artifactId>
         </exclusion>
@@ -401,10 +377,6 @@
         <exclusion>
           <groupId>io.netty</groupId>
           <artifactId>netty</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.jruby</groupId>
@@ -432,10 +404,6 @@
           <artifactId>netty</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.jruby</groupId>
           <artifactId>jruby-complete</artifactId>
         </exclusion>
@@ -457,10 +425,6 @@
         <exclusion>
           <groupId>io.netty</groupId>
           <artifactId>netty</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.jruby</groupId>
@@ -490,10 +454,6 @@
         <exclusion>
           <groupId>io.netty</groupId>
           <artifactId>netty</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.jruby</groupId>
@@ -609,10 +569,6 @@
               <artifactId>netty</artifactId>
             </exclusion>
             <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
-            </exclusion>
-            <exclusion>
               <groupId>org.jruby</groupId>
               <artifactId>jruby-complete</artifactId>
             </exclusion>
@@ -642,10 +598,6 @@
             <exclusion>
               <groupId>io.netty</groupId>
               <artifactId>netty</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
             </exclusion>
             <exclusion>
               <groupId>org.jruby</groupId>
@@ -681,10 +633,6 @@
               <artifactId>netty</artifactId>
             </exclusion>
             <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
-            </exclusion>
-            <exclusion>
               <groupId>org.jruby</groupId>
               <artifactId>jruby-complete</artifactId>
             </exclusion>
@@ -714,10 +662,6 @@
             <exclusion>
               <groupId>io.netty</groupId>
               <artifactId>netty</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
             </exclusion>
             <exclusion>
               <groupId>org.jruby</groupId>
@@ -755,10 +699,6 @@
             <exclusion>
               <groupId>io.netty</groupId>
               <artifactId>netty</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
             </exclusion>
             <exclusion>
               <groupId>org.jruby</groupId>
@@ -809,10 +749,6 @@
               <artifactId>netty</artifactId>
             </exclusion>
             <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
-            </exclusion>
-            <exclusion>
               <groupId>org.jruby</groupId>
               <artifactId>jruby-complete</artifactId>
             </exclusion>
@@ -842,10 +778,6 @@
             <exclusion>
               <groupId>io.netty</groupId>
               <artifactId>netty</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
             </exclusion>
             <exclusion>
               <groupId>org.jruby</groupId>
@@ -881,10 +813,6 @@
               <artifactId>netty</artifactId>
             </exclusion>
             <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
-            </exclusion>
-            <exclusion>
               <groupId>org.jruby</groupId>
               <artifactId>jruby-complete</artifactId>
             </exclusion>
@@ -914,10 +842,6 @@
             <exclusion>
               <groupId>io.netty</groupId>
               <artifactId>netty</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
             </exclusion>
             <exclusion>
               <groupId>org.jruby</groupId>
@@ -955,10 +879,6 @@
             <exclusion>
               <groupId>io.netty</groupId>
               <artifactId>netty</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
             </exclusion>
             <exclusion>
               <groupId>org.jruby</groupId>
@@ -1012,10 +932,6 @@
               <artifactId>netty</artifactId>
             </exclusion>
             <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
-            </exclusion>
-            <exclusion>
               <groupId>org.jruby</groupId>
               <artifactId>jruby-complete</artifactId>
             </exclusion>
@@ -1045,10 +961,6 @@
             <exclusion>
               <groupId>io.netty</groupId>
               <artifactId>netty</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
             </exclusion>
             <exclusion>
               <groupId>org.jruby</groupId>
@@ -1084,10 +996,6 @@
               <artifactId>netty</artifactId>
             </exclusion>
             <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
-            </exclusion>
-            <exclusion>
               <groupId>org.jruby</groupId>
               <artifactId>jruby-complete</artifactId>
             </exclusion>
@@ -1117,10 +1025,6 @@
             <exclusion>
               <groupId>io.netty</groupId>
               <artifactId>netty</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
             </exclusion>
             <exclusion>
               <groupId>org.jruby</groupId>
@@ -1158,10 +1062,6 @@
             <exclusion>
               <groupId>io.netty</groupId>
               <artifactId>netty</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
             </exclusion>
             <exclusion>
               <groupId>org.jruby</groupId>

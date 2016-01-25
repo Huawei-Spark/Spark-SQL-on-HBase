@@ -37,6 +37,8 @@ class HBaseTpcStringFormatMiniTestSuite extends TestBase {
   private[hbase] val csvPath = tpath(0)
 
   override protected def beforeAll() = {
+    super.beforeAll()
+    TestHbase.start
     val hbaseAdmin = TestHbase.hbaseAdmin
 
     /**
@@ -56,7 +58,7 @@ class HBaseTpcStringFormatMiniTestSuite extends TestBase {
     /**
      * drop the existing logical table if it exists
      */
-    if (TestHbase.catalog.checkLogicalTableExist(tableName)) {
+    if (TestHbase.hsc.catalog.tableExists(Seq(tableName))) {
       val dropSql = "DROP TABLE " + tableName
       try {
         runSql(dropSql)
@@ -145,6 +147,8 @@ class HBaseTpcStringFormatMiniTestSuite extends TestBase {
 
   override protected def afterAll() = {
     runSql("DROP TABLE " + tableName)
+    TestHbase.stop
+    super.afterAll()
   }
 
   test("Query 0") {
