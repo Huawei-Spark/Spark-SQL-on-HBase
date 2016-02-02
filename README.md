@@ -14,7 +14,7 @@ Online documentation https://github.com/Huawei-Spark/Spark-SQL-on-HBase/blob/mas
 
 ## Requirements
 
-This version of 1.0.0 requires Spark 1.4.0.
+This version of 1.0.0 requires Spark 1.6.0.
 
 ## Building Spark HBase
 
