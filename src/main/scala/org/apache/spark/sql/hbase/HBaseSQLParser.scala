@@ -16,27 +16,29 @@
  */
 package org.apache.spark.sql.hbase
 
-import org.apache.spark.sql.SQLContext
-import org.apache.spark.sql.catalyst.SqlParser
+import org.apache.spark.sql.{AnalysisException, SQLContext}
+import org.apache.spark.sql.catalyst.util.DataTypeParser
+import org.apache.spark.sql.catalyst.{AbstractSparkSQLParser, SqlParser}
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.execution.RunnableCommand
 import org.apache.spark.sql.hbase.execution._
 import org.apache.spark.sql.types._
+import org.apache.spark.unsafe.types.CalendarInterval
 import org.apache.spark.util.Utils
 
-object HBaseSQLParser {
-  def getKeywords: Seq[String] = {
-    val hbaseSqlFields =
-      Class.forName("org.apache.spark.sql.hbase.HBaseSQLParser").getDeclaredFields
-    val sparkSqlFields = Class.forName("org.apache.spark.sql.catalyst.SqlParser").getDeclaredFields
-    var keywords = hbaseSqlFields.filter(x => x.getName.charAt(0).isUpper).map(_.getName)
-    keywords ++= sparkSqlFields.filter(x => x.getName.charAt(0).isUpper).map(_.getName)
-    keywords.toSeq
-  }
-}
+//object HBaseSQLParser {
+//  def getKeywords: Seq[String] = {
+//    val hbaseSqlFields =
+//      Class.forName("org.apache.spark.sql.hbase.HBaseSQLParser").getDeclaredFields
+//    val sparkSqlFields = Class.forName("org.apache.spark.sql.catalyst.SqlParser").getDeclaredFields
+//    var keywords = hbaseSqlFields.filter(x => x.getName.charAt(0).isUpper).map(_.getName)
+//    keywords ++= sparkSqlFields.filter(x => x.getName.charAt(0).isUpper).map(_.getName)
+//    keywords.toSeq
+//  }
+//}
 
-class HBaseSQLParser extends SqlParser {
+object HBaseSQLParser extends AbstractSparkSQLParser with DataTypeParser {
 
   protected val ADD = Keyword("ADD")
   protected val ALTER = Keyword("ALTER")
@@ -59,8 +61,18 @@ class HBaseSQLParser extends SqlParser {
   protected val VALUES = Keyword("VALUES")
   protected val TERMINATED = Keyword("TERMINATED")
 
+  // Copy from Spark code, due to unable to leverage SqlParser
+  protected val INSERT = Keyword("INSERT")
+  protected val INTO = Keyword("INTO")
+  protected val TABLE = Keyword("TABLE")
+  protected val IN = Keyword("IN")
+  protected val BY = Keyword("BY")
+  protected val INTERVAL = Keyword("INTERVAL")
+  protected val NULL = Keyword("NULL")
+  protected val TRUE = Keyword("TRUE")
+  protected val FALSE = Keyword("FALSE")
+
   override protected lazy val start: Parser[LogicalPlan] =
-    start1 | insert | cte |
       create | drop | alterDrop | alterAdd |
       insertValues | load | show | describe
 
@@ -80,7 +92,7 @@ class HBaseSQLParser extends SqlParser {
       (PRIMARY ~> KEY ~> "(" ~> keys <~ ")" <~ ")") ~
       (MAPPED ~> BY ~> "(" ~> opt(nameSpace)) ~
       (ident <~ ",") ~
-      (COLS ~> "=" ~> "[" ~> expressions <~ "]" <~ ")") ~
+      (COLS ~> "=" ~> "[" ~> mappings <~ "]" <~ ")") ~
       (IN ~> ident).? <~ opt(";") ^^ {
 
       case tableName ~ tableColumns ~ keySeq ~
@@ -88,13 +100,12 @@ class HBaseSQLParser extends SqlParser {
         // Since the lexical can not recognize the symbol "=" as we expected, we compose it
         // to expression first and then translate it into Map[String, (String, String)].
         // TODO: Now get the info by hacking, need to change it into normal way if possible
-        val infoMap: Map[String, (String, String)] =
-          mappingInfo.map { case EqualTo(e1, e2) =>
-            val info = e2.toString().substring(1).split('.')
+        val infoMap =
+          mappingInfo.map (e => {
+            val info = e._2.substring(1).split('.')
             if (info.length != 2) throw new Exception("\nSyntax Error of Create Table")
-            e1.toString().substring(1) ->(info(0), info(1))
-          }.toMap
-
+           (e._1.substring(1),(info(0), info(1)))
+          }).toMap
 
         // Check whether the column info are correct or not
         val tableColSet = tableColumns.unzip._1.toSet
@@ -191,17 +202,17 @@ class HBaseSQLParser extends SqlParser {
   protected lazy val alterAdd: Parser[LogicalPlan] =
     ALTER ~> TABLE ~> ident ~
       (ADD ~> tableCol) ~
-      (MAPPED ~> BY ~> "(" ~> expressions <~ ")") ^^ {
+      (MAPPED ~> BY ~> "(" ~> mappings<~ ")") ^^ {
       case tableName ~ tableColumn ~ mappingInfo =>
         // Since the lexical can not recognize the symbol "=" as we expected, we compose it
         // to expression first and then translate it into Map[String, (String, String)]
         // TODO: Now get the info by hacking, need to change it into normal way if possible
-        val infoMap: Map[String, (String, String)] =
-          mappingInfo.map { case EqualTo(e1, e2) =>
-            val info = e2.toString().substring(1).split('.')
+        val infoMap =
+          mappingInfo.map (e => {
+            val info = e._2.substring(1).split('.')
             if (info.length != 2) throw new Exception("\nSyntax Error of Create Table")
-            e1.toString().substring(1) ->(info(0), info(1))
-          }.toMap
+            (e._1.substring(1),(info(0), info(1)))
+          }).toMap
         val familyAndQualifier = infoMap(tableColumn._1)
 
         AlterAddColCommand(tableName, tableColumn._1, tableColumn._2,
@@ -253,6 +264,23 @@ class HBaseSQLParser extends SqlParser {
       case e1 ~ e2 => (e1, e2.toString.dropRight(4).toUpperCase)
     }
 
+  private def toNarrowestIntegerType(value: String): Any = {
+    val bigIntValue = BigDecimal(value)
+
+    bigIntValue match {
+      case v if bigIntValue.isValidInt => v.toIntExact
+      case v if bigIntValue.isValidLong => v.toLongExact
+      case v => v.underlying()
+    }
+  }
+
+  protected lazy val mappings: Parser[Seq[(String, String)]] = repsep(mapping, ",")
+
+  protected lazy val mapping: Parser[(String, String)] =
+    ident ~ ("=" ~> ident) ^^ {
+      case e1 ~ e2 => (e1, e2)
+    }
+
   protected lazy val nameSpace: Parser[String] = ident <~ "."
 
   protected lazy val tableCols: Parser[Seq[(String, String)]] = repsep(tableCol, ",")
@@ -261,6 +289,148 @@ class HBaseSQLParser extends SqlParser {
 
   protected lazy val values: Parser[Seq[Literal]] = repsep(literal, ",")
 
-  protected lazy val expressions: Parser[Seq[Expression]] = repsep(expression, ",")
+  def parse(input: String): LogicalPlan = synchronized {
+    // Initialize the Keywords.
+    initLexical
+    phrase(start)(new lexical.Scanner(input)) match {
+      case Success(plan, _) => plan
+      case failureOrError => {
+        SqlParser.parse(input)
+      }
+    }
+  }
 
+  // Copy from Spark code, due to unable to leverage SqlParser
+  private def toDecimalOrDouble(value: String): Any = {
+    val decimal = BigDecimal(value)
+    // follow the behavior in MS SQL Server
+    // https://msdn.microsoft.com/en-us/library/ms179899.aspx
+    if (value.contains('E') || value.contains('e')) {
+      decimal.doubleValue()
+    } else {
+      decimal.underlying()
+    }
+  }
+
+  protected lazy val literal: Parser[Literal] =
+    ( numericLiteral
+      | booleanLiteral
+      | stringLit ^^ { case s => Literal.create(s, StringType) }
+      | intervalLiteral
+      | NULL ^^^ Literal.create(null, NullType)
+      )
+
+  private def intervalUnit(unitName: String) = acceptIf {
+    case lexical.Identifier(str) =>
+      val normalized = lexical.normalizeKeyword(str)
+      normalized == unitName || normalized == unitName + "s"
+    case _ => false
+  } {_ => "wrong interval unit"}
+
+  protected lazy val intervalLiteral: Parser[Literal] =
+    ( INTERVAL ~> stringLit <~ intervalKeyword("year") ~ intervalKeyword("to") ~
+      intervalKeyword("month") ^^ { case s =>
+      Literal(CalendarInterval.fromYearMonthString(s))
+    }
+      | INTERVAL ~> stringLit <~ intervalKeyword("day") ~ intervalKeyword("to") ~
+      intervalKeyword("second") ^^ { case s =>
+      Literal(CalendarInterval.fromDayTimeString(s))
+    }
+      | INTERVAL ~> stringLit <~ intervalKeyword("year") ^^ { case s =>
+      Literal(CalendarInterval.fromSingleUnitString("year", s))
+    }
+      | INTERVAL ~> stringLit <~ intervalKeyword("month") ^^ { case s =>
+      Literal(CalendarInterval.fromSingleUnitString("month", s))
+    }
+      | INTERVAL ~> stringLit <~ intervalKeyword("day") ^^ { case s =>
+      Literal(CalendarInterval.fromSingleUnitString("day", s))
+    }
+      | INTERVAL ~> stringLit <~ intervalKeyword("hour") ^^ { case s =>
+      Literal(CalendarInterval.fromSingleUnitString("hour", s))
+    }
+      | INTERVAL ~> stringLit <~ intervalKeyword("minute") ^^ { case s =>
+      Literal(CalendarInterval.fromSingleUnitString("minute", s))
+    }
+      | INTERVAL ~> stringLit <~ intervalKeyword("second") ^^ { case s =>
+      Literal(CalendarInterval.fromSingleUnitString("second", s))
+    }
+      | INTERVAL ~> year.? ~ month.? ~ week.? ~ day.? ~ hour.? ~ minute.? ~ second.? ~
+      millisecond.? ~ microsecond.? ^^ { case year ~ month ~ week ~ day ~ hour ~ minute ~ second ~
+      millisecond ~ microsecond =>
+      if (!Seq(year, month, week, day, hour, minute, second,
+        millisecond, microsecond).exists(_.isDefined)) {
+        throw new AnalysisException(
+          "at least one time unit should be given for interval literal")
+      }
+      val months = Seq(year, month).map(_.getOrElse(0)).sum
+      val microseconds = Seq(week, day, hour, minute, second, millisecond, microsecond)
+        .map(_.getOrElse(0L)).sum
+      Literal(new CalendarInterval(months, microseconds))
+    }
+      )
+
+  protected lazy val month: Parser[Int] =
+    integral <~ intervalUnit("month") ^^ { case num => num.toInt }
+
+  protected lazy val year: Parser[Int] =
+    integral <~ intervalUnit("year") ^^ { case num => num.toInt * 12 }
+
+  protected lazy val microsecond: Parser[Long] =
+    integral <~ intervalUnit("microsecond") ^^ { case num => num.toLong }
+
+  protected lazy val millisecond: Parser[Long] =
+    integral <~ intervalUnit("millisecond") ^^ {
+      case num => num.toLong * CalendarInterval.MICROS_PER_MILLI
+    }
+
+  protected lazy val second: Parser[Long] =
+    integral <~ intervalUnit("second") ^^ {
+      case num => num.toLong * CalendarInterval.MICROS_PER_SECOND
+    }
+
+  protected lazy val minute: Parser[Long] =
+    integral <~ intervalUnit("minute") ^^ {
+      case num => num.toLong * CalendarInterval.MICROS_PER_MINUTE
+    }
+
+  protected lazy val hour: Parser[Long] =
+    integral <~ intervalUnit("hour") ^^ {
+      case num => num.toLong * CalendarInterval.MICROS_PER_HOUR
+    }
+
+  protected lazy val day: Parser[Long] =
+    integral <~ intervalUnit("day") ^^ {
+      case num => num.toLong * CalendarInterval.MICROS_PER_DAY
+    }
+
+  protected lazy val week: Parser[Long] =
+    integral <~ intervalUnit("week") ^^ {
+      case num => num.toLong * CalendarInterval.MICROS_PER_WEEK
+    }
+
+  private def intervalKeyword(keyword: String) = acceptIf {
+    case lexical.Identifier(str) =>
+      lexical.normalizeKeyword(str) == keyword
+    case _ => false
+  } {_ => "wrong interval keyword"}
+
+  protected lazy val sign: Parser[String] = "+" | "-"
+  protected lazy val integral: Parser[String] =
+    sign.? ~ numericLit ^^ { case s ~ n => s.getOrElse("") + n }
+
+  protected lazy val numericLiteral: Parser[Literal] =
+    ( integral  ^^ { case i => Literal(toNarrowestIntegerType(i)) }
+      | sign.? ~ unsignedFloat ^^
+      { case s ~ f => Literal(toDecimalOrDouble(s.getOrElse("") + f)) }
+      )
+
+  protected lazy val booleanLiteral: Parser[Literal] =
+    ( TRUE ^^^ Literal.create(true, BooleanType)
+      | FALSE ^^^ Literal.create(false, BooleanType)
+      )
+
+  protected lazy val unsignedFloat: Parser[String] =
+    ( "." ~> numericLit ^^ { u => "0." + u }
+      | elem("decimal", _.isInstanceOf[lexical.DecimalLit]) ^^ (_.chars)
+      )
 }
