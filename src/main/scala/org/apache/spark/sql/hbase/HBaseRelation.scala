@@ -160,12 +160,18 @@ private[hbase] case class HBaseRelation(
   logger.debug(s"HBaseRelation config has zkPort="
     + s"${getConf.get("hbase.zookeeper.property.clientPort")}")
 
-  @transient lazy val connection_ =
+  @transient var internal_connection : Connection = _
+  
+  def connection_ = {
     if (connection == null) {
-      ConnectionFactory.createConnection(getConf)
+      if (internal_connection == null) {
+        internal_connection = ConnectionFactory.createConnection(getConf)
+      }
+      internal_connection
     } else {
       connection
     }
+  }
 
   @transient private var htable_ : Table = _
 
@@ -188,10 +194,14 @@ private[hbase] case class HBaseRelation(
     refs.indexWhere(_.exprId == partitionKeys(keyIndex).exprId)
   }
 
-  def closeHTable() = {
+  def close() = {
     if (htable_ != null) {
       htable_.close()
       htable_ = null
+    }
+    if (connection == null && internal_connection != null) {
+      internal_connection.close()
+      internal_connection = null
     }
   }
 
@@ -712,7 +722,7 @@ private[hbase] case class HBaseRelation(
     if (puts.nonEmpty) {
       htable.put(puts.toList)
     }
-    closeHTable()
+    close()
   }
 
 

@@ -29,8 +29,7 @@ object TestHbase {
   def hsc: HBaseSQLContext = {
     if (hsc_ == null) {
       hsc_ = new HBaseSQLContext(new SparkContext("local", "TestSQLContext", new SparkConf(true)
-        .set("spark.hadoop.hbase.zookeeper.quorum", "localhost")
-        .set("spark.hadoop.dfs.replication", "1")))
+        .set("spark.hadoop.hbase.zookeeper.quorum", "localhost")))
     }
     hsc_
   }
@@ -50,6 +49,7 @@ object TestHbase {
 
   def stop: Unit = {
     hsc_.catalog.stopAdmin()
+    hsc_.catalog.connection.close()
     hsc.sparkContext.stop()
     hsc_ = null
     testUtil.cleanupDataTestDirOnTestFS()

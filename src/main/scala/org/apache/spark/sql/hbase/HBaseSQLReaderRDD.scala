@@ -194,7 +194,7 @@ class HBaseSQLReaderRDD(val relation: HBaseRelation,
       def close() = {
         try {
           scanner.close()
-          relation.closeHTable()
+          relation.close()
         } catch {
           case e: Exception => logWarning("Exception in scanner.close", e)
         }

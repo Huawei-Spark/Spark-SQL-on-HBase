@@ -284,7 +284,7 @@ case class BulkLoadIntoTableCommand(
           if (recordsWritten > 0) {
             load.doBulkLoad(targetPath, relation.connection_.getAdmin, relation.htable,
               relation.connection_.getRegionLocator(relation.hTableName))
-            relation.closeHTable()
+            relation.close()
           }
         }
         1
@@ -304,7 +304,7 @@ case class BulkLoadIntoTableCommand(
       load.doBulkLoad(tablePath, relation.connection_.getAdmin, relation.htable,
       relation.connection_.getRegionLocator(relation.hTableName))
     }
-    relation.closeHTable()
+    relation.close()
     logDebug(s"finish BulkLoad on table ${relation.htable.getName}:" +
       s" ${System.currentTimeMillis()}")
     Seq.empty[Row]

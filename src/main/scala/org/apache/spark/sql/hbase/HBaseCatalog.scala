@@ -181,6 +181,7 @@ private[hbase] class HBaseCatalog(@transient hbaseContext: SQLContext,
             """The directory of a certain regionserver is not accessible,
             |please add 'cd ~' before 'start regionserver' in your regionserver start script.""")
         }
+        metadataTable.close()
       } else {
         deploySuccessfully_internal = Some(true)
       }
