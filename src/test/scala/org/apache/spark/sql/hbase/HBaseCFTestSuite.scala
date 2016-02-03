@@ -40,24 +40,23 @@ class HBaseCFTestSuite extends TestBase {
      * create hbase table if it does not exists
      */
     super.beforeAll()
-    TestHbase.start
-    if (!TestHbase.hsc.catalog.tableExists(Seq(hbaseTableName))) {
+    if (!TestHbase.catalog.tableExists(Seq(hbaseTableName))) {
       val descriptor = new HTableDescriptor(TableName.valueOf(tableName))
       hbaseFamilies.foreach { f => descriptor.addFamily(new HColumnDescriptor(f))}
       try {
-        TestHbase.hsc.catalog.admin.createTable(descriptor)
+        TestHbase.catalog.admin.createTable(descriptor)
       } catch {
         case e: TableExistsException =>
           logError(s"Table already exists $tableName", e)
       } finally {
-        TestHbase.hsc.catalog.stopAdmin()
+        TestHbase.catalog.stopAdmin()
       }
     }
 
     /**
      * drop the existing logical table if it exists
      */
-    if (TestHbase.hsc.catalog.tableExists(Seq(tableName))) {
+    if (TestHbase.catalog.tableExists(Seq(tableName))) {
       val dropSql = "DROP TABLE " + tableName
       try {
         runSql(dropSql)
@@ -106,7 +105,6 @@ class HBaseCFTestSuite extends TestBase {
 
   override protected def afterAll() = {
     runSql(s"DROP TABLE $tableName")
-    TestHbase.stop
     super.afterAll()
   }
 

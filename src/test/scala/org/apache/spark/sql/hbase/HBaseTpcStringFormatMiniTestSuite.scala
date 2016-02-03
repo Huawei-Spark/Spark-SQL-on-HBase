@@ -38,7 +38,6 @@ class HBaseTpcStringFormatMiniTestSuite extends TestBase {
 
   override protected def beforeAll() = {
     super.beforeAll()
-    TestHbase.start
     val hbaseAdmin = TestHbase.hbaseAdmin
 
     /**
@@ -58,7 +57,7 @@ class HBaseTpcStringFormatMiniTestSuite extends TestBase {
     /**
      * drop the existing logical table if it exists
      */
-    if (TestHbase.hsc.catalog.tableExists(Seq(tableName))) {
+    if (TestHbase.catalog.tableExists(Seq(tableName))) {
       val dropSql = "DROP TABLE " + tableName
       try {
         runSql(dropSql)
@@ -147,7 +146,6 @@ class HBaseTpcStringFormatMiniTestSuite extends TestBase {
 
   override protected def afterAll() = {
     runSql("DROP TABLE " + tableName)
-    TestHbase.stop
     super.afterAll()
   }
 

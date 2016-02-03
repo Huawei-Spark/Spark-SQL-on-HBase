@@ -36,20 +36,17 @@ class TestBaseWithSplitData extends TestBase {
   val HbaseTableName = TableName.valueOf("ht")
   val Metadata_Table = TableName.valueOf("metadata")
   var alreadyInserted = false
-  var hsc: HBaseSQLContext = _
 
   override protected def beforeAll() = {
     super.beforeAll()
-    TestHbase.start
-    hsc = TestHbase.hsc
     setupData(useMultiplePartitions = true, needInsertData = true)
+    TestData
   }
 
   override protected def afterAll() = {
     runSql("DROP TABLE " + TableName_a)
     runSql("DROP TABLE " + TableName_b)
     dropNativeHbaseTable("ht")
-    TestHbase.stop
     super.afterAll()
   }
 
@@ -88,7 +85,7 @@ class TestBaseWithSplitData extends TestBase {
         null
       }
 
-      hsc.catalog.createTable(TableName_a, null,
+      TestHbase.catalog.createTable(TableName_a, null,
         HbaseTableName.getNameAsString, allColumns, splitKeys)
 
       runSql( s"""CREATE TABLE $TableName_b(col1 STRING, col2 BYTE, col3 SHORT, col4 INTEGER,
@@ -123,7 +120,7 @@ class TestBaseWithSplitData extends TestBase {
         case (rowValue, rowType, colFamily, colQualifier) =>
           addRowVals(put, rowValue, rowType, colFamily, colQualifier)
       }
-      val htable = hsc.catalog.connection.getTable(HbaseTableName)
+      val htable = new HTable(TestHbase.sparkContext.hadoopConfiguration, HbaseTableName)
       htable.put(put)
       htable.close()
     }

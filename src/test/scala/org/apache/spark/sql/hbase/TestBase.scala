@@ -100,7 +100,7 @@ abstract class TestBase
 
   def runSql(sql: String): Array[Row] = {
     logInfo(sql)
-    TestHbase.hsc.sql(sql).collect()
+    TestHbase.sql(sql).collect()
   }
 
   override protected def afterAll(): Unit = {

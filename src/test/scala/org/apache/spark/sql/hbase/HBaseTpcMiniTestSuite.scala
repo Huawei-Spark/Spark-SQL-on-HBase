@@ -40,12 +40,11 @@ class HBaseTpcMiniTestSuite extends TestBase {
      * create hbase table if it does not exists
      */
     super.beforeAll()
-    TestHbase.start
-    if (!TestHbase.hsc.catalog.admin.tableExists(TableName.valueOf(hbaseTableName))) {
+    if (!TestHbase.catalog.admin.tableExists(TableName.valueOf(hbaseTableName))) {
       val descriptor = new HTableDescriptor(TableName.valueOf(tableName))
       hbaseFamilies.foreach { f => descriptor.addFamily(new HColumnDescriptor(f))}
       try {
-        TestHbase.hsc.catalog.admin.createTable(descriptor)
+        TestHbase.catalog.admin.createTable(descriptor)
       } catch {
         case e: TableExistsException =>
           logError(s"Table already exists $tableName", e)
@@ -57,7 +56,7 @@ class HBaseTpcMiniTestSuite extends TestBase {
     /**
      * drop the existing logical table if it exists
      */
-    if (TestHbase.hsc.catalog.tableExists(Seq(tableName))) {
+    if (TestHbase.catalog.tableExists(Seq(tableName))) {
       val dropSql = "DROP TABLE " + tableName
       try {
         runSql(dropSql)
@@ -143,7 +142,6 @@ class HBaseTpcMiniTestSuite extends TestBase {
 
   override protected def afterAll() = {
     runSql("DROP TABLE " + tableName)
-    TestHbase.stop
     super.afterAll()
   }
 
@@ -199,6 +197,20 @@ class HBaseTpcMiniTestSuite extends TestBase {
     val sql = "SELECT ss_item_sk, ss_ticket_number, sum(ss_wholesale_cost) as sum_wholesale_cost FROM store_sales WHERE ss_item_sk > 4000 AND ss_item_sk <= 5000 GROUP BY ss_item_sk, ss_ticket_number"
     val rows = runSql(sql)
     assert(rows.length == 5)
+  }
+
+  test("Query 7.1") {
+    val sql =
+      s"""SELECT ss_item_sk, ss_ticket_number, sum(ss_wholesale_cost) as sum_wholesale_cost
+         |FROM store_sales
+         |WHERE ss_item_sk > 17182
+         |AND ss_item_sk <= 17183
+         |GROUP BY ss_item_sk, ss_ticket_number""".stripMargin
+    val rows = runSql(sql)
+    assert(rows.length == 1)
+    assert(rows(0)(0) == 17183)
+    assert(rows(0)(1) == 6)
+    assert(rows(0)(2) == 0.0) // should not be null
   }
 
   test("Query 8") {

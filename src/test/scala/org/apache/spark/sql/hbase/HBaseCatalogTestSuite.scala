@@ -18,7 +18,6 @@ package org.apache.spark.sql.hbase
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase._
-import org.apache.hadoop.hbase.client.{ConnectionFactory}
 import org.apache.spark.sql.catalyst.expressions.GenericRow
 import org.apache.spark.sql.catalyst.plans.logical.Subquery
 import org.apache.spark.sql.hbase.util.HBaseKVHelper
@@ -26,22 +25,8 @@ import org.apache.spark.sql.sources.LogicalRelation
 import org.apache.spark.sql.types._
 
 class HBaseCatalogTestSuite extends TestBase {
-  var catalog: HBaseCatalog = _
-  var configuration: Configuration = _
-  override def beforeAll() = {
-    super.beforeAll()
-    TestHbase.start
-    catalog = TestHbase.hsc.catalog
-    configuration = TestHbase.hsc.sparkContext.hadoopConfiguration
-  }
+  val (catalog, configuration) = (TestHbase.catalog, TestHbase.sparkContext.hadoopConfiguration)
 
-  override def afterAll() = {
-    catalog = null
-    configuration = null
-    TestHbase.stop
-    super.afterAll()
-  }
-  
   test("Create Table") {
     // prepare the test data
     val namespace = "default"

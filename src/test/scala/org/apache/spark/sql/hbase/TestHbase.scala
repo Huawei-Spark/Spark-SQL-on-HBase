@@ -17,52 +17,30 @@
 
 package org.apache.spark.sql.hbase
 
-import org.apache.hadoop.hbase.client.{ConnectionFactory}
 import org.apache.hadoop.hbase.{HBaseTestingUtility, MiniHBaseCluster}
 import org.apache.spark.{SparkConf, SparkContext}
 
 
-object TestHbase {
+object TestHbase extends HBaseSQLContext(
+  new SparkContext("local", "TestSQLContext", new SparkConf(true)
+    .set("spark.hadoop.hbase.zookeeper.quorum", "localhost"))) {
 
-  private var hsc_ : HBaseSQLContext = _
+  @transient val testUtil: HBaseTestingUtility =
+    new HBaseTestingUtility(sparkContext.hadoopConfiguration)
 
-  def hsc: HBaseSQLContext = {
-    if (hsc_ == null) {
-      hsc_ = new HBaseSQLContext(new SparkContext("local", "TestSQLContext", new SparkConf(true)
-        .set("spark.hadoop.hbase.zookeeper.quorum", "localhost")))
-    }
-    hsc_
-  }
+  testUtil.startMiniZKCluster
+  logDebug(s"Spin up hbase minicluster with 1 master, 1 RS, 1 dataNode")
 
-  @transient var testUtil: HBaseTestingUtility = _
+  @transient val cluster: MiniHBaseCluster = testUtil.startMiniHBaseCluster(1, 1)
+  logInfo(s"Started HBaseMiniCluster with regions = ${cluster.countServedRegions}")
 
-  def start: Unit = {
-    // testUtil = new HBaseTestingUtility(hsc.sparkContext.hadoopConfiguration)
-    testUtil = new HBaseTestingUtility(hsc.sparkContext.hadoopConfiguration)
-    testUtil.startMiniZKCluster
-    testUtil.startMiniHBaseCluster(1, 1)
-    // The following operation will initialize the HBaseCatalog.
-    // And it should be done after starting MiniHBaseCluster
-    hsc.catalog.deploySuccessfully_internal = Some(true)
-    hsc.catalog.pwdIsAccessible = true
-  }
+  logInfo(s"Configuration zkPort="
+    + s"${sparkContext.hadoopConfiguration.get("hbase.zookeeper.property.clientPort")}")
 
-  def stop: Unit = {
-    hsc_.catalog.stopAdmin()
-    hsc_.catalog.connection.close()
-    hsc.sparkContext.stop()
-    hsc_ = null
-    testUtil.cleanupDataTestDirOnTestFS()
-    testUtil.cleanupTestDir()
-    testUtil.shutdownMiniCluster()
-    testUtil.shutdownMiniZKCluster()
-    testUtil = null
-  }
+  // The following operation will initialize the HBaseCatalog.
+  // And it should be done after starting MiniHBaseCluster
+  catalog.deploySuccessfully_internal = Some(true)
+  catalog.pwdIsAccessible = true
 
-  /*
-  hsc.logInfo(s"Configuration zkPort="
-    + s"${hsc.sparkContext.hadoopConfiguration.get("hbase.zookeeper.property.clientPort")}")
-*/
-
-  def hbaseAdmin = hsc.catalog.admin
+  def hbaseAdmin = catalog.admin
 }

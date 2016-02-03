@@ -23,22 +23,21 @@ import org.apache.spark.sql.catalyst.plans.logical
 
 case class TestData(k: Int, v: String)
 
-class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
+object TestData {
+  import TestHbase.implicits._
 
-  import hsc._
-  import hsc.implicits._
-  val testData = sparkContext.parallelize(
+  val testData = TestHbase.sparkContext.parallelize(
     (1 to 100).map(i => TestData(i, i.toString))).toDF()
   testData.registerTempTable("testData")
 
-  val negativeData = sparkContext.parallelize(
+  val negativeData = TestHbase.sparkContext.parallelize(
     (1 to 100).map(i => TestData(-i, (-i).toString))).toDF()
   negativeData.registerTempTable("negativeData")
 
   case class LargeAndSmallInts(a: Int, b: Int)
 
   val largeAndSmallInts =
-    sparkContext.parallelize(
+    TestHbase.sparkContext.parallelize(
       LargeAndSmallInts(2147483644, 1) ::
         LargeAndSmallInts(1, 2) ::
         LargeAndSmallInts(2147483645, 1) ::
@@ -50,7 +49,7 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
   case class TestData2(a: Int, b: Int)
 
   val testData2 =
-    sparkContext.parallelize(
+    TestHbase.sparkContext.parallelize(
       TestData2(1, 1) ::
         TestData2(1, 2) ::
         TestData2(2, 1) ::
@@ -62,7 +61,7 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
   case class DecimalData(a: BigDecimal, b: BigDecimal)
 
   val decimalData =
-    sparkContext.parallelize(
+    TestHbase.sparkContext.parallelize(
       DecimalData(1, 1) ::
         DecimalData(1, 2) ::
         DecimalData(2, 1) ::
@@ -74,7 +73,7 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
   case class BinaryData(a: Array[Byte], b: Int)
 
   val binaryData =
-    sparkContext.parallelize(
+    TestHbase.sparkContext.parallelize(
       BinaryData("12".getBytes, 1) ::
         BinaryData("22".getBytes, 5) ::
         BinaryData("122".getBytes, 3) ::
@@ -85,7 +84,7 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
   case class TestData3(a: Int, b: Option[Int])
 
   val testData3 =
-    sparkContext.parallelize(
+    TestHbase.sparkContext.parallelize(
       TestData3(1, None) ::
         TestData3(2, Some(2)) :: Nil).toDF()
   testData3.registerTempTable("testData3")
@@ -95,7 +94,7 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
   case class UpperCaseData(N: Int, L: String)
 
   val upperCaseData =
-    sparkContext.parallelize(
+    TestHbase.sparkContext.parallelize(
       UpperCaseData(1, "A") ::
         UpperCaseData(2, "B") ::
         UpperCaseData(3, "C") ::
@@ -107,7 +106,7 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
   case class LowerCaseData(n: Int, l: String)
 
   val lowerCaseData =
-    sparkContext.parallelize(
+    TestHbase.sparkContext.parallelize(
       LowerCaseData(1, "a") ::
         LowerCaseData(2, "b") ::
         LowerCaseData(3, "c") ::
@@ -117,7 +116,7 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
   case class ArrayData(dt: Seq[Int], nestedData: Seq[Seq[Int]])
 
   val arrayData =
-    sparkContext.parallelize(
+    TestHbase.sparkContext.parallelize(
       ArrayData(Seq(1, 2, 3), Seq(Seq(1, 2, 3))) ::
         ArrayData(Seq(2, 3, 4), Seq(Seq(2, 3, 4))) :: Nil)
   arrayData.toDF().registerTempTable("arrayData")
@@ -125,7 +124,7 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
   case class MapData(data: scala.collection.Map[Int, String])
 
   val mapData =
-    sparkContext.parallelize(
+    TestHbase.sparkContext.parallelize(
       MapData(Map(1 -> "a1", 2 -> "b1", 3 -> "c1", 4 -> "d1", 5 -> "e1")) ::
         MapData(Map(1 -> "a2", 2 -> "b2", 3 -> "c2", 4 -> "d2")) ::
         MapData(Map(1 -> "a3", 2 -> "b3", 3 -> "c3")) ::
@@ -136,11 +135,11 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
   case class StringData(s: String)
 
   val repeatedData =
-    sparkContext.parallelize(List.fill(2)(StringData("test"))).toDF()
+    TestHbase.sparkContext.parallelize(List.fill(2)(StringData("test"))).toDF()
   repeatedData.registerTempTable("repeatedData")
 
   val nullableRepeatedData =
-    sparkContext.parallelize(
+    TestHbase.sparkContext.parallelize(
       List.fill(2)(StringData(null)) ++
         List.fill(2)(StringData("test"))).toDF()
   nullableRepeatedData.registerTempTable("nullableRepeatedData")
@@ -148,7 +147,7 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
   case class NullInts(a: Integer)
 
   val nullInts =
-    sparkContext.parallelize(
+    TestHbase.sparkContext.parallelize(
       NullInts(1) ::
         NullInts(2) ::
         NullInts(3) ::
@@ -157,7 +156,7 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
   nullInts.registerTempTable("nullInts")
 
   val allNulls =
-    sparkContext.parallelize(
+    TestHbase.sparkContext.parallelize(
       NullInts(null) ::
         NullInts(null) ::
         NullInts(null) ::
@@ -167,7 +166,7 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
   case class NullStrings(n: Int, s: String)
 
   val nullStrings =
-    sparkContext.parallelize(
+    TestHbase.sparkContext.parallelize(
       NullStrings(1, "abc") ::
         NullStrings(2, "ABC") ::
         NullStrings(3, null) :: Nil).toDF()
@@ -175,10 +174,10 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
 
   case class TableName(tableName: String)
 
-  sparkContext.parallelize(TableName("test") :: Nil).toDF().registerTempTable("tableName")
+  TestHbase.sparkContext.parallelize(TableName("test") :: Nil).toDF().registerTempTable("tableName")
 
   val unparsedStrings =
-    sparkContext.parallelize(
+    TestHbase.sparkContext.parallelize(
       "1, A1, true, null" ::
         "2, B2, false, null" ::
         "3, C3, true, null" ::
@@ -186,7 +185,7 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
 
   case class TimestampField(time: Timestamp)
 
-  val timestamps = sparkContext.parallelize((1 to 3).map { i =>
+  val timestamps = TestHbase.sparkContext.parallelize((1 to 3).map { i =>
     TimestampField(new Timestamp(i))
   }).toDF()
   timestamps.registerTempTable("timestamps")
@@ -194,18 +193,18 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
   case class IntField(i: Int)
 
   // An RDD with 4 elements and 8 partitions
-  val withEmptyParts = sparkContext.parallelize((1 to 4).map(IntField), 8).toDF()
+  val withEmptyParts = TestHbase.sparkContext.parallelize((1 to 4).map(IntField), 8).toDF()
   withEmptyParts.registerTempTable("withEmptyParts")
 
   case class Person(id: Int, name: String, age: Int)
 
   case class Salary(personId: Int, salary: Double)
 
-  val person = sparkContext.parallelize(
+  val person = TestHbase.sparkContext.parallelize(
     Person(0, "mike", 30) ::
       Person(1, "jim", 20) :: Nil)
   person.toDF().registerTempTable("person")
-  val salary = sparkContext.parallelize(
+  val salary = TestHbase.sparkContext.parallelize(
     Salary(0, 2000.0) ::
       Salary(1, 1000.0) :: Nil).toDF()
   salary.registerTempTable("salary")
@@ -213,7 +212,7 @@ class TestDataStore(@transient val hsc: HBaseSQLContext) extends Serializable {
   case class ComplexData(m: Map[Int, String], s: TestData, a: Seq[Int], b: Boolean)
 
   val complexData =
-    sparkContext.parallelize(
+    TestHbase.sparkContext.parallelize(
       ComplexData(Map(1 -> "1"), TestData(1, "1"), Seq(1), b = true)
         :: ComplexData(Map(2 -> "2"), TestData(2, "2"), Seq(2), b = false)
         :: Nil).toDF()
