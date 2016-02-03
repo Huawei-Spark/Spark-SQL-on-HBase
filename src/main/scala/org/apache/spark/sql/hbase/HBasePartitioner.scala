@@ -27,7 +27,7 @@ object HBasePartitioner {
   }
 }
 
-class HBasePartitioner (var splitKeys: Array[HBaseRawType]) extends Partitioner {
+class HBasePartitioner (val splitKeys: Array[HBaseRawType]) extends Partitioner {
   import HBasePartitioner.HBaseRawOrdering
 
   type t = HBaseRawType
