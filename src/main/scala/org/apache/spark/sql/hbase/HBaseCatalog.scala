@@ -129,17 +129,6 @@ private[hbase] class HBaseCatalog(@transient hbaseContext: SQLContext,
     admin.createTable(tableDescriptor, splitKeys)
   }
 
-  def enableCoprocessor(hbaseTableName: TableName): Unit = {
-    if (deploySuccessfully.get) {
-      val td = admin.getTableDescriptor(hbaseTableName)
-      td.addCoprocessor(
-        "org.apache.spark.sql.hbase.SparkSqlRegionObserver",
-        null, Coprocessor.PRIORITY_USER, null)
-    } else {
-      throw new Exception(s"$hbaseTableName has not been deployed successfully")
-    }
-  }
-
   def hasCoprocessor(hbaseTableName: TableName): Boolean = {
     val hTableDescriptor = admin.getTableDescriptor(hbaseTableName)
     hTableDescriptor.hasCoprocessor("org.apache.spark.sql.hbase.SparkSqlRegionObserver")
