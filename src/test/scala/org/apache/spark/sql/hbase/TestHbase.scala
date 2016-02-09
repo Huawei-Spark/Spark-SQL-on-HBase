@@ -22,7 +22,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 
 object TestHbase extends HBaseSQLContext(
-  new SparkContext("local", "TestSQLContext", new SparkConf(true)
+  new SparkContext("local[2]", "TestSQLContext", new SparkConf(true)
     .set("spark.hadoop.hbase.zookeeper.quorum", "localhost"))) {
 
   @transient val testUtil: HBaseTestingUtility =
