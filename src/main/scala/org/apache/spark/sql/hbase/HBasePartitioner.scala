@@ -39,11 +39,11 @@ class HBasePartitioner (val splitKeys: Array[HBaseRawType]) extends Partitioner 
   // we will miss the last region's date when bulk load
   lazy private val realSplitKeys = if (splitKeys.isEmpty) splitKeys else splitKeys.tail
 
-  def numPartitions = if (len == 0) 1 else len
+  override def numPartitions = if (len == 0) 1 else len
 
   @transient private lazy val binarySearch: ((Array[t], t) => Int) = CollectionsUtils.makeBinarySearch[t]
 
-  def getPartition(key: Any): Int = {
+  override def getPartition(key: Any): Int = {
     val k = key.asInstanceOf[t]
     var partition = 0
     if (len <= 128 && len > 0) {
