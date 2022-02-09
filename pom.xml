@@ -37,7 +37,7 @@
     <sbt.project.name>hbase</sbt.project.name>
     <project.version>1.4.0</project.version>
     <spark.version>1.4.0</spark.version>
-    <hadoop.version>2.4.0</hadoop.version>
+    <hadoop.version>2.10.1</hadoop.version>
     <hbase.version>0.98.5-hadoop2</hbase.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
